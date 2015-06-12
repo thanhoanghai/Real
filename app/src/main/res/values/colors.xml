@@ -1,27 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="cyan">#3CD7D1</color>
-    <color name="darker_cyan">#14AFA9</color>
+    <color name="cyan">#2DD7D0</color>
+    <color name="darker_cyan">#00AFA8</color>
+    <color name="tab_item_divider">#0ABDB6</color>
     <color name="transparent">#00000000</color>
     <color name="black">#000000</color>
     <color name="white">#ffffff</color>
-    <color name="tabbar_bg">#ECECEF</color>
-    <color name="tabbar_border">#D9D9DC</color>
-    <color name="menu_selected">#16A79A</color>
-    <color name="fragment_bg">#F5F5F5</color>
-    <color name="menu_text_gray">#919191</color>
+    <color name="trans_gray">#227D7D7D</color>
     <color name="text_gray">#606060</color>
-    <color name="list_item_selector">#B2B5BA</color>
-    <color name="orange">#FC8C38</color>
-    <color name="section_header">#FBFBFB</color>
-    <color name="trans_black">#88000000</color>
-    <color name="filter_bar">#46B7AC</color>
-    <color name="lighter_white">#f4f4f4</color>
-    <color name="lighter_gray">#E9EAED</color>
-    <color name="peter_river">#3498db</color>
-    <color name="belize_hole">#2980b9</color>
-    <color name="turquoise">#1abc9c</color>
-    <color name="green_sea">#16a085</color>
+    <color name="highlight_gray">#F3F3F3</color>
 
 </resources>
