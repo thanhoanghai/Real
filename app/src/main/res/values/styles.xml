@@ -1,20 +1,10 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <item name="actionBarStyle">@style/MyActionBar</item>
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:windowBackground">@color/white</item>
         <item name="actionBarItemBackground">@drawable/selector_action_bar_item_bg</item>
         <item name="android:itemBackground">@drawable/selector_action_bar_overflow_item_bg</item>
-    </style>
-
-    <!-- ActionBar styles -->
-    <style name="MyActionBar" parent="@style/Widget.AppCompat.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/cyan</item>
-
-        <!-- Support library compatibility -->
-        <item name="background">@color/cyan</item>
-
     </style>
 
 </resources>

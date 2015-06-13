@@ -4,8 +4,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="asdasd" />
+    <com.synova.realestate.customviews.FilterSegmentsBar
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.synova.realestate.customviews.CustomSwipeRefreshLayout
+        android:id="@+id/tab_grid_swipeRefreshLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/tab_grid_rvItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical" />
+    </com.synova.realestate.customviews.CustomSwipeRefreshLayout>
 </LinearLayout>

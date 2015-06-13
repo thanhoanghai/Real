@@ -1,51 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.synova.realestate.customviews.ReclickableTabHost xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@android:id/tabhost"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <LinearLayout
-        android:id="@+id/root_view_container"
+    <com.synova.realestate.customviews.AdsImageView
+        android:id="@+id/adsImageView"
+        android:layout_width="match_parent"
+        android:layout_height="60dp" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_below="@+id/adsImageView"
+        android:background="@color/cyan"
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <com.synova.realestate.customviews.ReclickableTabHost
+        android:id="@android:id/tabhost"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_below="@+id/toolbar">
 
-        <FrameLayout
-            android:id="@android:id/tabcontent"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_weight="0" />
-
-        <android.support.v4.widget.DrawerLayout
-            android:id="@+id/drawer_layout"
+        <LinearLayout
+            android:id="@+id/root_view_container"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <FrameLayout
-                android:id="@+id/container"
-                android:layout_width="fill_parent"
-                android:layout_height="match_parent" />
+                android:id="@android:id/tabcontent"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="0" />
 
-            <android.support.design.widget.NavigationView
-                android:id="@+id/navigation_view"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="start"
+            <android.support.v4.widget.DrawerLayout
+                android:id="@+id/drawer_layout"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1">
+
+                <FrameLayout
+                    android:id="@+id/container"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent" />
+
+                <android.support.design.widget.NavigationView
+                    android:id="@+id/navigation_view"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="start"
+                    android:background="@color/cyan"
+                    app:itemTextColor="@color/white"
+                    app:menu="@menu/drawer" />
+            </android.support.v4.widget.DrawerLayout>
+
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:background="@color/cyan"
-                app:itemTextColor="@color/white"
-                app:menu="@menu/drawer" />
-        </android.support.v4.widget.DrawerLayout>
+                android:divider="@drawable/shape_tab_item_divider"
+                android:dividerPadding="0dp"
+                android:orientation="horizontal" />
+        </LinearLayout>
 
-        <TabWidget
-            android:id="@android:id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/cyan"
-            android:divider="@drawable/shape_tab_item_divider"
-            android:dividerPadding="0dp"
-            android:orientation="horizontal" />
-    </LinearLayout>
+    </com.synova.realestate.customviews.ReclickableTabHost>
 
-</com.synova.realestate.customviews.ReclickableTabHost>
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="3dp"
+        android:layout_below="@+id/toolbar"
+        android:background="@drawable/shape_action_bar_shadow" />
+</RelativeLayout>
+

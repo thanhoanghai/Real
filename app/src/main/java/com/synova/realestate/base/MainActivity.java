@@ -11,6 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.PopupMenu;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TabHost;
 
 import com.synova.realestate.R;
+import com.synova.realestate.customviews.AdsImageView;
 import com.synova.realestate.customviews.ReclickableTabHost;
 import com.synova.realestate.fragments.TabGridFragment;
 
@@ -39,14 +41,25 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
     private ActionBar actionBar;
     private PopupMenu popupMenu;
 
+    private AdsImageView adsView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-         setupActionBar();
-         setupDrawer();
+        setupActionBar();
+        setupDrawer();
         setupTabHost();
+
+        adsView = (AdsImageView) findViewById(R.id.adsImageView);
+        adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
+        adsView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Snackbar.make(adsView, "You've clicked ads banner!", Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -56,6 +69,9 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
     }
 
     private void setupActionBar() {
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
         actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);

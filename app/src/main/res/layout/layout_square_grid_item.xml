@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.synova.realestate.customviews.SquareRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/selector_grid_item_bg"
+    android:padding="4dp">
+
+    <ImageView
+        android:id="@+id/grid_item_ivPhoto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:src="@drawable/image_defaulft" />
+
+    <TextView
+        android:id="@+id/grid_item_tvPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:background="@color/cyan"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:text="750$"
+        android:textColor="@color/white"
+        android:textSize="12sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="1px"
+        android:layout_marginRight="1px"
+        android:background="@drawable/shape_bottom_gradient"
+        android:orientation="vertical"
+        android:padding="4dp">
+
+        <TextView
+            android:id="@+id/grid_item_tvTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:singleLine="true"
+            android:text="St Raphael"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/grid_item_tvDescription"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:gravity="center"
+            android:paddingTop="1dp"
+            android:singleLine="true"
+            android:text="2 piece(s) | 35 m2 | 300 m"
+            android:textColor="@color/white"
+            android:textSize="8sp" />
+    </LinearLayout>
+
+</com.synova.realestate.customviews.SquareRelativeLayout>

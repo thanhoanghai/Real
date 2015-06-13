@@ -12,6 +12,8 @@ public class Constants {
     public static final String DATE_ONLY_PATTERN = "dd/MM/yyyy";
     public static final String TIME_ONLY_PATTERN = "HH:mm";
 
+    public static final int HOUSE_PRICE_LIMIT = 10000;
+
     public enum TabBar {
         GRID, LIST, LOCATION, ALERT, FAVORITE
     }
@@ -30,5 +32,9 @@ public class Constants {
             this.transitionInResId = transitionInResId;
             this.transitionOutResId = transitionOutResId;
         }
+    }
+
+    public enum ListLoadingState {
+        NONE, SWIPE_REFRESH, LOAD_MORE
     }
 }
