@@ -17,6 +17,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.models.House;
+import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,7 +25,8 @@ import java.util.List;
 /**
  * Created by ducth on 6/13/15.
  */
-public class HouseAdapter extends RecyclerView.Adapter<HouseAdapter.HouseViewHolder> implements
+public class HouseListAdapter extends RecyclerView.Adapter<HouseListAdapter.HouseViewHolder>
+        implements
         View.OnClickListener {
 
     private List<House> houses = new ArrayList<>();
@@ -59,7 +61,7 @@ public class HouseAdapter extends RecyclerView.Adapter<HouseAdapter.HouseViewHol
     @Override
     public HouseViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         View view = LayoutInflater.from(viewGroup.getContext()).inflate(
-                R.layout.layout_square_grid_item, viewGroup, false);
+                R.layout.layout_tab_list_item, viewGroup, false);
         view.setOnClickListener(this);
         return new HouseViewHolder(view);
     }
@@ -69,8 +71,8 @@ public class HouseAdapter extends RecyclerView.Adapter<HouseAdapter.HouseViewHol
         House house = houses.get(i);
 
         ImageLoader.getInstance().displayImage(house.photo, holder.ivPhoto);
-        holder.tvPrice
-                .setText(house.price <= Constants.HOUSE_PRICE_LIMIT ? house.price + "€" : "€");
+        holder.tvPrice.setText(house.price <= Constants.HOUSE_PRICE_LIMIT ? Util
+                .formatPriceNumber(house.price) + "€" : "€");
         holder.tvTitle.setText(house.title);
 
         String description = house.pieces + " piece(s) | " + house.surface + " m2 | "
@@ -100,10 +102,10 @@ public class HouseAdapter extends RecyclerView.Adapter<HouseAdapter.HouseViewHol
 
         public HouseViewHolder(View itemView) {
             super(itemView);
-            ivPhoto = (ImageView) itemView.findViewById(R.id.grid_item_ivPhoto);
-            tvPrice = (TextView) itemView.findViewById(R.id.grid_item_tvPrice);
-            tvTitle = (TextView) itemView.findViewById(R.id.grid_item_tvTitle);
-            tvDescription = (TextView) itemView.findViewById(R.id.grid_item_tvDescription);
+            ivPhoto = (ImageView) itemView.findViewById(R.id.list_item_ivPhoto);
+            tvPrice = (TextView) itemView.findViewById(R.id.list_item_tvPrice);
+            tvTitle = (TextView) itemView.findViewById(R.id.list_item_tvTitle);
+            tvDescription = (TextView) itemView.findViewById(R.id.list_item_tvDescription);
         }
     }
 }

@@ -6,14 +6,14 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.synova.realestate.R;
-import com.synova.realestate.adapters.HouseGridAdapter;
+import com.synova.realestate.adapters.HouseListAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.models.House;
@@ -24,14 +24,12 @@ import java.util.List;
 /**
  * Created by ducth on 6/12/15.
  */
-public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
-
-    private static final int GRID_COLUMN_COUNT = 3;
+public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
     private RecyclerView rvItems;
-    private HouseGridAdapter houseAdapter;
+    private HouseListAdapter houseAdapter;
 
     private Constants.ListLoadingState loadingState = Constants.ListLoadingState.NONE;
 
@@ -48,8 +46,8 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
         swipeRefreshLayout.setOnRefreshListener(this);
 
         rvItems = (RecyclerView) rootView.findViewById(R.id.tab_grid_rvItems);
-        GridLayoutManager manager = new GridLayoutManager(activity, GRID_COLUMN_COUNT,
-                GridLayoutManager.VERTICAL, false);
+        LinearLayoutManager manager = new LinearLayoutManager(activity,
+                LinearLayoutManager.VERTICAL, false);
         rvItems.setLayoutManager(manager);
         rvItems.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -61,7 +59,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
                 }
             }
         });
-        houseAdapter = new HouseGridAdapter();
+        houseAdapter = new HouseListAdapter();
         rvItems.setAdapter(houseAdapter);
 
         loadingDialog = new ProgressDialog(activity);

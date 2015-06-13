@@ -23,6 +23,7 @@ import com.synova.realestate.R;
 import com.synova.realestate.customviews.AdsImageView;
 import com.synova.realestate.customviews.ReclickableTabHost;
 import com.synova.realestate.fragments.TabGridFragment;
+import com.synova.realestate.fragments.TabListFragment;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -151,7 +152,7 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
                     pushFragment(new TabGridFragment(), Constants.TransitionType.NONE, true);
                     break;
                 case LIST:
-                    pushFragment(new TabGridFragment(), Constants.TransitionType.NONE, true);
+                    pushFragment(new TabListFragment(), Constants.TransitionType.NONE, true);
                     break;
                 case LOCATION:
                     pushFragment(new TabGridFragment(), Constants.TransitionType.NONE, true);

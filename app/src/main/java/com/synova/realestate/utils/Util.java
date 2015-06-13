@@ -1,6 +1,23 @@
 
 package com.synova.realestate.utils;
 
+import java.lang.reflect.Method;
+import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.joda.time.DateTime;
+
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -28,21 +45,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.synova.realestate.base.Constants;
-
-import org.joda.time.DateTime;
-
-import java.lang.reflect.Method;
-import java.math.BigInteger;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by ducth on 04/06/2015.
@@ -547,6 +549,17 @@ public class Util {
         v.layout(0, 0, v.getLayoutParams().width, v.getLayoutParams().height);
         v.draw(c);
         return b;
+    }
+
+    public static String formatPriceNumber(double price) {
+        DecimalFormatSymbols dfs = new DecimalFormatSymbols();
+        dfs.setDecimalSeparator('.');
+        dfs.setGroupingSeparator(' ');
+
+        String pattern = "#,##0";
+        DecimalFormat df = new DecimalFormat(pattern, dfs);
+        df.setGroupingUsed(true);
+        return df.format(price).replace(",", " ");
     }
 
     private static class ClickableText extends ClickableSpan {
