@@ -24,6 +24,7 @@ import com.synova.realestate.customviews.AdsImageView;
 import com.synova.realestate.customviews.ReclickableTabHost;
 import com.synova.realestate.fragments.TabGridFragment;
 import com.synova.realestate.fragments.TabListFragment;
+import com.synova.realestate.fragments.TabLocationFragment;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -116,9 +117,9 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         tabHost.setup();
         tabHost.setOnTabChangedListener(this);
 
-        addTab(Constants.TabBar.GRID.name(), R.mipmap.ic_launcher);
-        addTab(Constants.TabBar.LIST.name(), R.mipmap.ic_launcher);
-        addTab(Constants.TabBar.LOCATION.name(), R.mipmap.ic_launcher);
+        addTab(Constants.TabBar.GRID.name(), R.drawable.ico_grid);
+        addTab(Constants.TabBar.LIST.name(), R.drawable.ico_list);
+        addTab(Constants.TabBar.LOCATION.name(), R.drawable.ico_location);
         addTab(Constants.TabBar.ALERT.name(), R.mipmap.ic_launcher);
         addTab(Constants.TabBar.FAVORITE.name(), R.mipmap.ic_launcher);
     }
@@ -155,7 +156,7 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
                     pushFragment(new TabListFragment(), Constants.TransitionType.NONE, true);
                     break;
                 case LOCATION:
-                    pushFragment(new TabGridFragment(), Constants.TransitionType.NONE, true);
+                    pushFragment(new TabLocationFragment(), Constants.TransitionType.NONE, true);
                     break;
                 case ALERT:
                     pushFragment(new TabGridFragment(), Constants.TransitionType.NONE, true);

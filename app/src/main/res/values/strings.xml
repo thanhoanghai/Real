@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">RealEstate</string>
+    <string name="app_name">Real Estate</string>
+    <string name="MAP_DEBUG_API_KEY">AIzaSyCjMPx2K4HHUHzCQbl1HyfP4RCNBJqdE70</string>
+    <string name="MAP_RELEASE_API_KEY"></string>
     <string name="open_drawer">Open drawer</string>
     <string name="close_drawer">Close drawer</string>
 </resources>

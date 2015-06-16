@@ -79,7 +79,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
     private List<House> createMockData() {
         List<House> houses = new ArrayList<>();
 
-        for (int i = 0; i < 15; i++) {
+        for (int i = 0; i < 30; i++) {
             House house = new House();
             house.price = 750;
             house.photo = i % 2 == 0 ? "http://images.travelpod.com/tripwow/photos2/ta-02e0-d424-1301/alimetov-yambol-bulgaria+13162716848-tpweb11w-19996.jpg"

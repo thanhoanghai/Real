@@ -37,4 +37,8 @@ public class Constants {
     public enum ListLoadingState {
         NONE, SWIPE_REFRESH, LOAD_MORE
     }
+
+    public enum NetworkLoadingState {
+        NONE, LOADING, LOADED, LOAD_MORE, FAIL
+    }
 }
