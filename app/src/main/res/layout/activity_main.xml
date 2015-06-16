@@ -59,7 +59,7 @@
             <TabWidget
                 android:id="@android:id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="?attr/actionBarSize"
                 android:background="@color/cyan"
                 android:divider="@drawable/shape_tab_item_divider"
                 android:dividerPadding="0dp"

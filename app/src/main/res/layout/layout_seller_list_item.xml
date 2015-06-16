@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/selector_seller_list_item_bg"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/seller_item_ivThumbnail"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginRight="10dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/image_defaulft" />
+
+    <TextView
+        android:id="@+id/seller_item_tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/seller_item_ivThumbnail"
+        android:layout_toLeftOf="@+id/seller_item_tvAnnonces"
+        android:layout_toRightOf="@+id/seller_item_ivThumbnail"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="Title"
+        android:textColor="@color/text_gray"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/seller_item_tvAnnonces"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/seller_item_tvTitle"
+        android:layout_alignParentRight="true"
+        android:text="999 annonces"
+        android:textColor="@color/cyan" />
+
+    <TextView
+        android:id="@+id/seller_item_tvWebsite"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/seller_item_tvTitle"
+        android:layout_below="@+id/seller_item_tvTitle"
+        android:layout_marginTop="10dp"
+        android:drawableLeft="@drawable/ico_web"
+        android:drawablePadding="10dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="www.realestate.com"
+        android:textColor="@color/text_gray" />
+
+    <TextView
+        android:id="@+id/seller_item_tvPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/seller_item_tvTitle"
+        android:layout_below="@+id/seller_item_tvWebsite"
+        android:layout_marginTop="3dp"
+        android:drawableLeft="@drawable/ico_phone"
+        android:drawablePadding="10dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="51-22-48"
+        android:textColor="@color/text_gray" />
+
+    <TextView
+        android:id="@+id/seller_item_tvMail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/seller_item_tvTitle"
+        android:layout_below="@+id/seller_item_tvPhone"
+        android:layout_marginTop="3dp"
+        android:drawableLeft="@drawable/ico_mail"
+        android:drawablePadding="10dp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="mail02@realestate.com"
+        android:textColor="@color/text_gray" />
+
+</RelativeLayout>

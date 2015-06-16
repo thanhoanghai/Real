@@ -25,6 +25,7 @@ import com.synova.realestate.customviews.ReclickableTabHost;
 import com.synova.realestate.fragments.TabGridFragment;
 import com.synova.realestate.fragments.TabListFragment;
 import com.synova.realestate.fragments.TabLocationFragment;
+import com.synova.realestate.fragments.TabSellerFragment;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -120,8 +121,8 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         addTab(Constants.TabBar.GRID.name(), R.drawable.ico_grid);
         addTab(Constants.TabBar.LIST.name(), R.drawable.ico_list);
         addTab(Constants.TabBar.LOCATION.name(), R.drawable.ico_location);
-        addTab(Constants.TabBar.ALERT.name(), R.mipmap.ic_launcher);
-        addTab(Constants.TabBar.FAVORITE.name(), R.mipmap.ic_launcher);
+        addTab(Constants.TabBar.ALERT.name(), R.drawable.ico_sellers);
+        addTab(Constants.TabBar.FAVORITE.name(), R.drawable.ico_star_empty);
     }
 
     private void addTab(String title, int iconRes) {
@@ -159,7 +160,7 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
                     pushFragment(new TabLocationFragment(), Constants.TransitionType.NONE, true);
                     break;
                 case ALERT:
-                    pushFragment(new TabGridFragment(), Constants.TransitionType.NONE, true);
+                    pushFragment(new TabSellerFragment(), Constants.TransitionType.NONE, true);
                     break;
                 case FAVORITE:
                     pushFragment(new TabGridFragment(), Constants.TransitionType.NONE, true);
