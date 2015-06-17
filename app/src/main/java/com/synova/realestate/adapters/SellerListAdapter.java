@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
+import com.synova.realestate.base.Constants;
 import com.synova.realestate.models.Seller;
 
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.List;
 /**
  * Created by ducth on 6/17/15.
  */
-public class SellerListAdapter extends RecyclerView.Adapter<SellerListAdapter.SellerItemViewHolder>
+public class SellerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements View.OnClickListener {
 
     private List<Seller> sellers = new ArrayList<>();
@@ -36,27 +37,57 @@ public class SellerListAdapter extends RecyclerView.Adapter<SellerListAdapter.Se
 
     @Override
     public int getItemCount() {
-        return sellers.size();
+        return sellers.size() + 1;
     }
 
     @Override
-    public SellerItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(
-                R.layout.layout_seller_list_item, parent, false);
-        view.setOnClickListener(this);
-        return new SellerItemViewHolder(view);
+    public int getItemViewType(int position) {
+        return position == sellers.size() ? Constants.RecyclerViewType.FOOTER.ordinal()
+                : Constants.RecyclerViewType.ITEM.ordinal();
     }
 
     @Override
-    public void onBindViewHolder(SellerItemViewHolder holder, int position) {
-        Seller seller = sellers.get(position);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view;
+        Constants.RecyclerViewType type = Constants.RecyclerViewType.values()[viewType];
+        switch (type) {
+            case HEADER:
+                break;
+            case ITEM:
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.layout_seller_list_item, parent, false);
+                view.setOnClickListener(this);
+                return new SellerItemViewHolder(view);
+            case FOOTER:
+                view = LayoutInflater.from(parent.getContext()).inflate(
+                        R.layout.layout_footer_load_more, parent, false);
+                return new RecyclerView.ViewHolder(view) {
+                };
+        }
+        return null;
+    }
 
-        ImageLoader.getInstance().displayImage(seller.thumbnail, holder.ivThumbnail);
-        holder.tvTitle.setText(seller.title);
-        holder.tvAnnonces.setText(seller.annonces + " annonces");
-        holder.tvWebsite.setText(seller.website);
-        holder.tvPhone.setText(seller.phone);
-        holder.tvMail.setText(seller.mail);
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder h, int position) {
+        int viewType = getItemViewType(position);
+        Constants.RecyclerViewType type = Constants.RecyclerViewType.values()[viewType];
+        switch (type) {
+            case HEADER:
+                break;
+            case ITEM:
+                Seller seller = sellers.get(position);
+                SellerItemViewHolder holder = (SellerItemViewHolder) h;
+
+                ImageLoader.getInstance().displayImage(seller.thumbnail, holder.ivThumbnail);
+                holder.tvTitle.setText(seller.title);
+                holder.tvAnnonces.setText(seller.annonces + " annonces");
+                holder.tvWebsite.setText(seller.website);
+                holder.tvPhone.setText(seller.phone);
+                holder.tvMail.setText(seller.mail);
+                break;
+            case FOOTER:
+                break;
+        }
     }
 
     @Override

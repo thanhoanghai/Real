@@ -1,7 +1,6 @@
 
 package com.synova.realestate.fragments;
 
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -33,8 +32,6 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
 
     private Constants.ListLoadingState loadingState = Constants.ListLoadingState.NONE;
 
-    private ProgressDialog loadingDialog;
-
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
@@ -63,13 +60,7 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
         sellersAdapter = new SellerListAdapter();
         rvItems.setAdapter(sellersAdapter);
 
-        loadingDialog = new ProgressDialog(activity);
-        loadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-        loadingDialog.setCancelable(false);
-        loadingDialog.setMessage("Please wait...");
-
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
-        loadingDialog.show();
         loadNewData();
 
         return rootView;
@@ -95,7 +86,6 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
 
     private void loadMore() {
         loadingState = Constants.ListLoadingState.LOAD_MORE;
-        loadingDialog.show();
 
         new Handler().postDelayed(new Runnable() {
             @Override
@@ -104,7 +94,6 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
                 sellersAdapter.addItems(houses);
 
                 loadingState = Constants.ListLoadingState.NONE;
-                loadingDialog.dismiss();
             }
         }, 2000);
     }
@@ -120,7 +109,6 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
 
                 swipeRefreshLayout.setRefreshing(false);
                 loadingState = Constants.ListLoadingState.NONE;
-                loadingDialog.dismiss();
             }
         }, 2000);
     }

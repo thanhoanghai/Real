@@ -7,7 +7,8 @@
     <color name="trans_cyan">#552DD8D1</color>
     <color name="transparent">#00000000</color>
     <color name="black">#000000</color>
-    <color name="trans_black">#33000000</color>
+    <color name="trans_black">#88000000</color>
+    <color name="lighter_trans_black">#33000000</color>
     <color name="darker_trans_black">#dd000000</color>
     <color name="white">#ffffff</color>
     <color name="trans_gray">#227D7D7D</color>

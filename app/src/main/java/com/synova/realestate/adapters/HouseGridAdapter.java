@@ -25,7 +25,7 @@ import java.util.List;
 /**
  * Created by ducth on 6/13/15.
  */
-public class HouseGridAdapter extends RecyclerView.Adapter<HouseGridAdapter.HouseViewHolder> implements
+public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
         View.OnClickListener {
 
     private List<House> houses = new ArrayList<>();
@@ -54,33 +54,70 @@ public class HouseGridAdapter extends RecyclerView.Adapter<HouseGridAdapter.Hous
 
     @Override
     public int getItemCount() {
-        return houses.size();
+        return houses.size() + 2;
     }
 
     @Override
-    public HouseViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        View view = LayoutInflater.from(viewGroup.getContext()).inflate(
-                R.layout.layout_square_grid_item, viewGroup, false);
-        view.setOnClickListener(this);
-        return new HouseViewHolder(view);
+    public int getItemViewType(int position) {
+        return position > houses.size() - 1 ? Constants.RecyclerViewType.FOOTER.ordinal()
+                : Constants.RecyclerViewType.ITEM.ordinal();
     }
 
     @Override
-    public void onBindViewHolder(HouseViewHolder holder, int i) {
-        House house = houses.get(i);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+        View view;
+        Constants.RecyclerViewType type = Constants.RecyclerViewType.values()[viewType];
+        switch (type) {
+            case HEADER:
+                break;
+            case ITEM:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(
+                        R.layout.layout_square_grid_item, viewGroup, false);
+                view.setOnClickListener(this);
+                return new HouseViewHolder(view);
+            case FOOTER:
+                view = LayoutInflater.from(viewGroup.getContext()).inflate(
+                        R.layout.layout_footer_load_more, viewGroup, false);
+                return new RecyclerView.ViewHolder(view) {
+                };
+        }
+        return null;
+    }
 
-        ImageLoader.getInstance().displayImage(house.photo, holder.ivPhoto);
-        holder.tvPrice.setText(house.price <= Constants.HOUSE_PRICE_LIMIT ? Util
-                .formatPriceNumber(house.price) + "€" : "€");
-        holder.tvTitle.setText(house.title);
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder h, int position) {
+        int viewType = getItemViewType(position);
+        Constants.RecyclerViewType type = Constants.RecyclerViewType.values()[viewType];
 
-        String description = house.pieces + " piece(s) | " + house.surface + " m2 | "
-                + house.distance + " m";
-        Spannable spannable = new SpannableString(description);
-        int start = description.indexOf("m2") + 1;
-        spannable
-                .setSpan(new SuperscriptSpan(), start, start + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        holder.tvDescription.setText(spannable);
+        switch (type) {
+            case HEADER:
+                break;
+            case ITEM:
+                House house = houses.get(position);
+                HouseViewHolder holder = (HouseViewHolder) h;
+
+                ImageLoader.getInstance().displayImage(house.photo, holder.ivPhoto);
+                holder.tvPrice.setText(house.price <= Constants.HOUSE_PRICE_LIMIT ? Util
+                        .formatPriceNumber(house.price) + "€" : "€");
+                holder.tvTitle.setText(house.title);
+
+                String description = house.pieces + " piece(s) | " + house.surface + " m2 | "
+                        + house.distance + " m";
+                Spannable spannable = new SpannableString(description);
+                int start = description.indexOf("m2") + 1;
+                spannable
+                        .setSpan(new SuperscriptSpan(), start, start + 1,
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+                holder.tvDescription.setText(spannable);
+                break;
+            case FOOTER:
+                if (position == houses.size()) {
+                    h.itemView.setVisibility(View.GONE);
+                } else {
+                    h.itemView.setVisibility(View.VISIBLE);
+                }
+                break;
+        }
     }
 
     @Override
@@ -107,4 +144,5 @@ public class HouseGridAdapter extends RecyclerView.Adapter<HouseGridAdapter.Hous
             tvDescription = (TextView) itemView.findViewById(R.id.grid_item_tvDescription);
         }
     }
+
 }

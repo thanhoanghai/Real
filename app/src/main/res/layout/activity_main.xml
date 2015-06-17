@@ -12,7 +12,7 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
+        android:layout_height="50dp"
         android:layout_below="@+id/adsImageView"
         android:background="@color/cyan"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
@@ -59,7 +59,7 @@
             <TabWidget
                 android:id="@android:id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
+                android:layout_height="50dp"
                 android:background="@color/cyan"
                 android:divider="@drawable/shape_tab_item_divider"
                 android:dividerPadding="0dp"

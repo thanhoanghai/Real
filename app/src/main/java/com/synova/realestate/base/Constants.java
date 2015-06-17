@@ -41,4 +41,8 @@ public class Constants {
     public enum NetworkLoadingState {
         NONE, LOADING, LOADED, LOAD_MORE, FAIL
     }
+
+    public enum RecyclerViewType {
+        HEADER, ITEM, FOOTER
+    }
 }
