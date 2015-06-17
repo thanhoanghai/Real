@@ -163,7 +163,7 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
                     pushFragment(new TabSellerFragment(), Constants.TransitionType.NONE, true);
                     break;
                 case FAVORITE:
-                    pushFragment(new TabGridFragment(), Constants.TransitionType.NONE, true);
+                    pushFragment(new TabListFragment(), Constants.TransitionType.NONE, true);
                     break;
             }
         } else {

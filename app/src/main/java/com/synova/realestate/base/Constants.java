@@ -12,6 +12,10 @@ public class Constants {
     public static final String DATE_ONLY_PATTERN = "dd/MM/yyyy";
     public static final String TIME_ONLY_PATTERN = "HH:mm";
 
+    public static final long INTERVAL = 1000 * 10;
+    public static final long FASTEST_INTERVAL = 1000 * 5;
+    public static final int LOCATION_CHANGE_THRESHOLD = 500;
+
     public static final int HOUSE_PRICE_LIMIT = 10000;
 
     public enum TabBar {

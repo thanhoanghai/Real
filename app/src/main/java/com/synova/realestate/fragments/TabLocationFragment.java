@@ -42,10 +42,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
 
-    private static final long INTERVAL = 1000 * 10;
-    private static final long FASTEST_INTERVAL = 1000 * 5;
-    private static final int LOCATION_CHANGE_THRESHOLD = 500;
-
     private RetainMapFragment mapFragment;
     private GoogleMap map;
     private GoogleApiClient googleApiClient;
@@ -77,8 +73,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private void setupMap() {
         locationRequest = new LocationRequest();
-        locationRequest.setInterval(INTERVAL);
-        locationRequest.setFastestInterval(FASTEST_INTERVAL);
+        locationRequest.setInterval(Constants.INTERVAL);
+        locationRequest.setFastestInterval(Constants.FASTEST_INTERVAL);
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         googleApiClient = new GoogleApiClient.Builder(activity)
@@ -97,7 +93,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         groupDetailBottom.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                
+
             }
         });
         ivThumbnail = (ImageView) rootView.findViewById(R.id.tab_location_bottom_ivThumbnail);

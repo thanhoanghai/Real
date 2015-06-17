@@ -9,13 +9,13 @@ import android.text.style.SuperscriptSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.models.House;
 import com.synova.realestate.utils.Util;
 
@@ -30,9 +30,9 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private List<House> houses = new ArrayList<>();
 
-    private AdapterView.OnItemClickListener onItemClickedListener;
+    private OnRecyclerViewItemClickedListener onItemClickedListener;
 
-    public void setOnItemClickedListener(AdapterView.OnItemClickListener onItemClickedListener) {
+    public void setOnItemClickedListener(OnRecyclerViewItemClickedListener onItemClickedListener) {
         this.onItemClickedListener = onItemClickedListener;
     }
 
@@ -123,9 +123,10 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     @Override
     public void onClick(View v) {
         if (onItemClickedListener != null) {
-            AdapterView parent = (AdapterView) v.getParent();
-            int position = parent.getPositionForView(v);
-            onItemClickedListener.onItemClick((AdapterView) v.getParent(), v, position, v.getId());
+            RecyclerView parent = (RecyclerView) v.getParent();
+            int position = parent.getChildAdapterPosition(v);
+            onItemClickedListener.onItemClicked(parent, v, position, v.getId(),
+                    houses.get(position));
         }
     }
 

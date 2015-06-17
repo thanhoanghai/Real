@@ -15,6 +15,7 @@
         android:layout_height="50dp"
         android:layout_below="@+id/adsImageView"
         android:background="@color/cyan"
+        android:gravity="center_vertical"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <com.synova.realestate.customviews.ReclickableTabHost

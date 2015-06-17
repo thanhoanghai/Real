@@ -46,7 +46,7 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
         LinearLayoutManager manager = new LinearLayoutManager(activity,
                 LinearLayoutManager.VERTICAL, false);
         rvItems.setLayoutManager(manager);
-        rvItems.addItemDecoration(new DividerDecoration(activity));
+        rvItems.addItemDecoration(new DividerDecoration(activity, 0));
         rvItems.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
             @Override

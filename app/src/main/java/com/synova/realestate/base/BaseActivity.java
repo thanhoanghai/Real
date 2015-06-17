@@ -1,12 +1,15 @@
 
 package com.synova.realestate.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.gson.Gson;
 import com.synova.realestate.R;
+import com.synova.realestate.models.House;
 import com.synova.realestate.utils.Util;
 
 import java.util.Stack;
@@ -96,6 +99,12 @@ public class BaseActivity extends AppCompatActivity {
                 super.onBackPressed();
             }
         }
+    }
+
+    public void showDetailActivity(House house){
+        Intent intent = new Intent(this, DetailActivity.class);
+        intent.putExtra("house", new Gson().toJson(house));
+        startActivity(intent);
     }
 
 }

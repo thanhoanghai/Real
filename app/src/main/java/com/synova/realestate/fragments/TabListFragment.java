@@ -15,6 +15,7 @@ import com.synova.realestate.R;
 import com.synova.realestate.adapters.HouseListAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.models.House;
 
 import java.util.ArrayList;
@@ -23,7 +24,8 @@ import java.util.List;
 /**
  * Created by ducth on 6/12/15.
  */
-public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener {
+public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
+        OnRecyclerViewItemClickedListener<House> {
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -57,6 +59,7 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
             }
         });
         houseAdapter = new HouseListAdapter();
+        houseAdapter.setOnItemClickedListener(this);
         rvItems.setAdapter(houseAdapter);
 
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
@@ -115,5 +118,11 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
     @Override
     public void onRefresh() {
         loadNewData();
+    }
+
+    @Override
+    public void onItemClicked(RecyclerView recyclerView, View view, int position, long id,
+            House data) {
+        activity.showDetailActivity(data);
     }
 }

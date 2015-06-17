@@ -22,10 +22,14 @@ public class DividerDecoration extends RecyclerView.ItemDecoration {
 
     private Drawable mDivider;
 
-    public DividerDecoration(Context context) {
-        final TypedArray a = context.obtainStyledAttributes(ATTRS);
-        mDivider = a.getDrawable(0);
-        a.recycle();
+    public DividerDecoration(Context context, int drawableResId) {
+        if (drawableResId <= 0) {
+            final TypedArray a = context.obtainStyledAttributes(ATTRS);
+            mDivider = a.getDrawable(0);
+            a.recycle();
+        } else {
+            mDivider = context.getResources().getDrawable(drawableResId);
+        }
     }
 
     private int getOrientation(RecyclerView parent) {

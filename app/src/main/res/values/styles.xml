@@ -5,6 +5,15 @@
         <item name="android:windowBackground">@color/white</item>
         <item name="actionBarItemBackground">@drawable/selector_action_bar_item_bg</item>
         <item name="android:itemBackground">@drawable/selector_action_bar_overflow_item_bg</item>
+        <item name="vpiCirclePageIndicatorStyle">@style/CustomCirclePageIndicator</item>
+    </style>
+
+    <style name="CustomCirclePageIndicator">
+        <item name="fillColor">@color/white</item>
+        <!--<item name="pageColor">@color/white</item>-->
+        <item name="strokeWidth">1dp</item>
+        <item name="radius">4dp</item>
+        <!--<item name="centered">true</item>-->
     </style>
 
 </resources>
