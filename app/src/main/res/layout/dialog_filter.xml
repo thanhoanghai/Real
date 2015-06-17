@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/dialog_rootView"
+    android:layout_width="match_parent"
+    android:layout_marginTop="60dp"
+    android:layout_marginLeft="10dp"
+    android:background="@color/transparent"
+    android:layout_marginRight="10dp"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:background="@color/cyan"
+        android:gravity="center"
+        android:text="Filter"
+        android:textColor="@color/white"
+        android:textSize="20sp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:paddingLeft="10dp"
+            android:background="@color/white"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Achat/Location"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <RadioButton
+                    android:id="@+id/dialog_filter_btnAchat"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:textSize="14sp"
+                    android:layout_weight="1"
+                    android:checked="true"
+                    android:text="Achat" />
+
+                <RadioButton
+                    android:id="@+id/dialog_filter_btnLocation"
+                    android:layout_width="0dp"
+                    android:textSize="14sp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Location" />
+            </RadioGroup>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Mots clés"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Type de biens"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/dialog_filter_rvType"
+                android:layout_width="match_parent"
+                android:layout_height="100dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Distance"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="200m"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="200"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="> 2000"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <com.appyvet.rangebar.RangeBar
+                android:id="@+id/dialog_filter_distanceBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:barColor="@color/divider_gray"
+                app:connectingLineColor="@color/cyan"
+                app:pinColor="@color/cyan"
+                app:rangeBar="false"
+                app:selectorColor="@color/cyan"
+                app:selectorSize="6dp"
+                app:textColor="@color/white"
+                app:tickEnd="2000"
+                app:tickHeight="0dp"
+                app:tickInterval="100"
+                app:tickStart="200" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Price"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="200k à 600k €"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="&lt; 50k"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="&gt; 2M"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <com.appyvet.rangebar.RangeBar
+                android:id="@+id/dialog_filter_priceBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:barColor="@color/divider_gray"
+                app:connectingLineColor="@color/cyan"
+                app:pinColor="@color/cyan"
+                app:rangeBar="true"
+                app:selectorColor="@color/cyan"
+                app:selectorSize="6dp"
+                app:textColor="@color/white"
+                app:tickEnd="2000"
+                app:tickHeight="0dp"
+                app:tickInterval="50"
+                app:tickStart="50" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Surface"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="10 à 300 m2"
+                    android:textColor="@color/black"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="5dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="10"
+                    android:textColor="@color/black" />
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:text="300"
+                    android:textColor="@color/black" />
+            </LinearLayout>
+
+            <com.appyvet.rangebar.RangeBar
+                android:id="@+id/dialog_filter_surfaceBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                app:barColor="@color/divider_gray"
+                app:connectingLineColor="@color/cyan"
+                app:pinColor="@color/cyan"
+                app:rangeBar="true"
+                app:selectorColor="@color/cyan"
+                app:selectorSize="6dp"
+                app:textColor="@color/white"
+                app:tickEnd="300"
+                app:tickHeight="0dp"
+                app:tickInterval="10"
+                app:tickStart="10" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -26,6 +26,7 @@ import com.synova.realestate.fragments.TabGridFragment;
 import com.synova.realestate.fragments.TabListFragment;
 import com.synova.realestate.fragments.TabLocationFragment;
 import com.synova.realestate.fragments.TabSellerFragment;
+import com.synova.realestate.utils.DialogUtils;
 
 import java.util.HashMap;
 import java.util.Stack;
@@ -250,6 +251,7 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
 
         switch (item.getItemId()) {
             case R.id.action_filter:
+                DialogUtils.showDialogFilter(this);
                 return true;
             case R.id.action_overflow:
                 if (popupMenu == null) {
