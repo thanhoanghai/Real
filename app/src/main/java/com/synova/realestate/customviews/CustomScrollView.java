@@ -40,11 +40,12 @@ public class CustomScrollView extends ScrollView {
 
         // check if we have any views that should use their own scrolling
         if (mInterceptScrollViews.size() > 0) {
-            int x = (int) event.getX();
-            int y = (int) event.getY();
             Rect bounds = new Rect();
 
             for (View view : mInterceptScrollViews) {
+                int x = (int) event.getX() + getLeft();
+                int y = (int) event.getY() + getTop();
+
                 view.getHitRect(bounds);
                 if (bounds.contains(x, y)) {
                     // were touching a view that should intercept scrolling

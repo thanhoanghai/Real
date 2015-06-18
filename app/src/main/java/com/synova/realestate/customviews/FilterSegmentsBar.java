@@ -73,12 +73,24 @@ public class FilterSegmentsBar extends FrameLayout implements RadioGroup.OnCheck
             switch (checkedId) {
                 case R.id.segment_distance:
                     onSegmentSelectedListener.onSegmentSelected(0, checkedId);
+                    segmentDistance.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                            R.drawable.ico_sort_up, 0);
+                    segmentPrice.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                    segmentDate.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                     break;
                 case R.id.segment_price:
                     onSegmentSelectedListener.onSegmentSelected(1, checkedId);
+                    segmentDistance.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                    segmentPrice.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                            R.drawable.ico_sort_up, 0);
+                    segmentDate.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
                     break;
                 case R.id.segment_date:
                     onSegmentSelectedListener.onSegmentSelected(2, checkedId);
+                    segmentDistance.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                    segmentPrice.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0);
+                    segmentDate.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+                            R.drawable.ico_sort_up, 0);
                     break;
             }
         }

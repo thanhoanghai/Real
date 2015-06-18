@@ -22,6 +22,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -220,7 +221,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private Marker createMarker(double lat, double lng, String title) {
         return map.addMarker(new MarkerOptions()
-                // .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_diadiem))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ico_marker_cyan))
                 .position(new LatLng(lat, lng))
                 .title(title));
     }

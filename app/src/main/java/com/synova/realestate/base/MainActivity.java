@@ -57,7 +57,8 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         setupTabHost();
 
         adsView = (AdsImageView) findViewById(R.id.adsImageView);
-        adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
+//        adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
+        adsView.setImageResource(R.drawable.img_ads_banner);
         adsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -81,7 +82,7 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setIcon(R.mipmap.ic_launcher);
+        actionBar.setIcon(R.drawable.ico_navbar_logo);
     }
 
     private void setupDrawer() {
@@ -119,10 +120,10 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         tabHost.setup();
         tabHost.setOnTabChangedListener(this);
 
-        addTab(Constants.TabBar.GRID.name(), R.drawable.ico_grid);
-        addTab(Constants.TabBar.LIST.name(), R.drawable.ico_list);
-        addTab(Constants.TabBar.LOCATION.name(), R.drawable.ico_location);
-        addTab(Constants.TabBar.ALERT.name(), R.drawable.ico_sellers);
+        addTab(Constants.TabBar.GRID.name(), R.drawable.ico_tabbar_grid);
+        addTab(Constants.TabBar.LIST.name(), R.drawable.ico_tabbar_list);
+        addTab(Constants.TabBar.LOCATION.name(), R.drawable.ico_tabbar_location);
+        addTab(Constants.TabBar.ALERT.name(), R.drawable.ico_tabbar_sellers_list);
         addTab(Constants.TabBar.FAVORITE.name(), R.drawable.ico_star_empty);
     }
 

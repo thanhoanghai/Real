@@ -9,9 +9,10 @@
         android:id="@+id/seller_item_ivThumbnail"
         android:layout_width="100dp"
         android:layout_height="100dp"
+        android:layout_centerVertical="true"
         android:layout_marginRight="10dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/image_defaulft" />
+        android:src="@drawable/img_default_grid" />
 
     <TextView
         android:id="@+id/seller_item_tvTitle"
@@ -42,9 +43,10 @@
         android:layout_alignLeft="@+id/seller_item_tvTitle"
         android:layout_below="@+id/seller_item_tvTitle"
         android:layout_marginTop="10dp"
-        android:drawableLeft="@drawable/ico_web"
-        android:drawablePadding="10dp"
+        android:drawableLeft="@drawable/ico_website_gray"
+        android:drawablePadding="13dp"
         android:ellipsize="end"
+        android:gravity="center_vertical"
         android:singleLine="true"
         android:text="www.realestate.com"
         android:textColor="@color/text_gray" />
@@ -55,10 +57,11 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/seller_item_tvTitle"
         android:layout_below="@+id/seller_item_tvWebsite"
-        android:layout_marginTop="3dp"
-        android:drawableLeft="@drawable/ico_phone"
-        android:drawablePadding="10dp"
+        android:layout_marginTop="8dp"
+        android:drawableLeft="@drawable/ico_phone_gray"
+        android:drawablePadding="18dp"
         android:ellipsize="end"
+        android:gravity="center_vertical"
         android:singleLine="true"
         android:text="51-22-48"
         android:textColor="@color/text_gray" />
@@ -69,10 +72,11 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/seller_item_tvTitle"
         android:layout_below="@+id/seller_item_tvPhone"
-        android:layout_marginTop="3dp"
-        android:drawableLeft="@drawable/ico_mail"
-        android:drawablePadding="10dp"
+        android:layout_marginTop="8dp"
+        android:drawableLeft="@drawable/ico_mail_gray"
+        android:drawablePadding="8dp"
         android:ellipsize="end"
+        android:gravity="center_vertical"
         android:singleLine="true"
         android:text="mail02@realestate.com"
         android:textColor="@color/text_gray" />

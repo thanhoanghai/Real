@@ -12,10 +12,11 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="45dp"
         android:layout_below="@+id/adsImageView"
         android:background="@color/cyan"
         android:gravity="center_vertical"
+        android:minHeight="45dp"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <com.synova.realestate.customviews.ReclickableTabHost

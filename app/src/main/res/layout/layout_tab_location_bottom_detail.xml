@@ -22,7 +22,7 @@
             android:layout_height="match_parent"
             android:layout_margin="10dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/image_defaulft" />
+            android:src="@drawable/img_default_grid" />
 
         <TextView
             android:id="@+id/tab_location_bottom_tvTitle"

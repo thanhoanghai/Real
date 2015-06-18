@@ -28,7 +28,7 @@ public class AdsImageView extends ImageView {
     }
 
     private void init() {
-        setScaleType(ScaleType.CENTER_CROP);
+        setScaleType(ScaleType.FIT_XY);
     }
 
     public void setAdsUrl(String url) {

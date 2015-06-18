@@ -13,8 +13,9 @@
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="45dp"
         android:background="@color/cyan"
+        android:minHeight="45dp"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <RelativeLayout
@@ -26,6 +27,12 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/shape_bottom_gradient" />
+
         <com.viewpagerindicator.CirclePageIndicator
             android:id="@+id/detail_slideshow_indicator"
             android:layout_width="wrap_content"
@@ -33,6 +40,7 @@
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:padding="6dp" />
+
     </RelativeLayout>
 
     <com.synova.realestate.customviews.CustomScrollView

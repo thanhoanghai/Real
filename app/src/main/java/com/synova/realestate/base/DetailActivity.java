@@ -15,6 +15,7 @@ import android.view.View;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -62,7 +63,8 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
         setContentView(R.layout.activity_detail);
 
         adsView = (AdsImageView) findViewById(R.id.adsImageView);
-        adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
+        // adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
+        adsView.setImageResource(R.drawable.img_ads_banner);
         adsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -77,7 +79,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
 
         scrollView = (CustomScrollView) findViewById(R.id.detail_scrollView);
         scrollView.addInterceptScrollView(mapFragment.getView());
-
+        scrollView.addInterceptScrollView(rvData);
     }
 
     private void setupActionBar() {
@@ -89,7 +91,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setIcon(R.mipmap.ic_launcher);
+        actionBar.setIcon(R.drawable.ico_navbar_logo);
     }
 
     private void setupSlideShow() {
@@ -154,7 +156,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
 
         dataAdapter.setData(data);
 
-        rvData.setMinimumHeight(data.size() * Util.dpToPx(this, 30));
+        rvData.setMinimumHeight(data.size() * Util.dpToPx(this, 30) + Util.dpToPx(this, 10));
     }
 
     @Override
@@ -173,7 +175,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
 
     private Marker createMarker(double lat, double lng, String title) {
         return map.addMarker(new MarkerOptions()
-                // .icon(BitmapDescriptorFactory.fromResource(R.drawable.icon_diadiem))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ico_marker_cyan))
                 .position(new LatLng(lat, lng))
                 .title(title));
     }

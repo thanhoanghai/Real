@@ -5,13 +5,13 @@
 
     <item
         android:id="@+id/action_filter"
-        android:icon="@drawable/ic_filter"
+        android:icon="@drawable/ico_filter"
         android:title="Filter"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_overflow"
-        android:icon="@drawable/ic_action_overflow"
+        android:icon="@drawable/ico_overflow"
         android:title="More"
         app:showAsAction="always" />
 
