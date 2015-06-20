@@ -25,7 +25,28 @@
         <cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager
             android:id="@+id/detail_slideShow"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="@color/black" />
+
+        <ImageButton
+            android:id="@+id/detail_btnPreSlide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerInParent="true"
+            android:background="@color/transparent"
+            android:padding="10dp"
+            android:src="@drawable/ico_slide_pre" />
+
+        <ImageButton
+            android:id="@+id/detail_btnNextSlide"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:background="@color/transparent"
+            android:padding="10dp"
+            android:src="@drawable/ico_slide_next" />
 
         <View
             android:layout_width="match_parent"
@@ -33,7 +54,7 @@
             android:layout_alignParentBottom="true"
             android:background="@drawable/shape_bottom_gradient" />
 
-        <com.viewpagerindicator.CirclePageIndicator
+        <com.synova.realestate.customviews.CustomCirclePageIndicator
             android:id="@+id/detail_slideshow_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -97,21 +118,20 @@
                 android:textColor="@color/white"
                 android:textSize="20sp" />
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/detail_rvData"
+            <LinearLayout
+                android:id="@+id/detail_groupData"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:orientation="vertical"
                 android:paddingLeft="10dp"
-                android:paddingRight="10dp">
-
-            </android.support.v7.widget.RecyclerView>
+                android:paddingRight="10dp" />
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="40dp"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
+                android:layout_marginTop="20dp"
                 android:background="@color/cyan"
                 android:gravity="center_vertical"
                 android:paddingLeft="10dp"

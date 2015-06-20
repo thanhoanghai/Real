@@ -4,13 +4,16 @@ package com.synova.realestate.base;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -20,15 +23,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.synova.realestate.R;
-import com.synova.realestate.adapters.DetailDataAdapter;
 import com.synova.realestate.adapters.DetailSlideShowAdapter;
 import com.synova.realestate.customviews.AdsImageView;
-import com.synova.realestate.customviews.CustomScrollView;
-import com.synova.realestate.customviews.DividerDecoration;
+import com.synova.realestate.customviews.CustomCirclePageIndicator;
 import com.synova.realestate.fragments.RetainMapFragment;
 import com.synova.realestate.models.DetailData;
-import com.synova.realestate.utils.Util;
-import com.viewpagerindicator.CirclePageIndicator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,23 +38,16 @@ import cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager;
 /**
  * Created by ducth on 6/17/15.
  */
-public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
+public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
+        View.OnClickListener {
 
     private AdsImageView adsView;
 
-    private ActionBar actionBar;
+    private GoogleMap map;
 
     private AutoScrollViewPager slideShowView;
-    private CirclePageIndicator slideShowIndicator;
-    private DetailSlideShowAdapter slideShowAdapter;
-
-    private RecyclerView rvData;
-    private DetailDataAdapter dataAdapter;
-
-    private CustomScrollView scrollView;
-
-    private RetainMapFragment mapFragment;
-    private GoogleMap map;
+    private ImageButton btnPreSlide;
+    private ImageButton btnNextSlide;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,17 +68,13 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
         setupActionBar();
         setupSlideShow();
         setupDataList();
-
-        scrollView = (CustomScrollView) findViewById(R.id.detail_scrollView);
-        scrollView.addInterceptScrollView(mapFragment.getView());
-        scrollView.addInterceptScrollView(rvData);
     }
 
     private void setupActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        actionBar = getSupportActionBar();
+        ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
@@ -95,13 +83,42 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
     }
 
     private void setupSlideShow() {
+        btnPreSlide = (ImageButton) findViewById(R.id.detail_btnPreSlide);
+        btnPreSlide.setOnClickListener(this);
+        btnNextSlide = (ImageButton) findViewById(R.id.detail_btnNextSlide);
+        btnNextSlide.setOnClickListener(this);
+
         slideShowView = (AutoScrollViewPager) findViewById(R.id.detail_slideShow);
         slideShowView.setInterval(5000);
         slideShowView.startAutoScroll();
-        slideShowAdapter = new DetailSlideShowAdapter();
+        final DetailSlideShowAdapter slideShowAdapter = new DetailSlideShowAdapter();
         slideShowView.setAdapter(slideShowAdapter);
+        slideShowView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
 
-        slideShowIndicator = (CirclePageIndicator) findViewById(R.id.detail_slideshow_indicator);
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 0) {
+                    btnPreSlide.setVisibility(View.GONE);
+                } else if (position == slideShowAdapter.getCount() - 1) {
+                    btnNextSlide.setVisibility(View.GONE);
+                } else {
+                    btnPreSlide.setVisibility(View.VISIBLE);
+                    btnNextSlide.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        CustomCirclePageIndicator slideShowIndicator = (CustomCirclePageIndicator) findViewById(R.id.detail_slideshow_indicator);
         slideShowIndicator.setViewPager(slideShowView);
         slideShowIndicator.setSnap(true);
 
@@ -114,24 +131,18 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
                 .add("http://rumahinteriorminimalis.com/wp-content/uploads/2014/09/modern-sunroom-designs-covered-jessica-dauray-with-beige-tones-600x300.jpg");
 
         slideShowAdapter.setData(photoUrls);
+        slideShowView.setCurrentItem(-1);
+        slideShowView.setCurrentItem(0);
     }
 
     private void setupMap() {
-        mapFragment = (RetainMapFragment) getSupportFragmentManager().findFragmentById(
-                R.id.detail_mapFragment);
+        RetainMapFragment mapFragment = (RetainMapFragment) getSupportFragmentManager()
+                .findFragmentById(
+                        R.id.detail_mapFragment);
         mapFragment.getMapAsync(this);
     }
 
     private void setupDataList() {
-        rvData = (RecyclerView) findViewById(R.id.detail_rvData);
-        LinearLayoutManager manager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
-                false);
-        rvData.setLayoutManager(manager);
-        rvData.addItemDecoration(new DividerDecoration(this, R.drawable.shape_cyan_divider));
-
-        dataAdapter = new DetailDataAdapter();
-        rvData.setAdapter(dataAdapter);
-
         List<DetailData> data = new ArrayList<>();
 
         DetailData detailData = new DetailData();
@@ -154,9 +165,25 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
         detailData.quantity = 3;
         data.add(detailData);
 
-        dataAdapter.setData(data);
+        LinearLayout parent = (LinearLayout) findViewById(R.id.detail_groupData);
 
-        rvData.setMinimumHeight(data.size() * Util.dpToPx(this, 30) + Util.dpToPx(this, 10));
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (int i = 0; i < data.size(); i++) {
+            if (i > 0) {
+                View divider = new View(this);
+                divider.setBackgroundResource(R.drawable.shape_cyan_divider);
+                parent.addView(divider);
+            }
+            View item = inflater.inflate(R.layout.layout_detail_data_list_item, parent, false);
+            TextView tvTitle = (TextView) item.findViewById(R.id.detail_data_item_tvTitle);
+            TextView tvQuantity = (TextView) item.findViewById(R.id.detail_data_item_tvQuantity);
+
+            tvTitle.setText(data.get(i).title);
+            tvQuantity.setText(data.get(i).quantity + "");
+
+            parent.addView(item);
+        }
+
     }
 
     @Override
@@ -216,5 +243,17 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.detail_btnPreSlide:
+                slideShowView.setCurrentItem(slideShowView.getCurrentItem() - 1);
+                break;
+            case R.id.detail_btnNextSlide:
+                slideShowView.setCurrentItem(slideShowView.getCurrentItem() + 1);
+                break;
+        }
     }
 }
