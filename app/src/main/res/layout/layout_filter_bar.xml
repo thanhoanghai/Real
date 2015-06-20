@@ -4,23 +4,31 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <RadioGroup
-        android:id="@+id/groupSegments"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:orientation="horizontal">
 
-        <RadioButton
-            android:id="@+id/segment_distance"
+        <FrameLayout
+            android:id="@+id/group_distance"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:button="@null"
-            android:checked="true"
-            android:gravity="center"
-            android:text="Distance"
-            android:textColor="@color/selector_segment_filter_text_color"
-            android:textSize="16sp" />
+            android:layout_weight="1">
+
+            <CheckBox
+                android:id="@+id/segment_distance"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@color/transparent"
+                android:button="@null"
+                android:checked="false"
+                android:drawablePadding="5dp"
+                android:gravity="center"
+                android:text="Distance"
+                android:textColor="@color/text_gray"
+                android:textSize="16sp" />
+        </FrameLayout>
 
         <View
             android:layout_width="1px"
@@ -29,16 +37,25 @@
             android:layout_marginTop="12dp"
             android:background="@color/divider_gray" />
 
-        <RadioButton
-            android:id="@+id/segment_price"
+        <FrameLayout
+            android:id="@+id/group_price"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:button="@null"
-            android:gravity="center"
-            android:text="Price"
-            android:textColor="@color/selector_segment_filter_text_color"
-            android:textSize="16sp" />
+            android:layout_weight="1">
+
+            <CheckBox
+                android:id="@+id/segment_price"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@color/transparent"
+                android:button="@null"
+                android:drawablePadding="5dp"
+                android:gravity="center"
+                android:text="Prix"
+                android:textColor="@color/text_gray"
+                android:textSize="16sp" />
+        </FrameLayout>
 
         <View
             android:layout_width="1px"
@@ -47,17 +64,27 @@
             android:layout_marginTop="12dp"
             android:background="@color/divider_gray" />
 
-        <RadioButton
-            android:id="@+id/segment_date"
+        <FrameLayout
+            android:id="@+id/group_date"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:button="@null"
-            android:gravity="center"
-            android:text="Date"
-            android:textColor="@color/selector_segment_filter_text_color"
-            android:textSize="16sp" />
-    </RadioGroup>
+            android:layout_weight="1">
+
+            <CheckBox
+                android:id="@+id/segment_date"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:background="@color/transparent"
+                android:button="@null"
+                android:drawablePadding="5dp"
+                android:gravity="center"
+                android:text="Date"
+                android:textColor="@color/text_gray"
+                android:textSize="16sp" />
+        </FrameLayout>
+
+    </LinearLayout>
 
     <View
         android:layout_width="match_parent"
