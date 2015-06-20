@@ -1,23 +1,6 @@
 
 package com.synova.realestate.utils;
 
-import java.lang.reflect.Method;
-import java.math.BigInteger;
-import java.net.URLEncoder;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import org.joda.time.DateTime;
-
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -34,10 +17,13 @@ import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.text.Spannable;
+import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
+import android.text.style.SuperscriptSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -45,6 +31,23 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
 import com.synova.realestate.base.Constants;
+
+import org.joda.time.DateTime;
+
+import java.lang.reflect.Method;
+import java.math.BigInteger;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by ducth on 04/06/2015.
@@ -560,6 +563,14 @@ public class Util {
         DecimalFormat df = new DecimalFormat(pattern, dfs);
         df.setGroupingUsed(true);
         return df.format(price).replace(",", " ");
+    }
+
+    public static Spannable formatSurfaceSuperScriptText(String text) {
+        Spannable spannable = new SpannableString(text);
+        int start = text.indexOf("m2") + 1;
+        spannable
+                .setSpan(new SuperscriptSpan(), start, start + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        return spannable;
     }
 
     private static class ClickableText extends ClickableSpan {

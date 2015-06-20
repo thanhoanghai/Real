@@ -2,10 +2,6 @@
 package com.synova.realestate.adapters;
 
 import android.support.v7.widget.RecyclerView;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.SuperscriptSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -103,12 +99,7 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
                 String description = house.pieces + " piece(s) | " + house.surface + " m2 | "
                         + house.distance + " m";
-                Spannable spannable = new SpannableString(description);
-                int start = description.indexOf("m2") + 1;
-                spannable
-                        .setSpan(new SuperscriptSpan(), start, start + 1,
-                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-                holder.tvDescription.setText(spannable);
+                holder.tvDescription.setText(Util.formatSurfaceSuperScriptText(description));
                 break;
             case FOOTER:
                 break;

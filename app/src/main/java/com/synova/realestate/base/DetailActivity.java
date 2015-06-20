@@ -11,8 +11,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -22,12 +25,16 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
+import com.synova.realestate.adapters.DetailMapInfoWindowAdapter;
 import com.synova.realestate.adapters.DetailSlideShowAdapter;
 import com.synova.realestate.customviews.AdsImageView;
 import com.synova.realestate.customviews.CustomCirclePageIndicator;
+import com.synova.realestate.customviews.TouchableWrapperView;
 import com.synova.realestate.fragments.RetainMapFragment;
 import com.synova.realestate.models.DetailData;
+import com.synova.realestate.models.Seller;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,15 +46,19 @@ import cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager;
  * Created by ducth on 6/17/15.
  */
 public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
-        View.OnClickListener {
+        View.OnClickListener, ViewPager.OnPageChangeListener {
 
     private AdsImageView adsView;
 
     private GoogleMap map;
 
     private AutoScrollViewPager slideShowView;
+    private DetailSlideShowAdapter slideShowAdapter;
     private ImageButton btnPreSlide;
     private ImageButton btnNextSlide;
+
+    private ViewGroup groupData;
+    private ViewGroup groupSellers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +79,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         setupActionBar();
         setupSlideShow();
         setupDataList();
+        setupSellerList();
     }
 
     private void setupActionBar() {
@@ -91,32 +103,10 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         slideShowView = (AutoScrollViewPager) findViewById(R.id.detail_slideShow);
         slideShowView.setInterval(5000);
         slideShowView.startAutoScroll();
-        final DetailSlideShowAdapter slideShowAdapter = new DetailSlideShowAdapter();
+        slideShowView.addOnPageChangeListener(this);
+
+        slideShowAdapter = new DetailSlideShowAdapter();
         slideShowView.setAdapter(slideShowAdapter);
-        slideShowView.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-
-            @Override
-            public void onPageSelected(int position) {
-                if (position == 0) {
-                    btnPreSlide.setVisibility(View.GONE);
-                } else if (position == slideShowAdapter.getCount() - 1) {
-                    btnNextSlide.setVisibility(View.GONE);
-                } else {
-                    btnPreSlide.setVisibility(View.VISIBLE);
-                    btnNextSlide.setVisibility(View.VISIBLE);
-                }
-            }
-
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
 
         CustomCirclePageIndicator slideShowIndicator = (CustomCirclePageIndicator) findViewById(R.id.detail_slideshow_indicator);
         slideShowIndicator.setViewPager(slideShowView);
@@ -131,11 +121,14 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 .add("http://rumahinteriorminimalis.com/wp-content/uploads/2014/09/modern-sunroom-designs-covered-jessica-dauray-with-beige-tones-600x300.jpg");
 
         slideShowAdapter.setData(photoUrls);
-        slideShowView.setCurrentItem(-1);
-        slideShowView.setCurrentItem(0);
+        onPageSelected(0);
     }
 
     private void setupMap() {
+        ScrollView scrollView = (ScrollView) findViewById(R.id.detail_scrollView);
+        TouchableWrapperView mapTouchableWrapperView = (TouchableWrapperView) findViewById(R.id.detail_mapTouchableWrapperView);
+        mapTouchableWrapperView.setScrollableView(scrollView);
+
         RetainMapFragment mapFragment = (RetainMapFragment) getSupportFragmentManager()
                 .findFragmentById(
                         R.id.detail_mapFragment);
@@ -165,23 +158,84 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         detailData.quantity = 3;
         data.add(detailData);
 
-        LinearLayout parent = (LinearLayout) findViewById(R.id.detail_groupData);
+        groupData = (LinearLayout) findViewById(R.id.detail_groupData);
 
         LayoutInflater inflater = LayoutInflater.from(this);
         for (int i = 0; i < data.size(); i++) {
             if (i > 0) {
                 View divider = new View(this);
                 divider.setBackgroundResource(R.drawable.shape_cyan_divider);
-                parent.addView(divider);
+                groupData.addView(divider);
             }
-            View item = inflater.inflate(R.layout.layout_detail_data_list_item, parent, false);
+            View item = inflater.inflate(R.layout.layout_detail_data_list_item, groupData, false);
             TextView tvTitle = (TextView) item.findViewById(R.id.detail_data_item_tvTitle);
             TextView tvQuantity = (TextView) item.findViewById(R.id.detail_data_item_tvQuantity);
 
             tvTitle.setText(data.get(i).title);
             tvQuantity.setText(data.get(i).quantity + "");
 
-            parent.addView(item);
+            groupData.addView(item);
+        }
+    }
+
+    private void setupSellerList() {
+        List<Seller> sellers = new ArrayList<>();
+
+        Seller seller = new Seller();
+        seller.thumbnail = "";
+        seller.title = "Nom Adresse 1";
+        seller.website = "http://google.com";
+        seller.phone = "51-22-48";
+        seller.mail = "mail01@realestate.com";
+        seller.annonces = 100;
+        sellers.add(seller);
+
+        seller = new Seller();
+        seller.thumbnail = "";
+        seller.title = "Nom Adresse 2";
+        seller.website = "http://google.com";
+        seller.phone = "51-22-49";
+        seller.mail = "mail02@realestate.com";
+        seller.annonces = 100;
+        sellers.add(seller);
+
+        seller = new Seller();
+        seller.thumbnail = "";
+        seller.title = "Nom Adresse 3";
+        seller.website = "http://google.com";
+        seller.phone = "51-22-50";
+        seller.mail = "mail03@realestate.com";
+        seller.annonces = 100;
+        sellers.add(seller);
+
+        groupSellers = (ViewGroup) findViewById(R.id.detail_groupSellers);
+
+        LayoutInflater inflater = LayoutInflater.from(this);
+        for (Seller s : sellers) {
+            View view = inflater.inflate(R.layout.layout_detail_seller_list_item,
+                    groupSellers, false);
+
+            ImageView ivThumbnail = (ImageView) view.findViewById(R.id.detail_seller_ivThumbnail);
+            TextView tvTitle = (TextView) view.findViewById(R.id.detail_seller_tvTitle);
+            TextView tvPrice = (TextView) view.findViewById(R.id.detail_seller_tvPrice);
+            TextView tvPhone = (TextView) view.findViewById(R.id.detail_seller_tvPhone);
+            TextView tvMail = (TextView) view.findViewById(R.id.detail_seller_tvMail);
+            ViewGroup groupPhone = (ViewGroup) view.findViewById(R.id.detail_seller_groupPhone);
+            ViewGroup groupMail = (ViewGroup) view.findViewById(R.id.detail_seller_groupMail);
+
+            ImageLoader.getInstance().displayImage(s.thumbnail, ivThumbnail);
+            tvTitle.setText(s.title);
+            // tvPrice.setText(s.);
+            tvPhone.setText(s.phone);
+            tvMail.setText(s.mail);
+
+            groupPhone.setTag(s);
+            groupPhone.setOnClickListener(this);
+
+            groupMail.setTag(s);
+            groupMail.setOnClickListener(this);
+
+            groupSellers.addView(view);
         }
 
     }
@@ -194,6 +248,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
         map = googleMap;
         map.getUiSettings().setMapToolbarEnabled(false);
+        map.setInfoWindowAdapter(new DetailMapInfoWindowAdapter(this));
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
                 location.getLongitude()), 16));
 
@@ -250,10 +305,46 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         switch (v.getId()) {
             case R.id.detail_btnPreSlide:
                 slideShowView.setCurrentItem(slideShowView.getCurrentItem() - 1);
+                slideShowView.stopAutoScroll();
+                slideShowView.startAutoScroll();
                 break;
             case R.id.detail_btnNextSlide:
                 slideShowView.setCurrentItem(slideShowView.getCurrentItem() + 1);
+                slideShowView.stopAutoScroll();
+                slideShowView.startAutoScroll();
+                break;
+            case R.id.detail_seller_groupPhone:
+                Seller seller = (Seller) v.getTag();
+                Snackbar.make(v, "Call " + seller.phone, Snackbar.LENGTH_SHORT).show();
+                break;
+            case R.id.detail_seller_groupMail:
+                seller = (Seller) v.getTag();
+                Snackbar.make(v, "Send mail to " + seller.mail, Snackbar.LENGTH_SHORT).show();
                 break;
         }
+    }
+
+    @Override
+    public void onPageSelected(int position) {
+        if (position == 0) {
+            btnPreSlide.setVisibility(View.GONE);
+            btnNextSlide.setVisibility(View.VISIBLE);
+        } else if (position == slideShowAdapter.getCount() - 1) {
+            btnPreSlide.setVisibility(View.VISIBLE);
+            btnNextSlide.setVisibility(View.GONE);
+        } else {
+            btnPreSlide.setVisibility(View.VISIBLE);
+            btnNextSlide.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+
     }
 }

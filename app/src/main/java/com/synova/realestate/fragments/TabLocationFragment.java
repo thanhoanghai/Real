@@ -4,10 +4,6 @@ package com.synova.realestate.fragments;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.SuperscriptSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -210,13 +206,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         tvTitle.setText(marker.getTitle());
         tvPrice.setText("750€");
         String description = "2 piece(s) | 35 m2 | 300 m";
-        Spannable spannable = new SpannableString(description);
-        int start = description.indexOf("m2") + 1;
-        spannable
-                .setSpan(new SuperscriptSpan(), start, start + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        tvDescription.setText(spannable);
+        tvDescription.setText(Util.formatSurfaceSuperScriptText(description));
 
-        return true;
+        return false;
     }
 
     private Marker createMarker(double lat, double lng, String title) {

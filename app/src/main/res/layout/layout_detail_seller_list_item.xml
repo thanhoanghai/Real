@@ -32,7 +32,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="750€"
-            android:textColor="@color/cyan" />
+            android:textColor="@color/cyan"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <LinearLayout
