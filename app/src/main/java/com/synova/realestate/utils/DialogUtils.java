@@ -12,7 +12,6 @@ import android.view.WindowManager;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.edmodo.rangebar.RangeBar;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
@@ -20,6 +19,7 @@ import com.facebook.rebound.SpringUtil;
 import com.nineoldandroids.view.ViewHelper;
 import com.synova.realestate.R;
 import com.synova.realestate.adapters.RadioButtonAdapter;
+import com.synova.realestate.customviews.rangebar.RangeBar;
 
 import java.util.ArrayList;
 import java.util.List;
