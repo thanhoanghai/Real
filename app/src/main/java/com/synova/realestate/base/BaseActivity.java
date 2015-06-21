@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.KeyEvent;
 
 import com.google.gson.Gson;
 import com.synova.realestate.R;
@@ -101,10 +102,17 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void showDetailActivity(House house){
+    public void showDetailActivity(House house) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("house", new Gson().toJson(house));
         startActivity(intent);
     }
 
+    @Override
+    public boolean onKeyUp(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_MENU) {
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
 }
