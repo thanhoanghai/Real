@@ -5,4 +5,6 @@
     <string name="MAP_RELEASE_API_KEY">AIzaSyAmWl0ohxUeEWcxJpfgkYKq9ZkhlGqJaH0</string>
     <string name="open_drawer">Open drawer</string>
     <string name="close_drawer">Close drawer</string>
+    <string name="surface_unit"><![CDATA[%1$s m<sup><small>2</small></sup>]]></string>
+    <string name="list_item_description_template"><![CDATA[%1$s piece(s) | %2$s m<sup><small>2</small></sup> | %3$s m]]></string>
 </resources>

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -217,8 +218,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                         ivThumbnail);
         tvTitle.setText(marker.getTitle());
         tvPrice.setText("750€");
-        String description = "2 piece(s) | 35 m2 | 300 m";
-        tvDescription.setText(Util.formatSurfaceSuperScriptText(description));
+        String description = String.format(
+                activity.getString(R.string.list_item_description_template), 2, 35, 300);
+        tvDescription.setText(Html.fromHtml(description));
 
         return false;
     }
@@ -259,9 +261,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.tab_location_btnMenu:
-                ((MainActivity)activity).openDrawer();
+                ((MainActivity) activity).openDrawer();
                 break;
         }
     }

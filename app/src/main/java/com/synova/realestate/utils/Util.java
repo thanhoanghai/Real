@@ -21,13 +21,10 @@ import android.provider.Settings;
 import android.provider.Settings.Secure;
 import android.telephony.TelephonyManager;
 import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.text.style.SuperscriptSpan;
 import android.text.style.URLSpan;
 import android.util.DisplayMetrics;
 import android.view.View;
@@ -617,14 +614,6 @@ public class Util {
                 + (badge.getHeight() - textBounds.height()) / 2, badgeText);
 
         return mutableBitmap;
-    }
-
-    public static Spannable formatSurfaceSuperScriptText(String text) {
-        Spannable spannable = new SpannableString(text);
-        int start = text.indexOf("m2") + 1;
-        spannable
-                .setSpan(new SuperscriptSpan(), start, start + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        return spannable;
     }
 
     private static class ClickableText extends ClickableSpan {

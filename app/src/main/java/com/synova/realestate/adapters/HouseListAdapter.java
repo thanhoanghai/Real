@@ -2,6 +2,7 @@
 package com.synova.realestate.adapters;
 
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -97,9 +98,11 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         .formatPriceNumber(house.price) + "€" : "€");
                 holder.tvTitle.setText(house.title);
 
-                String description = house.pieces + " piece(s) | " + house.surface + " m2 | "
-                        + house.distance + " m";
-                holder.tvDescription.setText(Util.formatSurfaceSuperScriptText(description));
+                String description = String.format(
+                        holder.tvDescription.getContext().getString(
+                                R.string.list_item_description_template), house.pieces,
+                        house.surface, house.distance);
+                holder.tvDescription.setText(Html.fromHtml(description));
                 break;
             case FOOTER:
                 break;

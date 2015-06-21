@@ -6,9 +6,13 @@ import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.SeekBar;
+import android.widget.TextView;
 
+import com.edmodo.rangebar.RangeBar;
 import com.facebook.rebound.SimpleSpringListener;
 import com.facebook.rebound.Spring;
 import com.facebook.rebound.SpringSystem;
@@ -121,7 +125,7 @@ public class DialogUtils {
     // return dialog;
     // }
 
-    public static Dialog showDialogFilter(Context context) {
+    public static Dialog showDialogFilter(final Context context) {
         final Dialog dialog = createDialogAndSave(context, R.layout.dialog_filter, true);
 
         View rootView = dialog.findViewById(R.id.dialog_rootView);
@@ -149,6 +153,63 @@ public class DialogUtils {
         adapter.setData(items);
 
         recyclerView.setMinimumHeight(Util.dpToPx(context, 90));
+
+        final TextView tvDistance = (TextView) dialog.findViewById(R.id.dialog_filter_tvDistance);
+        SeekBar distanceBar = (SeekBar) dialog.findViewById(R.id.dialog_filter_distanceBar);
+        distanceBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                tvDistance.setText((200 + 100 * progress) + "m");
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
+        final TextView tvPrice = (TextView) dialog.findViewById(R.id.dialog_filter_tvPrice);
+        RangeBar priceBar = (RangeBar) dialog.findViewById(R.id.dialog_filter_priceBar);
+        priceBar.setThumbIndices(3, 11);
+        priceBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+            @Override
+            public void onIndexChangeListener(RangeBar rangeBar, int leftThumbIndex,
+                    int rightThumbIndex) {
+                String text = "";
+                if (leftThumbIndex == rightThumbIndex) {
+                    text = (50 + leftThumbIndex * 50) + "k €";
+                } else {
+                    text = (50 + leftThumbIndex * 50) + "k à " + (50 + rightThumbIndex * 50)
+                            + "k €";
+                }
+                tvPrice.setText(text);
+            }
+        });
+
+        final TextView tvSurface = (TextView) dialog.findViewById(R.id.dialog_filter_tvSurface);
+        tvSurface.setText(Html.fromHtml(String.format(context.getString(R.string.surface_unit),
+                "10 à 300")));
+        RangeBar surfaceBar = (RangeBar) dialog.findViewById(R.id.dialog_filter_surfaceBar);
+        surfaceBar.setThumbIndices(0, surfaceBar.getRightIndex());
+        surfaceBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
+            @Override
+            public void onIndexChangeListener(RangeBar rangeBar, int leftThumbIndex,
+                    int rightThumbIndex) {
+                String text = "";
+                if (leftThumbIndex == rightThumbIndex) {
+                    text = (10 + leftThumbIndex * 10) + "";
+                } else {
+                    text = (10 + leftThumbIndex * 10) + " à " + (10 + rightThumbIndex * 10);
+                }
+                tvSurface.setText(Html.fromHtml(String.format(
+                        context.getString(R.string.surface_unit), text)));
+            }
+        });
 
         return dialog;
     }
