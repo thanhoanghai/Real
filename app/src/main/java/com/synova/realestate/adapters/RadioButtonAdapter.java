@@ -16,7 +16,7 @@ public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.
         implements View.OnClickListener {
 
     private RadioButton mSelectedRB;
-    private int mSelectedPosition = -1;
+    private int mSelectedPosition = 0;
 
     private List<String> items = new ArrayList<>();
 
@@ -26,7 +26,7 @@ public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.
         this.recyclerView = recyclerView;
     }
 
-    public void setData(List<String> items){
+    public void setData(List<String> items) {
         this.items = items;
         notifyDataSetChanged();
     }
@@ -54,7 +54,7 @@ public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.
             holder.radioButton.setChecked(false);
         } else {
             holder.radioButton.setChecked(true);
-            if (mSelectedRB != null && holder.radioButton != mSelectedRB) {
+            if (holder.radioButton != mSelectedRB) {
                 mSelectedRB = holder.radioButton;
             }
         }

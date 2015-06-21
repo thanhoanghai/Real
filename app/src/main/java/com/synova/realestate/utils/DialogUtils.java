@@ -122,7 +122,16 @@ public class DialogUtils {
     // }
 
     public static Dialog showDialogFilter(Context context) {
-        Dialog dialog = createDialogAndSave(context, R.layout.dialog_filter, true);
+        final Dialog dialog = createDialogAndSave(context, R.layout.dialog_filter, true);
+
+        View rootView = dialog.findViewById(R.id.dialog_rootView);
+        rootView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
         RecyclerView recyclerView = (RecyclerView) dialog.findViewById(R.id.dialog_filter_rvType);
         GridLayoutManager manager = new GridLayoutManager(context, 2, GridLayoutManager.VERTICAL,
                 false);
@@ -153,7 +162,8 @@ public class DialogUtils {
 
     private static Dialog createDialog(Context context, int layoutId,
             boolean isCancelable) {
-        return doCreateDialog(context, layoutId, isCancelable, R.style.AlertDialog_AppCompat);
+        return doCreateDialog(context, layoutId, isCancelable,
+                android.R.style.Theme_Holo_NoActionBar);
     }
 
     private static Dialog doCreateDialog(Context context, int layoutId,
