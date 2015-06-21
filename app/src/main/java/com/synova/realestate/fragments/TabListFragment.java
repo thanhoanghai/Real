@@ -15,6 +15,7 @@ import com.synova.realestate.R;
 import com.synova.realestate.adapters.HouseListAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.models.House;
 
@@ -66,6 +67,12 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
         loadNewData();
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)activity).disableDrawer();
     }
 
     private List<House> createMockData() {

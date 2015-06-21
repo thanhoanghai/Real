@@ -15,6 +15,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:visibility="gone" />
+        android:visibility="invisible" />
+
+    <ImageView
+        android:id="@+id/tab_location_btnMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/tab_location_groupDetailBottom"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ico_map_menu" />
 
 </RelativeLayout>

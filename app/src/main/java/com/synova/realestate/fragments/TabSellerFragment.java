@@ -15,6 +15,7 @@ import com.synova.realestate.R;
 import com.synova.realestate.adapters.SellerListAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.customviews.DividerDecoration;
 import com.synova.realestate.models.Seller;
 
@@ -64,6 +65,12 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
         loadNewData();
 
         return rootView;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)activity).disableDrawer();
     }
 
     private List<Seller> createMockData() {

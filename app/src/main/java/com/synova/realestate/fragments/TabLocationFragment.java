@@ -29,6 +29,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.models.House;
 import com.synova.realestate.utils.Util;
 
@@ -39,7 +40,8 @@ import java.util.Random;
  */
 public class TabLocationFragment extends BaseFragment implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener {
+        LocationListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener,
+        View.OnClickListener {
 
     private RetainMapFragment mapFragment;
     private GoogleMap map;
@@ -50,6 +52,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     private Location currentLocation;
 
     private Circle selectedMarkerCircle;
+
+    private ImageView btnMenu;
 
     private ViewGroup groupDetailBottom;
     private ImageView ivThumbnail;
@@ -66,6 +70,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
         setupMap();
         setupGroupDetailBottom();
+
+        btnMenu = (ImageView) rootView.findViewById(R.id.tab_location_btnMenu);
+        btnMenu.setOnClickListener(this);
 
         return rootView;
     }
@@ -116,6 +123,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     @Override
     public void onResume() {
         super.onResume();
+
+        ((MainActivity) activity).enableDrawer();
+
         if (!Util.isLocationEnabled(activity)) {
             // DialogUtils.showOpenLocationSettingDialog(activity);
         }
@@ -189,7 +199,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onMapClick(LatLng latLng) {
-        groupDetailBottom.setVisibility(View.GONE);
+        groupDetailBottom.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -218,7 +228,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         return map.addMarker(new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromBitmap(icon))
                 .position(new LatLng(lat, lng))
-                .anchor(0.15f, 0.9f)
+                .anchor(0.2f, 0.9f)
                 .title(title));
     }
 
@@ -247,4 +257,12 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.tab_location_btnMenu:
+                ((MainActivity)activity).openDrawer();
+                break;
+        }
+    }
 }

@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,7 +58,7 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         setupTabHost();
 
         adsView = (AdsImageView) findViewById(R.id.adsImageView);
-//        adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
+        // adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
         adsView.setImageResource(R.drawable.img_ads_banner);
         adsView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -65,6 +66,12 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
                 Snackbar.make(adsView, "You've clicked ads banner!", Snackbar.LENGTH_SHORT).show();
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        disableDrawer();
     }
 
     @Override
@@ -208,6 +215,18 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         ft.commit();
     }
 
+    public void enableDrawer() {
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+    }
+
+    public void disableDrawer() {
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+    }
+
+    public void openDrawer(){
+        drawerLayout.openDrawer(Gravity.LEFT);
+    }
+
     private BaseFragment getCurrentFragment() {
         return fragmentStacks.get(currentTabTag).peek();
     }
@@ -246,7 +265,8 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.onOptionsItemSelected(item)) {
+        if (drawerLayout.getDrawerLockMode(Gravity.LEFT) == DrawerLayout.LOCK_MODE_UNLOCKED
+                && drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
 
