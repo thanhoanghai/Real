@@ -257,8 +257,9 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
     private Marker createMarker(double lat, double lng, String title) {
         return map.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ico_marker_cyan))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ico_marker_bien))
                 .position(new LatLng(lat, lng))
+                .anchor(0.15f, 0.9f)
                 .title(title));
     }
 

@@ -1,6 +1,7 @@
 
 package com.synova.realestate.fragments;
 
+import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,6 +29,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.models.House;
 import com.synova.realestate.utils.Util;
 
 import java.util.Random;
@@ -211,10 +213,12 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         return false;
     }
 
-    private Marker createMarker(double lat, double lng, String title) {
+    private Marker createMarker(double lat, double lng, String title, House.HouseType houseType) {
+        Bitmap icon = Util.createMarkerBitmapWithBadge(activity, houseType, 999);
         return map.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ico_marker_cyan))
+                .icon(BitmapDescriptorFactory.fromBitmap(icon))
                 .position(new LatLng(lat, lng))
+                .anchor(0.15f, 0.9f)
                 .title(title));
     }
 
@@ -239,7 +243,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
             double lat = loc.getLatitude() + number / 10E3;
             double lng = loc.getLongitude() + number / 10E3;
 
-            createMarker(lat, lng, "House " + i);
+            createMarker(lat, lng, "House " + i, House.HouseType.BIEN);
         }
     }
 

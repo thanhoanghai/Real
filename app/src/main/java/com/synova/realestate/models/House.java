@@ -14,10 +14,14 @@ public class House {
     public float surface;
     public float price;
     @SerializedName("propertyType")
-    public int type;
+    public HouseType type;
     @SerializedName("nbpieces")
     public int pieces;
     @SerializedName("imgurl")
     public String photo;
     public String distance;
+
+    public enum HouseType {
+        BIEN, AGENCE, PARTICULIER, NOTAIRE
+    }
 }

@@ -10,7 +10,11 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -30,7 +34,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.models.House;
 
 import org.joda.time.DateTime;
 
@@ -563,6 +569,54 @@ public class Util {
         DecimalFormat df = new DecimalFormat(pattern, dfs);
         df.setGroupingUsed(true);
         return df.format(price).replace(",", " ");
+    }
+
+    public static Bitmap createMarkerBitmapWithBadge(Context context, House.HouseType type,
+            int badgeNumber) {
+        int iconResId = 0;
+        switch (type) {
+            case BIEN:
+                iconResId = R.drawable.ico_marker_bien;
+                break;
+            case AGENCE:
+                iconResId = R.drawable.ico_marker_agence;
+                break;
+            case PARTICULIER:
+                iconResId = R.drawable.ico_marker_particulier;
+                break;
+            case NOTAIRE:
+                iconResId = R.drawable.ico_marker_notaire;
+                break;
+        }
+
+        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), iconResId);
+        Bitmap badge = BitmapFactory.decodeResource(context.getResources(), R.drawable.ico_badge);
+
+        Paint bitmapPaint = new Paint();
+        bitmapPaint.setAntiAlias(true);
+
+        Paint badgeText = new Paint();
+        badgeText.setAntiAlias(true);
+        badgeText.setTextSize(Util.dpToPx(context, 12));
+        badgeText.setColor(Color.WHITE);
+
+        Bitmap.Config config = Bitmap.Config.ARGB_8888;
+        Bitmap mutableBitmap = Bitmap.createBitmap(icon.getWidth() + badge.getWidth() / 2,
+                icon.getHeight(), config);
+        Canvas canvas = new Canvas(mutableBitmap);
+
+        canvas.drawBitmap(icon, 0, 0, bitmapPaint);
+
+        canvas.drawBitmap(badge, mutableBitmap.getWidth() - badge.getWidth(), 0, bitmapPaint);
+
+        String badgeNum = "" + badgeNumber;
+        Rect textBounds = new Rect();
+        badgeText.getTextBounds(badgeNum, 0, badgeNum.length(), textBounds);
+        canvas.drawText(badgeNum, mutableBitmap.getWidth() - textBounds.width()
+                - (badge.getWidth() - textBounds.width()) / 2, textBounds.height()
+                + (badge.getHeight() - textBounds.height()) / 2, badgeText);
+
+        return mutableBitmap;
     }
 
     public static Spannable formatSurfaceSuperScriptText(String text) {

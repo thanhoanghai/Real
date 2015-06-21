@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/navigation_item_title"
+            android:checked="true"
+            android:title="Filtrer par" />
+
+        <item
+            android:id="@+id/navigation_item_bien"
+            android:checked="true"
+            android:icon="@drawable/ico_marker_bien"
+            android:title="bien" />
+
+        <item
+            android:id="@+id/navigation_item_agence"
+            android:icon="@drawable/ico_marker_agence"
+            android:title="Agence" />
+
+        <item
+            android:id="@+id/navigation_item_particulier"
+            android:icon="@drawable/ico_marker_particulier"
+            android:title="Particulier" />
+
+        <item
+            android:id="@+id/navigation_item_Notaire"
+            android:icon="@drawable/ico_marker_notaire"
+            android:title="Notaire" />
+    </group>
+</menu>

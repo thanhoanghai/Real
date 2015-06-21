@@ -6,6 +6,7 @@
         <item name="actionBarItemBackground">@drawable/selector_action_bar_item_bg</item>
         <item name="android:itemBackground">@drawable/selector_action_bar_overflow_item_bg</item>
         <item name="vpiCirclePageIndicatorStyle">@style/CustomCirclePageIndicator</item>
+        <item name="android:textAllCaps">false</item>
     </style>
 
     <style name="CustomCirclePageIndicator">
