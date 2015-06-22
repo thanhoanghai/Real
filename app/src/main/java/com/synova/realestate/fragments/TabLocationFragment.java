@@ -138,7 +138,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     @Override
     public void onPause() {
         super.onPause();
-        stopRequestLocationUpdate();
+        if (googleApiClient.isConnected()) {
+            stopRequestLocationUpdate();
+        }
     }
 
     @Override
