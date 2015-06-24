@@ -15,6 +15,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.NinePatchDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -570,9 +571,6 @@ public class Util {
 
     public static Bitmap createMarkerBitmapWithBadge(Context context, Constants.ElementType type,
             int badgeNumber) {
-        Bitmap icon = createMarkerBitmap(context, type);
-        Bitmap badge = BitmapFactory.decodeResource(context.getResources(), R.drawable.ico_badge);
-
         Paint bitmapPaint = new Paint();
         bitmapPaint.setAntiAlias(true);
 
@@ -581,21 +579,34 @@ public class Util {
         badgeText.setTextSize(Util.dpToPx(context, 12));
         badgeText.setColor(Color.WHITE);
 
-        Bitmap.Config config = Bitmap.Config.ARGB_8888;
-        Bitmap mutableBitmap = Bitmap.createBitmap(icon.getWidth() + badge.getWidth() / 2,
-                icon.getHeight(), config);
-        Canvas canvas = new Canvas(mutableBitmap);
+        Bitmap icon = createMarkerBitmap(context, type);
+        NinePatchDrawable badge = (NinePatchDrawable) context.getResources().getDrawable(
+                R.drawable.ico_badge);
 
-        canvas.drawBitmap(icon, 0, 0, bitmapPaint);
-
-        canvas.drawBitmap(badge, mutableBitmap.getWidth() - badge.getWidth(), 0, bitmapPaint);
-
-        String badgeNum = "" + badgeNumber;
         Rect textBounds = new Rect();
+        String badgeNum = "" + badgeNumber;
         badgeText.getTextBounds(badgeNum, 0, badgeNum.length(), textBounds);
-        canvas.drawText(badgeNum, mutableBitmap.getWidth() - textBounds.width()
-                - (badge.getWidth() - textBounds.width()) / 2, textBounds.height()
-                + (badge.getHeight() - textBounds.height()) / 2, badgeText);
+
+        int badgeWidth = badge.getIntrinsicWidth();
+        int padding = 16;
+        if (badgeWidth < textBounds.width() + padding * 2) {
+            badgeWidth = textBounds.width() + padding * 2;
+        }
+
+        Bitmap.Config config = Bitmap.Config.ARGB_8888;
+        Bitmap mutableBitmap = Bitmap.createBitmap(icon.getWidth() + badgeWidth / 2
+                + padding,
+                icon.getHeight(), config);
+
+        badge.setBounds(mutableBitmap.getWidth() - badgeWidth, 0, mutableBitmap.getWidth(),
+                badge.getIntrinsicHeight());
+
+        Canvas canvas = new Canvas(mutableBitmap);
+        canvas.drawBitmap(icon, 0, 0, bitmapPaint);
+        badge.draw(canvas);
+        canvas.drawText(badgeNum,
+                badge.getBounds().left + (badge.getBounds().width() - textBounds.width()) / 2,
+                (badge.getBounds().height() + textBounds.height()) / 2, badgeText);
 
         return mutableBitmap;
     }

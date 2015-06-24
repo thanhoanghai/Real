@@ -307,14 +307,16 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 .center(new LatLng(lat, lng))
                 .radius(radius)
                 .fillColor(getResources().getColor(R.color.trans_cyan))
-                .strokeWidth(0));
+                .strokeWidth(1)
+                .strokeColor(getResources().getColor(R.color.trans_gray)));
     }
 
     private void addSelectedMarkerPolygon(LatLng[] latLngs) {
         selectedMarkerPolygon = map.addPolygon(new PolygonOptions()
                 .add(latLngs)
-                .strokeWidth(0)
-                .fillColor(getResources().getColor(R.color.trans_cyan)));
+                .fillColor(getResources().getColor(R.color.trans_cyan))
+                .strokeWidth(1)
+                .strokeColor(getResources().getColor(R.color.text_gray)));
     }
 
     @Override
