@@ -10,8 +10,8 @@ public class MapRequestEnt {
     public double xMax;
     public double yMax;
     public int adsOffset;
-    public int surfaceMinS;
-    public int surfaceMaxS;
+    public String surfaceMinS;
+    public String surfaceMaxS;
     public String deviceId;
 
 }

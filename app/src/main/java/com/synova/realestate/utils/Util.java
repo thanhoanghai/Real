@@ -31,9 +31,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
-import com.synova.realestate.models.House;
 
 import org.joda.time.DateTime;
 
@@ -568,25 +568,9 @@ public class Util {
         return df.format(price).replace(",", " ");
     }
 
-    public static Bitmap createMarkerBitmapWithBadge(Context context, House.HouseType type,
+    public static Bitmap createMarkerBitmapWithBadge(Context context, Constants.ElementType type,
             int badgeNumber) {
-        int iconResId = 0;
-        switch (type) {
-            case BIEN:
-                iconResId = R.drawable.ico_marker_bien;
-                break;
-            case AGENCE:
-                iconResId = R.drawable.ico_marker_agence;
-                break;
-            case PARTICULIER:
-                iconResId = R.drawable.ico_marker_particulier;
-                break;
-            case NOTAIRE:
-                iconResId = R.drawable.ico_marker_notaire;
-                break;
-        }
-
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), iconResId);
+        Bitmap icon = createMarkerBitmap(context, type);
         Bitmap badge = BitmapFactory.decodeResource(context.getResources(), R.drawable.ico_badge);
 
         Paint bitmapPaint = new Paint();
@@ -614,6 +598,43 @@ public class Util {
                 + (badge.getHeight() - textBounds.height()) / 2, badgeText);
 
         return mutableBitmap;
+    }
+
+    public static Bitmap createMarkerBitmap(Context context, Constants.ElementType type) {
+        int iconResId = 0;
+        switch (type) {
+            case BIEN:
+                iconResId = R.drawable.ico_marker_bien;
+                break;
+            case AGENCE:
+                iconResId = R.drawable.ico_marker_agence;
+                break;
+            case PARTICULIER:
+                iconResId = R.drawable.ico_marker_particulier;
+                break;
+            case NOTAIRE:
+                iconResId = R.drawable.ico_marker_notaire;
+                break;
+        }
+
+        return BitmapFactory.decodeResource(context.getResources(), iconResId);
+    }
+
+    public static LatLng convertPointGeomToLatLng(String pointGeom) {
+        String[] point = pointGeom.substring(6, pointGeom.length() - 1).split(" ");
+        LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
+        return latLng;
+    }
+
+    public static LatLng[] convertZoneGeomToLatLngs(String zoneGeom) {
+        String[] points = zoneGeom.substring(9, zoneGeom.length() - 2).split(",");
+        LatLng[] latLngs = new LatLng[points.length];
+        for (int i = 0; i < points.length; i++) {
+            String[] point = points[i].split(" ");
+            LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
+            latLngs[i] = latLng;
+        }
+        return latLngs;
     }
 
     private static class ClickableText extends ClickableSpan {
