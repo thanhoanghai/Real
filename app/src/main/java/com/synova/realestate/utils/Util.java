@@ -15,6 +15,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.drawable.NinePatchDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.Settings;
@@ -31,9 +32,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
-import com.synova.realestate.models.House;
 
 import org.joda.time.DateTime;
 
@@ -568,8 +569,49 @@ public class Util {
         return df.format(price).replace(",", " ");
     }
 
-    public static Bitmap createMarkerBitmapWithBadge(Context context, House.HouseType type,
+    public static Bitmap createMarkerBitmapWithBadge(Context context, Constants.ElementType type,
             int badgeNumber) {
+        Paint bitmapPaint = new Paint();
+        bitmapPaint.setAntiAlias(true);
+
+        Paint badgeText = new Paint();
+        badgeText.setAntiAlias(true);
+        badgeText.setTextSize(Util.dpToPx(context, 12));
+        badgeText.setColor(Color.WHITE);
+
+        Bitmap icon = createMarkerBitmap(context, type);
+        NinePatchDrawable badge = (NinePatchDrawable) context.getResources().getDrawable(
+                R.drawable.ico_badge);
+
+        Rect textBounds = new Rect();
+        String badgeNum = "" + badgeNumber;
+        badgeText.getTextBounds(badgeNum, 0, badgeNum.length(), textBounds);
+
+        int badgeWidth = badge.getIntrinsicWidth();
+        int padding = 16;
+        if (badgeWidth < textBounds.width() + padding * 2) {
+            badgeWidth = textBounds.width() + padding * 2;
+        }
+
+        Bitmap.Config config = Bitmap.Config.ARGB_8888;
+        Bitmap mutableBitmap = Bitmap.createBitmap(icon.getWidth() + badgeWidth / 2
+                + padding,
+                icon.getHeight(), config);
+
+        badge.setBounds(mutableBitmap.getWidth() - badgeWidth, 0, mutableBitmap.getWidth(),
+                badge.getIntrinsicHeight());
+
+        Canvas canvas = new Canvas(mutableBitmap);
+        canvas.drawBitmap(icon, 0, 0, bitmapPaint);
+        badge.draw(canvas);
+        canvas.drawText(badgeNum,
+                badge.getBounds().left + (badge.getBounds().width() - textBounds.width()) / 2,
+                (badge.getBounds().height() + textBounds.height()) / 2, badgeText);
+
+        return mutableBitmap;
+    }
+
+    public static Bitmap createMarkerBitmap(Context context, Constants.ElementType type) {
         int iconResId = 0;
         switch (type) {
             case BIEN:
@@ -586,34 +628,24 @@ public class Util {
                 break;
         }
 
-        Bitmap icon = BitmapFactory.decodeResource(context.getResources(), iconResId);
-        Bitmap badge = BitmapFactory.decodeResource(context.getResources(), R.drawable.ico_badge);
+        return BitmapFactory.decodeResource(context.getResources(), iconResId);
+    }
 
-        Paint bitmapPaint = new Paint();
-        bitmapPaint.setAntiAlias(true);
+    public static LatLng convertPointGeomToLatLng(String pointGeom) {
+        String[] point = pointGeom.substring(6, pointGeom.length() - 1).split(" ");
+        LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
+        return latLng;
+    }
 
-        Paint badgeText = new Paint();
-        badgeText.setAntiAlias(true);
-        badgeText.setTextSize(Util.dpToPx(context, 12));
-        badgeText.setColor(Color.WHITE);
-
-        Bitmap.Config config = Bitmap.Config.ARGB_8888;
-        Bitmap mutableBitmap = Bitmap.createBitmap(icon.getWidth() + badge.getWidth() / 2,
-                icon.getHeight(), config);
-        Canvas canvas = new Canvas(mutableBitmap);
-
-        canvas.drawBitmap(icon, 0, 0, bitmapPaint);
-
-        canvas.drawBitmap(badge, mutableBitmap.getWidth() - badge.getWidth(), 0, bitmapPaint);
-
-        String badgeNum = "" + badgeNumber;
-        Rect textBounds = new Rect();
-        badgeText.getTextBounds(badgeNum, 0, badgeNum.length(), textBounds);
-        canvas.drawText(badgeNum, mutableBitmap.getWidth() - textBounds.width()
-                - (badge.getWidth() - textBounds.width()) / 2, textBounds.height()
-                + (badge.getHeight() - textBounds.height()) / 2, badgeText);
-
-        return mutableBitmap;
+    public static LatLng[] convertZoneGeomToLatLngs(String zoneGeom) {
+        String[] points = zoneGeom.substring(9, zoneGeom.length() - 2).split(",");
+        LatLng[] latLngs = new LatLng[points.length];
+        for (int i = 0; i < points.length; i++) {
+            String[] point = points[i].split(" ");
+            LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
+            latLngs[i] = latLng;
+        }
+        return latLngs;
     }
 
     private static class ClickableText extends ClickableSpan {

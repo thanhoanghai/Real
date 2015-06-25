@@ -26,15 +26,24 @@ import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.MainActivity;
-import com.synova.realestate.models.House;
+import com.synova.realestate.base.RealEstateApplication;
+import com.synova.realestate.models.MapResponseEnt;
+import com.synova.realestate.network.NetworkService;
+import com.synova.realestate.network.model.MapRequestEnt;
 import com.synova.realestate.utils.Util;
 
-import java.util.Random;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by ducth on 6/16/15.
@@ -53,6 +62,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     private Location currentLocation;
 
     private Circle selectedMarkerCircle;
+    private Polygon selectedMarkerPolygon;
 
     private ImageView btnMenu;
 
@@ -177,7 +187,39 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         if (loadingState != Constants.NetworkLoadingState.LOADING
                 && loadingState != Constants.NetworkLoadingState.LOADED) {
             loadingState = Constants.NetworkLoadingState.LOADING;
-            createMockData(location);
+
+            final MapRequestEnt mapRequestEnt = new MapRequestEnt();
+            mapRequestEnt.deviceId = RealEstateApplication.deviceId;
+            // mapRequestEnt.xMin = location.getLatitude();
+            // mapRequestEnt.yMin = location.getLongitude();
+            // mapRequestEnt.xMax = location.getLatitude() + 200/1E6;
+            // mapRequestEnt.yMax = location.getLongitude() + 200/1E6;
+            mapRequestEnt.xMin = 2.1475;
+            mapRequestEnt.yMin = 48.9306;
+            mapRequestEnt.xMax = 2.4963;
+            mapRequestEnt.yMax = 48.7924;
+            mapRequestEnt.adsOffset = 100;
+            mapRequestEnt.surfaceMinS = 0 + "";
+            mapRequestEnt.surfaceMaxS = 2000 + "";
+
+            NetworkService.getMap(mapRequestEnt, new Callback<List<MapResponseEnt>>() {
+                @Override
+                public void success(List<MapResponseEnt> mapResponseEnts, Response response) {
+                    if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
+                        for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
+                            if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
+                                    && mapResponseEnt.elementType != null) {
+                                createMarker(mapResponseEnt);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+
+                }
+            });
         }
     }
 
@@ -210,7 +252,18 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         if (selectedMarkerCircle != null) {
             selectedMarkerCircle.remove();
         }
-        addSelectedMarkerCircle(marker.getPosition().latitude, marker.getPosition().longitude, 500);
+        if (selectedMarkerPolygon != null) {
+            selectedMarkerPolygon.remove();
+        }
+
+        MapResponseEnt mapResponseEnt = RealEstateApplication.GSON.fromJson(marker.getSnippet(),
+                MapResponseEnt.class);
+
+        LatLng[] polygon = Util.convertZoneGeomToLatLngs(mapResponseEnt.zoneGeom);
+        addSelectedMarkerPolygon(polygon);
+
+        // addSelectedMarkerCircle(marker.getPosition().latitude, marker.getPosition().longitude,
+        // 500);
 
         groupDetailBottom.setVisibility(View.VISIBLE);
         ImageLoader
@@ -227,13 +280,26 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         return false;
     }
 
-    private Marker createMarker(double lat, double lng, String title, House.HouseType houseType) {
-        Bitmap icon = Util.createMarkerBitmapWithBadge(activity, houseType, 999);
+    private Marker createMarker(MapResponseEnt mapResponseEnt) {
+        LatLng latLng = Util
+                .convertPointGeomToLatLng(mapResponseEnt.pointGeom);
+        String title = mapResponseEnt.adminName != null ? mapResponseEnt.adminName
+                : "";
+
+        Bitmap icon = null;
+        if (mapResponseEnt.nbAds > 0) {
+            icon = Util.createMarkerBitmapWithBadge(activity, mapResponseEnt.elementType,
+                    mapResponseEnt.nbAds);
+        } else {
+            icon = Util.createMarkerBitmap(activity, mapResponseEnt.elementType);
+        }
+
         return map.addMarker(new MarkerOptions()
                 .icon(BitmapDescriptorFactory.fromBitmap(icon))
-                .position(new LatLng(lat, lng))
+                .position(latLng)
                 .anchor(0.2f, 0.9f)
-                .title(title));
+                .title(title)
+                .snippet(RealEstateApplication.GSON.toJson(mapResponseEnt)));
     }
 
     private void addSelectedMarkerCircle(double lat, double lng, double radius) {
@@ -241,24 +307,16 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 .center(new LatLng(lat, lng))
                 .radius(radius)
                 .fillColor(getResources().getColor(R.color.trans_cyan))
-                .strokeWidth(0));
+                .strokeWidth(1)
+                .strokeColor(getResources().getColor(R.color.trans_gray)));
     }
 
-    private void createMockData(Location loc) {
-        int min = 10;
-        int max = 100;
-
-        Random r = new Random();
-        for (int i = 0; i < 5; i++) {
-            int number = r.nextInt(max - min + 1) + min;
-            if (i % 2 == 0) {
-                number = -number;
-            }
-            double lat = loc.getLatitude() + number / 10E3;
-            double lng = loc.getLongitude() + number / 10E3;
-
-            createMarker(lat, lng, "House " + i, House.HouseType.BIEN);
-        }
+    private void addSelectedMarkerPolygon(LatLng[] latLngs) {
+        selectedMarkerPolygon = map.addPolygon(new PolygonOptions()
+                .add(latLngs)
+                .fillColor(getResources().getColor(R.color.trans_cyan))
+                .strokeWidth(1)
+                .strokeColor(getResources().getColor(R.color.text_gray)));
     }
 
     @Override

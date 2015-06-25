@@ -1,6 +1,7 @@
 
 package com.synova.realestate.base;
 
+import com.google.gson.annotations.SerializedName;
 import com.synova.realestate.R;
 
 /**
@@ -36,6 +37,17 @@ public class Constants {
             this.transitionInResId = transitionInResId;
             this.transitionOutResId = transitionOutResId;
         }
+    }
+
+    public enum ElementType{
+        @SerializedName("bien")
+        BIEN,
+        @SerializedName("agence")
+        AGENCE,
+        @SerializedName("particulier")
+        PARTICULIER,
+        @SerializedName("notaire")
+        NOTAIRE
     }
 
     public enum ListLoadingState {

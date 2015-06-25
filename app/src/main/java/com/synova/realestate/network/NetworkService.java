@@ -1,11 +1,11 @@
 
 package com.synova.realestate.network;
 
-import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+import com.synova.realestate.base.RealEstateApplication;
+import com.synova.realestate.models.MapResponseEnt;
 import com.synova.realestate.network.model.AdEnt;
 import com.synova.realestate.network.model.AdsInfoEnt;
 import com.synova.realestate.network.model.FavoriteEnt;
@@ -34,9 +34,7 @@ public class NetworkService {
 
     private static RestService restService = new RestAdapter.Builder()
             .setEndpoint(BASE_URL)
-            .setConverter(
-                    new GsonConverter(new GsonBuilder().setFieldNamingPolicy(
-                            FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create()))
+            .setConverter(new GsonConverter(RealEstateApplication.GSON))
             .setLogLevel(RestAdapter.LogLevel.FULL)
             .build().create(RestService.class);
 
@@ -132,7 +130,7 @@ public class NetworkService {
                 NetworkCallback<String> callback);
 
         @POST("/property/getMap")
-        void getMap(@Body MapRequestEnt mapRequestEnt, NetworkCallback<String> callback);
+        void getMap(@Body MapRequestEnt mapRequestEnt, Callback<JsonElement> callback);
 
         @POST("/property/getDetails")
         void getPropertyDetail(@Body AdEnt adEnt, NetworkCallback<String> callback);
@@ -158,4 +156,26 @@ public class NetworkService {
         }
     }
 
+    public static void getMap(MapRequestEnt mapRequestEnt,
+            final Callback<List<MapResponseEnt>> callback) {
+        restService.getMap(mapRequestEnt, new Callback<JsonElement>() {
+
+            @Override
+            public void success(JsonElement jsonElement, Response response) {
+                List<MapResponseEnt> result = RealEstateApplication.GSON.fromJson(jsonElement,
+                        new TypeToken<List<MapResponseEnt>>() {
+                        }.getType());
+                if (callback != null) {
+                    callback.success(result, response);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if (callback != null) {
+                    callback.failure(error);
+                }
+            }
+        });
+    }
 }
