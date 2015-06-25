@@ -34,7 +34,7 @@ import com.synova.realestate.customviews.CustomCirclePageIndicator;
 import com.synova.realestate.customviews.TouchableWrapperView;
 import com.synova.realestate.fragments.RetainMapFragment;
 import com.synova.realestate.models.DetailData;
-import com.synova.realestate.models.Seller;
+import com.synova.realestate.models.Publisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -179,39 +179,39 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
     }
 
     private void setupSellerList() {
-        List<Seller> sellers = new ArrayList<>();
+        List<Publisher> publishers = new ArrayList<>();
 
-        Seller seller = new Seller();
-        seller.thumbnail = "";
-        seller.title = "Nom Adresse 1";
-        seller.website = "http://google.com";
-        seller.phone = "51-22-48";
-        seller.mail = "mail01@realestate.com";
-        seller.annonces = 100;
-        sellers.add(seller);
+        Publisher publisher = new Publisher();
+        publisher.thumbnail = "";
+        publisher.title = "Nom Adresse 1";
+        publisher.website = "http://google.com";
+        publisher.phone = "51-22-48";
+        publisher.mail = "mail01@realestate.com";
+        publisher.annonces = 100;
+        publishers.add(publisher);
 
-        seller = new Seller();
-        seller.thumbnail = "";
-        seller.title = "Nom Adresse 2";
-        seller.website = "http://google.com";
-        seller.phone = "51-22-49";
-        seller.mail = "mail02@realestate.com";
-        seller.annonces = 100;
-        sellers.add(seller);
+        publisher = new Publisher();
+        publisher.thumbnail = "";
+        publisher.title = "Nom Adresse 2";
+        publisher.website = "http://google.com";
+        publisher.phone = "51-22-49";
+        publisher.mail = "mail02@realestate.com";
+        publisher.annonces = 100;
+        publishers.add(publisher);
 
-        seller = new Seller();
-        seller.thumbnail = "";
-        seller.title = "Nom Adresse 3";
-        seller.website = "http://google.com";
-        seller.phone = "51-22-50";
-        seller.mail = "mail03@realestate.com";
-        seller.annonces = 100;
-        sellers.add(seller);
+        publisher = new Publisher();
+        publisher.thumbnail = "";
+        publisher.title = "Nom Adresse 3";
+        publisher.website = "http://google.com";
+        publisher.phone = "51-22-50";
+        publisher.mail = "mail03@realestate.com";
+        publisher.annonces = 100;
+        publishers.add(publisher);
 
         groupSellers = (ViewGroup) findViewById(R.id.detail_groupSellers);
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        for (Seller s : sellers) {
+        for (Publisher s : publishers) {
             View view = inflater.inflate(R.layout.layout_detail_seller_list_item,
                     groupSellers, false);
 
@@ -315,12 +315,12 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 slideShowView.startAutoScroll();
                 break;
             case R.id.detail_seller_groupPhone:
-                Seller seller = (Seller) v.getTag();
-                Snackbar.make(v, "Call " + seller.phone, Snackbar.LENGTH_SHORT).show();
+                Publisher publisher = (Publisher) v.getTag();
+                Snackbar.make(v, "Call " + publisher.phone, Snackbar.LENGTH_SHORT).show();
                 break;
             case R.id.detail_seller_groupMail:
-                seller = (Seller) v.getTag();
-                Snackbar.make(v, "Send mail to " + seller.mail, Snackbar.LENGTH_SHORT).show();
+                publisher = (Publisher) v.getTag();
+                Snackbar.make(v, "Send mail to " + publisher.mail, Snackbar.LENGTH_SHORT).show();
                 break;
         }
     }

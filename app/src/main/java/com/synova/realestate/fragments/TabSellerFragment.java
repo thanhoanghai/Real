@@ -17,7 +17,7 @@ import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.customviews.DividerDecoration;
-import com.synova.realestate.models.Seller;
+import com.synova.realestate.models.Publisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,22 +73,22 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
         ((MainActivity)activity).disableDrawer();
     }
 
-    private List<Seller> createMockData() {
-        List<Seller> sellers = new ArrayList<>();
+    private List<Publisher> createMockData() {
+        List<Publisher> publishers = new ArrayList<>();
 
         for (int i = 0; i < 30; i++) {
-            Seller seller = new Seller();
-            seller.thumbnail = i % 2 == 0 ? "http://images.travelpod.com/tripwow/photos2/ta-02e0-d424-1301/alimetov-yambol-bulgaria+13162716848-tpweb11w-19996.jpg"
+            Publisher publisher = new Publisher();
+            publisher.thumbnail = i % 2 == 0 ? "http://images.travelpod.com/tripwow/photos2/ta-02e0-d424-1301/alimetov-yambol-bulgaria+13162716848-tpweb11w-19996.jpg"
                     : "http://www.meta-project.org/wp-content/uploads/2011/07/SR_DB-2.jpg";
-            seller.title = "Seller " + i;
-            seller.annonces = i + 10;
-            seller.website = "www.realestate.com";
-            seller.phone = "51-22-48";
-            seller.mail = "mail02@realestate.com";
-            sellers.add(seller);
+            publisher.title = "Publisher " + i;
+            publisher.annonces = i + 10;
+            publisher.website = "www.realestate.com";
+            publisher.phone = "51-22-48";
+            publisher.mail = "mail02@realestate.com";
+            publishers.add(publisher);
         }
 
-        return sellers;
+        return publishers;
     }
 
     private void loadMore() {
@@ -97,7 +97,7 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                List<Seller> houses = createMockData();
+                List<Publisher> houses = createMockData();
                 sellersAdapter.addItems(houses);
 
                 loadingState = Constants.ListLoadingState.NONE;
@@ -111,7 +111,7 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                List<Seller> houses = createMockData();
+                List<Publisher> houses = createMockData();
                 sellersAdapter.setItems(houses);
 
                 swipeRefreshLayout.setRefreshing(false);

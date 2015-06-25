@@ -11,7 +11,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
-import com.synova.realestate.models.Seller;
+import com.synova.realestate.models.Publisher;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,27 +22,27 @@ import java.util.List;
 public class SellerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
         implements View.OnClickListener {
 
-    private List<Seller> sellers = new ArrayList<>();
+    private List<Publisher> publishers = new ArrayList<>();
 
-    public void setItems(List<Seller> sellers) {
-        this.sellers = sellers;
+    public void setItems(List<Publisher> publishers) {
+        this.publishers = publishers;
         notifyDataSetChanged();
     }
 
-    public void addItems(List<Seller> sellers) {
-        int start = sellers.size();
-        this.sellers.addAll(sellers);
-        notifyItemRangeInserted(start, sellers.size() - 1);
+    public void addItems(List<Publisher> publishers) {
+        int start = publishers.size();
+        this.publishers.addAll(publishers);
+        notifyItemRangeInserted(start, publishers.size() - 1);
     }
 
     @Override
     public int getItemCount() {
-        return sellers.size() + 1;
+        return publishers.size() + 1;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position == sellers.size() ? Constants.RecyclerViewType.FOOTER.ordinal()
+        return position == publishers.size() ? Constants.RecyclerViewType.FOOTER.ordinal()
                 : Constants.RecyclerViewType.ITEM.ordinal();
     }
 
@@ -75,15 +75,15 @@ public class SellerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             case HEADER:
                 break;
             case ITEM:
-                Seller seller = sellers.get(position);
+                Publisher publisher = publishers.get(position);
                 SellerItemViewHolder holder = (SellerItemViewHolder) h;
 
-                ImageLoader.getInstance().displayImage(seller.thumbnail, holder.ivThumbnail);
-                holder.tvTitle.setText(seller.title);
-                holder.tvAnnonces.setText(seller.annonces + " annonces");
-                holder.tvWebsite.setText(seller.website);
-                holder.tvPhone.setText(seller.phone);
-                holder.tvMail.setText(seller.mail);
+                ImageLoader.getInstance().displayImage(publisher.thumbnail, holder.ivThumbnail);
+                holder.tvTitle.setText(publisher.title);
+                holder.tvAnnonces.setText(publisher.annonces + " annonces");
+                holder.tvWebsite.setText(publisher.website);
+                holder.tvPhone.setText(publisher.phone);
+                holder.tvMail.setText(publisher.mail);
                 break;
             case FOOTER:
                 break;

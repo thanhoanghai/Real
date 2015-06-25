@@ -4,7 +4,7 @@ package com.synova.realestate.network.model;
 /**
  * Created by ducth on 6/23/15.
  */
-public class PublisherEnt {
+public class PublisherRequestEnt {
 
     public int publisherId;
     public double xLocalisation;

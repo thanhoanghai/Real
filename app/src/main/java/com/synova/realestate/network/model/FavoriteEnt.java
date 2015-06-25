@@ -8,4 +8,9 @@ public class FavoriteEnt {
 
     public String deviceId;
     public String propertyId;
+
+    public FavoriteEnt(String deviceId, String propertyId) {
+        this.deviceId = deviceId;
+        this.propertyId = propertyId;
+    }
 }
