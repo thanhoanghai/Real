@@ -633,7 +633,9 @@ public class Util {
 
     public static LatLng convertPointGeomToLatLng(String pointGeom) {
         String[] point = pointGeom.substring(6, pointGeom.length() - 1).split(" ");
-        LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
+//        LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
+        //TODO temp switch to fix server wrong response info
+        LatLng latLng = new LatLng(Double.parseDouble(point[1]), Double.parseDouble(point[0]));
         return latLng;
     }
 
@@ -642,7 +644,9 @@ public class Util {
         LatLng[] latLngs = new LatLng[points.length];
         for (int i = 0; i < points.length; i++) {
             String[] point = points[i].split(" ");
-            LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
+//            LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
+            //TODO temp switch to fix server wrong response info
+            LatLng latLng = new LatLng(Double.parseDouble(point[1]), Double.parseDouble(point[0]));
             latLngs[i] = latLng;
         }
         return latLngs;
