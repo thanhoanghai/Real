@@ -1,3 +1,4 @@
+
 package com.synova.realestate.customviews.rangebar;
 
 import android.content.Context;
@@ -25,8 +26,8 @@ class ConnectingLine {
         final Resources res = ctx.getResources();
 
         mConnectingLineWeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                                                          connectingLineWeight,
-                                                          res.getDisplayMetrics());
+                connectingLineWeight,
+                res.getDisplayMetrics());
 
         // Initialize the paint, set values
         mPaint = new Paint();

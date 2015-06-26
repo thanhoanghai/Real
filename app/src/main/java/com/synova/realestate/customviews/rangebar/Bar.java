@@ -42,7 +42,8 @@ class Bar {
         mLeftX = x;
         mRightX = x + length;
         mY = y;
-        barWeight = BarWeight;
+        barWeight = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, BarWeight, ctx
+                .getResources().getDisplayMetrics());
 
         mNumSegments = tickCount - 1;
         mTickDistance = length / mNumSegments;
