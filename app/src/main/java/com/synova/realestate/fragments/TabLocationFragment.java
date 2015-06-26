@@ -1,6 +1,13 @@
 
 package com.synova.realestate.fragments;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
@@ -24,6 +31,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
@@ -39,12 +47,6 @@ import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.MapRequestEnt;
 import com.synova.realestate.utils.Util;
 
-import java.util.List;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 /**
  * Created by ducth on 6/16/15.
  */
@@ -53,6 +55,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         LocationListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener,
         View.OnClickListener {
 
+    private static final int BOUNDS_PADDING = 100;
     private RetainMapFragment mapFragment;
     private GoogleMap map;
     private GoogleApiClient googleApiClient;
@@ -170,6 +173,20 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 new LatLng(location.getLatitude(), location.getLongitude()), 15));
     }
 
+    private void moveCameraToBound(List<LatLng> latLngs, boolean animate) {
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+        for (LatLng latLng : latLngs) {
+            builder.include(latLng);
+        }
+        LatLngBounds bounds = builder.build();
+
+        if (animate) {
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, BOUNDS_PADDING));
+        } else {
+            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, BOUNDS_PADDING));
+        }
+    }
+
     @Override
     public void onConnected(Bundle bundle) {
         startRequestLocationUpdate();
@@ -181,7 +198,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     @Override
     public void onLocationChanged(Location location) {
         if (currentLocation == null) {
-            moveCameraToLocation(location);
+            // moveCameraToLocation(location);
         }
         currentLocation = location;
         if (loadingState != Constants.NetworkLoadingState.LOADING
@@ -206,11 +223,20 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 @Override
                 public void success(List<MapResponseEnt> mapResponseEnts, Response response) {
                     if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
+                        List<LatLng> latLngs = new ArrayList<>();
                         for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
                             if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
                                     && mapResponseEnt.elementType != null) {
                                 createMarker(mapResponseEnt);
+
+                                LatLng latLng = Util
+                                        .convertPointGeomToLatLng(mapResponseEnt.pointGeom);
+                                latLngs.add(latLng);
                             }
+                        }
+
+                        if (latLngs.size() > 0){
+                            moveCameraToBound(latLngs, true);
                         }
                     }
                 }
