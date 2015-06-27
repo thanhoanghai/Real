@@ -12,12 +12,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.TabHost;
 
 import com.synova.realestate.R;
@@ -27,19 +27,22 @@ import com.synova.realestate.fragments.TabGridFragment;
 import com.synova.realestate.fragments.TabListFragment;
 import com.synova.realestate.fragments.TabLocationFragment;
 import com.synova.realestate.fragments.TabSellerFragment;
+import com.synova.realestate.models.eventbus.NavigationItemSelectedEvent;
 import com.synova.realestate.utils.DialogUtils;
 
 import java.util.HashMap;
 import java.util.Stack;
 
+import de.greenrobot.event.EventBus;
+
 public class MainActivity extends BaseActivity implements TabHost.OnTabChangeListener,
-        NavigationView.OnNavigationItemSelectedListener {
+        RadioGroup.OnCheckedChangeListener {
 
     private HashMap<String, Stack<BaseFragment>> fragmentStacks;
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
-    private NavigationView navigationView;
+    private RadioGroup groupNavigationItems;
     private ReclickableTabHost tabHost;
     private String currentTabTag = Constants.TabBar.GRID.name();
 
@@ -111,8 +114,11 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         drawerToggle.setDrawerIndicatorEnabled(true);
         drawerLayout.setDrawerListener(drawerToggle);
 
-        navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
+        groupNavigationItems = (RadioGroup) navigationView
+                .findViewById(R.id.navigation_groupNavigationItems);
+        groupNavigationItems.setOnCheckedChangeListener(this);
+        selectNavigationItem(R.id.navigation_btnBien);
     }
 
     private void setupTabHost() {
@@ -223,8 +229,12 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
-    public void openDrawer(){
-        drawerLayout.openDrawer(Gravity.LEFT);
+    public void openDrawer() {
+        drawerLayout.openDrawer(GravityCompat.START);
+    }
+
+    public void closeDrawer() {
+        drawerLayout.closeDrawer(GravityCompat.START);
     }
 
     private BaseFragment getCurrentFragment() {
@@ -265,7 +275,7 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerLayout.getDrawerLockMode(Gravity.LEFT) == DrawerLayout.LOCK_MODE_UNLOCKED
+        if (drawerLayout.getDrawerLockMode(GravityCompat.START) == DrawerLayout.LOCK_MODE_UNLOCKED
                 && drawerToggle.onOptionsItemSelected(item)) {
             return true;
         }
@@ -294,10 +304,18 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         return super.onOptionsItemSelected(item);
     }
 
+    public RadioGroup getGroupNavigationItems() {
+        return groupNavigationItems;
+    }
+
+    public void selectNavigationItem(int id) {
+        groupNavigationItems.check(-1);
+        groupNavigationItems.check(id);
+    }
+
     @Override
-    public boolean onNavigationItemSelected(MenuItem menuItem) {
-        drawerLayout.closeDrawer(GravityCompat.START);
-        menuItem.setChecked(true);
-        return false;
+    public void onCheckedChanged(RadioGroup group, int checkedId) {
+        closeDrawer();
+        EventBus.getDefault().postSticky(new NavigationItemSelectedEvent(checkedId));
     }
 }
