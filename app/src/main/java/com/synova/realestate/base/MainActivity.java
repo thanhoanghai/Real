@@ -316,6 +316,6 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
     @Override
     public void onCheckedChanged(RadioGroup group, int checkedId) {
         closeDrawer();
-        EventBus.getDefault().postSticky(new NavigationItemSelectedEvent(checkedId));
+        EventBus.getDefault().post(new NavigationItemSelectedEvent(checkedId));
     }
 }

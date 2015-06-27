@@ -131,7 +131,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().registerSticky(this);
+        EventBus.getDefault().register(this);
         googleApiClient.connect();
     }
 
@@ -387,8 +387,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     public void onEventMainThread(NavigationItemSelectedEvent event) {
-        EventBus.getDefault().removeStickyEvent(event);
-
         switch (event.checkedId) {
             case R.id.navigation_btnBien:
                 setMarkersVisible(Constants.ElementType.BIEN);
