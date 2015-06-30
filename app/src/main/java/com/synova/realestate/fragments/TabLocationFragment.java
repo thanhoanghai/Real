@@ -1,13 +1,6 @@
 
 package com.synova.realestate.fragments;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
@@ -43,9 +36,20 @@ import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.models.MapResponseEnt;
+import com.synova.realestate.models.eventbus.NavigationItemSelectedEvent;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.MapRequestEnt;
 import com.synova.realestate.utils.Util;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import de.greenrobot.event.EventBus;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by ducth on 6/16/15.
@@ -76,6 +80,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     private TextView tvPrice;
 
     private Constants.NetworkLoadingState loadingState = Constants.NetworkLoadingState.NONE;
+
+    private Map<Constants.ElementType, List<Marker>> markers = new HashMap<>();
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -125,12 +131,14 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     @Override
     public void onStart() {
         super.onStart();
+        EventBus.getDefault().register(this);
         googleApiClient.connect();
     }
 
     @Override
     public void onStop() {
         super.onStop();
+        EventBus.getDefault().unregister(this);
         googleApiClient.disconnect();
     }
 
@@ -227,15 +235,23 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                         for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
                             if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
                                     && mapResponseEnt.elementType != null) {
-                                createMarker(mapResponseEnt);
+                                Marker marker = createMarker(mapResponseEnt);
+                                latLngs.add(marker.getPosition());
 
-                                LatLng latLng = Util
-                                        .convertPointGeomToLatLng(mapResponseEnt.pointGeom);
-                                latLngs.add(latLng);
+                                List<Marker> elementTypeMarkers = markers
+                                        .get(mapResponseEnt.elementType);
+                                if (elementTypeMarkers == null) {
+                                    elementTypeMarkers = new ArrayList<>();
+                                    markers.put(mapResponseEnt.elementType, elementTypeMarkers);
+                                }
+                                elementTypeMarkers.add(marker);
                             }
                         }
 
-                        if (latLngs.size() > 0){
+                        if (latLngs.size() > 0) {
+                            onEventMainThread(new NavigationItemSelectedEvent(
+                                    ((MainActivity) activity).getGroupNavigationItems()
+                                            .getCheckedRadioButtonId()));
                             moveCameraToBound(latLngs, true);
                         }
                     }
@@ -353,4 +369,39 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 break;
         }
     }
+
+    private void setMarkersVisible(Constants.ElementType visibleType) {
+        for (Constants.ElementType type : markers.keySet()) {
+            List<Marker> elementTypeMarkers = markers.get(type);
+            for (Marker childMarker : elementTypeMarkers) {
+                childMarker.setVisible(type == visibleType);
+            }
+        }
+
+        if (selectedMarkerCircle != null) {
+            selectedMarkerCircle.setVisible(false);
+        }
+        if (selectedMarkerPolygon != null) {
+            selectedMarkerPolygon.setVisible(false);
+        }
+    }
+
+    public void onEventMainThread(NavigationItemSelectedEvent event) {
+        switch (event.checkedId) {
+            case R.id.navigation_btnBien:
+                setMarkersVisible(Constants.ElementType.BIEN);
+                break;
+            case R.id.navigation_btnAgence:
+                setMarkersVisible(Constants.ElementType.AGENCE);
+                break;
+            case R.id.navigation_btnParticulier:
+                setMarkersVisible(Constants.ElementType.PARTICULIER);
+                break;
+            case R.id.navigation_btnNotaire:
+                setMarkersVisible(Constants.ElementType.NOTAIRE);
+                break;
+        }
+
+    }
+
 }

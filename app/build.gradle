@@ -36,4 +36,5 @@ dependencies {
     compile 'com.facebook.rebound:rebound:0.3.8'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.squareup.retrofit:retrofit:1.9.0'
+    compile 'de.greenrobot:eventbus:2.4.0'
 }
