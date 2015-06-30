@@ -1,6 +1,13 @@
 
 package com.synova.realestate.fragments;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -10,6 +17,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.synova.realestate.R;
 import com.synova.realestate.adapters.HouseGridAdapter;
@@ -17,16 +25,17 @@ import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
+import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.House;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.synova.realestate.network.NetworkService;
+import com.synova.realestate.network.model.AdsInfoEnt;
+import com.synova.realestate.utils.DialogUtils;
 
 /**
  * Created by ducth on 6/12/15.
  */
 public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
-        OnRecyclerViewItemClickedListener<House> {
+        OnRecyclerViewItemClickedListener<AdsInfoResponseEnt> {
 
     private static final int GRID_COLUMN_COUNT = 3;
 
@@ -74,7 +83,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity)activity).disableDrawer();
+        ((MainActivity) activity).disableDrawer();
     }
 
     private List<House> createMockData() {
@@ -96,32 +105,40 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
     }
 
     private void loadMore() {
-        loadingState = Constants.ListLoadingState.LOAD_MORE;
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                List<House> houses = createMockData();
-                houseAdapter.addItems(houses);
-
-                loadingState = Constants.ListLoadingState.NONE;
-            }
-        }, 2000);
+//        loadingState = Constants.ListLoadingState.LOAD_MORE;
+//
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                List<House> houses = createMockData();
+//                houseAdapter.addItems(houses);
+//
+//                loadingState = Constants.ListLoadingState.NONE;
+//            }
+//        }, 2000);
     }
 
     private void loadNewData() {
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
-        new Handler().postDelayed(new Runnable() {
+        AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
+        NetworkService.getAdsInfo(adsInfoEnt, new Callback<List<AdsInfoResponseEnt>>() {
             @Override
-            public void run() {
-                List<House> houses = createMockData();
-                houseAdapter.setItems(houses);
+            public void success(List<AdsInfoResponseEnt> adsInfoResponseEnts, Response response) {
+                houseAdapter.setItems(adsInfoResponseEnts);
 
                 swipeRefreshLayout.setRefreshing(false);
                 loadingState = Constants.ListLoadingState.NONE;
             }
-        }, 2000);
+
+            @Override
+            public void failure(RetrofitError error) {
+                swipeRefreshLayout.setRefreshing(false);
+                loadingState = Constants.ListLoadingState.NONE;
+
+                Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -131,7 +148,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
 
     @Override
     public void onItemClicked(RecyclerView recyclerView, View view, int position, long id,
-            House data) {
+                              AdsInfoResponseEnt data) {
         activity.showDetailActivity(data);
     }
 }

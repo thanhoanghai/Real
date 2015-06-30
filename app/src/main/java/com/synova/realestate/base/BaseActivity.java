@@ -10,6 +10,7 @@ import android.view.KeyEvent;
 
 import com.google.gson.Gson;
 import com.synova.realestate.R;
+import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.House;
 import com.synova.realestate.utils.Util;
 
@@ -102,7 +103,7 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void showDetailActivity(House house) {
+    public void showDetailActivity(AdsInfoResponseEnt house) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("house", new Gson().toJson(house));
         startActivity(intent);

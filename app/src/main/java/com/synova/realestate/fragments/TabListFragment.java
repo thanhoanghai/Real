@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.synova.realestate.R;
 import com.synova.realestate.adapters.HouseListAdapter;
@@ -17,16 +18,23 @@ import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
+import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.House;
+import com.synova.realestate.network.NetworkService;
+import com.synova.realestate.network.model.AdsInfoEnt;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by ducth on 6/12/15.
  */
 public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.OnRefreshListener,
-        OnRecyclerViewItemClickedListener<House> {
+        OnRecyclerViewItemClickedListener<AdsInfoResponseEnt> {
 
     private SwipeRefreshLayout swipeRefreshLayout;
 
@@ -94,32 +102,40 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
     }
 
     private void loadMore() {
-        loadingState = Constants.ListLoadingState.LOAD_MORE;
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                List<House> houses = createMockData();
-                houseAdapter.addItems(houses);
-
-                loadingState = Constants.ListLoadingState.NONE;
-            }
-        }, 2000);
+//        loadingState = Constants.ListLoadingState.LOAD_MORE;
+//
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                List<House> houses = createMockData();
+//                houseAdapter.addItems(houses);
+//
+//                loadingState = Constants.ListLoadingState.NONE;
+//            }
+//        }, 2000);
     }
 
     private void loadNewData() {
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
-        new Handler().postDelayed(new Runnable() {
+        AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
+        NetworkService.getAdsInfo(adsInfoEnt, new Callback<List<AdsInfoResponseEnt>>() {
             @Override
-            public void run() {
-                List<House> houses = createMockData();
-                houseAdapter.setItems(houses);
+            public void success(List<AdsInfoResponseEnt> adsInfoResponseEnts, Response response) {
+                houseAdapter.setItems(adsInfoResponseEnts);
 
                 swipeRefreshLayout.setRefreshing(false);
                 loadingState = Constants.ListLoadingState.NONE;
             }
-        }, 2000);
+
+            @Override
+            public void failure(RetrofitError error) {
+                swipeRefreshLayout.setRefreshing(false);
+                loadingState = Constants.ListLoadingState.NONE;
+
+                Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -129,7 +145,7 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
 
     @Override
     public void onItemClicked(RecyclerView recyclerView, View view, int position, long id,
-            House data) {
+                              AdsInfoResponseEnt data) {
         activity.showDetailActivity(data);
     }
 }

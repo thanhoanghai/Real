@@ -1,18 +1,6 @@
 
 package com.synova.realestate.network;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
-import com.synova.realestate.base.RealEstateApplication;
-import com.synova.realestate.models.MapResponseEnt;
-import com.synova.realestate.network.model.AdEnt;
-import com.synova.realestate.network.model.AdsInfoEnt;
-import com.synova.realestate.network.model.FavoriteEnt;
-import com.synova.realestate.network.model.MapRequestEnt;
-import com.synova.realestate.network.model.PublisherRequestEnt;
-import com.synova.realestate.network.model.PublisherPropertyEnt;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +11,19 @@ import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
 import retrofit.http.Body;
 import retrofit.http.POST;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+import com.synova.realestate.base.RealEstateApplication;
+import com.synova.realestate.models.AdsInfoResponseEnt;
+import com.synova.realestate.models.MapResponseEnt;
+import com.synova.realestate.network.model.AdEnt;
+import com.synova.realestate.network.model.AdsInfoEnt;
+import com.synova.realestate.network.model.FavoriteEnt;
+import com.synova.realestate.network.model.MapRequestEnt;
+import com.synova.realestate.network.model.PublisherPropertyEnt;
+import com.synova.realestate.network.model.PublisherRequestEnt;
 
 /**
  * Created by ducth on 6/22/15.
@@ -37,6 +38,52 @@ public class NetworkService {
             .setConverter(new GsonConverter(RealEstateApplication.GSON))
             .setLogLevel(RestAdapter.LogLevel.FULL)
             .build().create(RestService.class);
+
+    public static void getAdsInfo(AdsInfoEnt adsInfoEnt,
+            final Callback<List<AdsInfoResponseEnt>> callback) {
+        restService.getAdsInfo(adsInfoEnt, new Callback<JsonElement>() {
+
+            @Override
+            public void success(JsonElement jsonElement, Response response) {
+                List<AdsInfoResponseEnt> result = RealEstateApplication.GSON.fromJson(jsonElement,
+                        new TypeToken<List<AdsInfoResponseEnt>>() {
+                        }.getType());
+                if (callback != null) {
+                    callback.success(result, response);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if (callback != null) {
+                    callback.failure(error);
+                }
+            }
+        });
+    }
+
+    public static void getMap(MapRequestEnt mapRequestEnt,
+            final Callback<List<MapResponseEnt>> callback) {
+        restService.getMap(mapRequestEnt, new Callback<JsonElement>() {
+
+            @Override
+            public void success(JsonElement jsonElement, Response response) {
+                List<MapResponseEnt> result = RealEstateApplication.GSON.fromJson(jsonElement,
+                        new TypeToken<List<MapResponseEnt>>() {
+                        }.getType());
+                if (callback != null) {
+                    callback.success(result, response);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if (callback != null) {
+                    callback.failure(error);
+                }
+            }
+        });
+    }
 
     public static void addFavorite(String deviceId, String propertyId,
             final NetworkCallback<Boolean> callback) {
@@ -104,7 +151,8 @@ public class NetworkService {
                 });
     }
 
-    public static void getListPublisher(PublisherRequestEnt publisherRequestEnt, NetworkCallback<JsonElement> callback) {
+    public static void getListPublisher(PublisherRequestEnt publisherRequestEnt,
+            NetworkCallback<JsonElement> callback) {
 
     }
 
@@ -120,7 +168,8 @@ public class NetworkService {
         void getListFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<JsonElement> callback);
 
         @POST("/publisher/getList")
-        void getListPublisher(@Body PublisherRequestEnt publisherRequestEnt, NetworkCallback<JsonElement> callback);
+        void getListPublisher(@Body PublisherRequestEnt publisherRequestEnt,
+                NetworkCallback<JsonElement> callback);
 
         @POST("/publisher/getDetails")
         void getPublisherDetail(@Body AdEnt adEnt, NetworkCallback<String> callback);
@@ -136,7 +185,7 @@ public class NetworkService {
         void getPropertyDetail(@Body AdEnt adEnt, NetworkCallback<String> callback);
 
         @POST("/property/getAdsInfo")
-        void getAdsInfo(@Body AdsInfoEnt adsInfoEnt, NetworkCallback<String> callback);
+        void getAdsInfo(@Body AdsInfoEnt adsInfoEnt, Callback<JsonElement> callback);
     }
 
     public static abstract class NetworkCallback<T> implements Callback<T> {
@@ -156,26 +205,4 @@ public class NetworkService {
         }
     }
 
-    public static void getMap(MapRequestEnt mapRequestEnt,
-            final Callback<List<MapResponseEnt>> callback) {
-        restService.getMap(mapRequestEnt, new Callback<JsonElement>() {
-
-            @Override
-            public void success(JsonElement jsonElement, Response response) {
-                List<MapResponseEnt> result = RealEstateApplication.GSON.fromJson(jsonElement,
-                        new TypeToken<List<MapResponseEnt>>() {
-                        }.getType());
-                if (callback != null) {
-                    callback.success(result, response);
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if (callback != null) {
-                    callback.failure(error);
-                }
-            }
-        });
-    }
 }

@@ -39,7 +39,7 @@ public class Constants {
         }
     }
 
-    public enum ElementType{
+    public enum ElementType {
         @SerializedName("bien")
         BIEN,
         @SerializedName("agence")
@@ -48,6 +48,30 @@ public class Constants {
         PARTICULIER,
         @SerializedName("notaire")
         NOTAIRE
+    }
+
+    public enum PropertyType {
+        @SerializedName("Appartement")
+        APPARTEMENT,
+        @SerializedName("Maison")
+        MAISON,
+        @SerializedName("Parking")
+        PARKING,
+        @SerializedName("Bureau")
+        BUREAU,
+        @SerializedName("Terrain")
+        TERRAIN,
+        @SerializedName("Commerce")
+        COMMERCE;
+    }
+
+    public enum FilterOrderType {
+        @SerializedName("distance")
+        DISTANCE,
+        @SerializedName("price")
+        PRICE,
+        @SerializedName("date")
+        DATE
     }
 
     public enum ListLoadingState {
