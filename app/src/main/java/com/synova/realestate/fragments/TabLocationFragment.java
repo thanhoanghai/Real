@@ -94,6 +94,61 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         btnMenu = (ImageView) rootView.findViewById(R.id.tab_location_btnMenu);
         btnMenu.setOnClickListener(this);
 
+        if (loadingState != Constants.NetworkLoadingState.LOADING
+                && loadingState != Constants.NetworkLoadingState.LOADED) {
+            loadingState = Constants.NetworkLoadingState.LOADING;
+
+            final MapRequestEnt mapRequestEnt = new MapRequestEnt();
+            mapRequestEnt.deviceId = RealEstateApplication.deviceId;
+            // mapRequestEnt.xMin = location.getLatitude();
+            // mapRequestEnt.yMin = location.getLongitude();
+            // mapRequestEnt.xMax = location.getLatitude() + 200/1E6;
+            // mapRequestEnt.yMax = location.getLongitude() + 200/1E6;
+            mapRequestEnt.xMin = 2.1475;
+            mapRequestEnt.yMin = 48.9306;
+            mapRequestEnt.xMax = 2.4963;
+            mapRequestEnt.yMax = 48.7924;
+            mapRequestEnt.adsOffset = 100;
+            mapRequestEnt.surfaceMinS = 0 + "";
+            mapRequestEnt.surfaceMaxS = 2000 + "";
+
+            NetworkService.getMap(mapRequestEnt, new Callback<List<MapResponseEnt>>() {
+                @Override
+                public void success(List<MapResponseEnt> mapResponseEnts, Response response) {
+                    if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
+                        List<LatLng> latLngs = new ArrayList<>();
+                        for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
+                            if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
+                                    && mapResponseEnt.elementType != null) {
+                                Marker marker = createMarker(mapResponseEnt);
+                                latLngs.add(marker.getPosition());
+
+                                List<Marker> elementTypeMarkers = markers
+                                        .get(mapResponseEnt.elementType);
+                                if (elementTypeMarkers == null) {
+                                    elementTypeMarkers = new ArrayList<>();
+                                    markers.put(mapResponseEnt.elementType, elementTypeMarkers);
+                                }
+                                elementTypeMarkers.add(marker);
+                            }
+                        }
+
+                        if (latLngs.size() > 0) {
+                            onEventMainThread(new NavigationItemSelectedEvent(
+                                    ((MainActivity) activity).getGroupNavigationItems()
+                                            .getCheckedRadioButtonId()));
+                            moveCameraToBound(latLngs, true);
+                        }
+                    }
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+
+                }
+            });
+        }
+
         return rootView;
     }
 
@@ -209,60 +264,60 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
             // moveCameraToLocation(location);
         }
         currentLocation = location;
-        if (loadingState != Constants.NetworkLoadingState.LOADING
-                && loadingState != Constants.NetworkLoadingState.LOADED) {
-            loadingState = Constants.NetworkLoadingState.LOADING;
-
-            final MapRequestEnt mapRequestEnt = new MapRequestEnt();
-            mapRequestEnt.deviceId = RealEstateApplication.deviceId;
-            // mapRequestEnt.xMin = location.getLatitude();
-            // mapRequestEnt.yMin = location.getLongitude();
-            // mapRequestEnt.xMax = location.getLatitude() + 200/1E6;
-            // mapRequestEnt.yMax = location.getLongitude() + 200/1E6;
-            mapRequestEnt.xMin = 2.1475;
-            mapRequestEnt.yMin = 48.9306;
-            mapRequestEnt.xMax = 2.4963;
-            mapRequestEnt.yMax = 48.7924;
-            mapRequestEnt.adsOffset = 100;
-            mapRequestEnt.surfaceMinS = 0 + "";
-            mapRequestEnt.surfaceMaxS = 2000 + "";
-
-            NetworkService.getMap(mapRequestEnt, new Callback<List<MapResponseEnt>>() {
-                @Override
-                public void success(List<MapResponseEnt> mapResponseEnts, Response response) {
-                    if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
-                        List<LatLng> latLngs = new ArrayList<>();
-                        for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
-                            if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
-                                    && mapResponseEnt.elementType != null) {
-                                Marker marker = createMarker(mapResponseEnt);
-                                latLngs.add(marker.getPosition());
-
-                                List<Marker> elementTypeMarkers = markers
-                                        .get(mapResponseEnt.elementType);
-                                if (elementTypeMarkers == null) {
-                                    elementTypeMarkers = new ArrayList<>();
-                                    markers.put(mapResponseEnt.elementType, elementTypeMarkers);
-                                }
-                                elementTypeMarkers.add(marker);
-                            }
-                        }
-
-                        if (latLngs.size() > 0) {
-                            onEventMainThread(new NavigationItemSelectedEvent(
-                                    ((MainActivity) activity).getGroupNavigationItems()
-                                            .getCheckedRadioButtonId()));
-                            moveCameraToBound(latLngs, true);
-                        }
-                    }
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-
-                }
-            });
-        }
+//        if (loadingState != Constants.NetworkLoadingState.LOADING
+//                && loadingState != Constants.NetworkLoadingState.LOADED) {
+//            loadingState = Constants.NetworkLoadingState.LOADING;
+//
+//            final MapRequestEnt mapRequestEnt = new MapRequestEnt();
+//            mapRequestEnt.deviceId = RealEstateApplication.deviceId;
+//            // mapRequestEnt.xMin = location.getLatitude();
+//            // mapRequestEnt.yMin = location.getLongitude();
+//            // mapRequestEnt.xMax = location.getLatitude() + 200/1E6;
+//            // mapRequestEnt.yMax = location.getLongitude() + 200/1E6;
+//            mapRequestEnt.xMin = 2.1475;
+//            mapRequestEnt.yMin = 48.9306;
+//            mapRequestEnt.xMax = 2.4963;
+//            mapRequestEnt.yMax = 48.7924;
+//            mapRequestEnt.adsOffset = 100;
+//            mapRequestEnt.surfaceMinS = 0 + "";
+//            mapRequestEnt.surfaceMaxS = 2000 + "";
+//
+//            NetworkService.getMap(mapRequestEnt, new Callback<List<MapResponseEnt>>() {
+//                @Override
+//                public void success(List<MapResponseEnt> mapResponseEnts, Response response) {
+//                    if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
+//                        List<LatLng> latLngs = new ArrayList<>();
+//                        for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
+//                            if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
+//                                    && mapResponseEnt.elementType != null) {
+//                                Marker marker = createMarker(mapResponseEnt);
+//                                latLngs.add(marker.getPosition());
+//
+//                                List<Marker> elementTypeMarkers = markers
+//                                        .get(mapResponseEnt.elementType);
+//                                if (elementTypeMarkers == null) {
+//                                    elementTypeMarkers = new ArrayList<>();
+//                                    markers.put(mapResponseEnt.elementType, elementTypeMarkers);
+//                                }
+//                                elementTypeMarkers.add(marker);
+//                            }
+//                        }
+//
+//                        if (latLngs.size() > 0) {
+//                            onEventMainThread(new NavigationItemSelectedEvent(
+//                                    ((MainActivity) activity).getGroupNavigationItems()
+//                                            .getCheckedRadioButtonId()));
+//                            moveCameraToBound(latLngs, true);
+//                        }
+//                    }
+//                }
+//
+//                @Override
+//                public void failure(RetrofitError error) {
+//
+//                }
+//            });
+//        }
     }
 
     @Override
