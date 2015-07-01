@@ -1,14 +1,20 @@
 
 package com.synova.realestate.fragments;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.text.Html;
+import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -21,6 +27,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
 import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
@@ -57,7 +64,7 @@ import retrofit.client.Response;
 public class TabLocationFragment extends BaseFragment implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
         LocationListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener,
-        View.OnClickListener {
+        View.OnClickListener, GoogleMap.OnCameraChangeListener {
 
     private static final int BOUNDS_PADDING = 100;
     private RetainMapFragment mapFragment;
@@ -83,6 +90,15 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private Map<Constants.ElementType, List<Marker>> markers = new HashMap<>();
 
+    /**
+     * Latitude = Y-axis, Longitude = X-axis.
+     */
+    private LatLng currentMin = new LatLng(48.9306, 2.1475);
+    private LatLng currentMax = new LatLng(48.7924, 2.4963);
+    private boolean isTouchingMap;
+
+    private boolean isForceMoveMap;
+
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
@@ -94,60 +110,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         btnMenu = (ImageView) rootView.findViewById(R.id.tab_location_btnMenu);
         btnMenu.setOnClickListener(this);
 
-        if (loadingState != Constants.NetworkLoadingState.LOADING
-                && loadingState != Constants.NetworkLoadingState.LOADED) {
-            loadingState = Constants.NetworkLoadingState.LOADING;
+        TouchableWrapper touchableWrapper = new TouchableWrapper(getActivity());
+        touchableWrapper.addView(rootView);
 
-            final MapRequestEnt mapRequestEnt = new MapRequestEnt();
-            mapRequestEnt.deviceId = RealEstateApplication.deviceId;
-            // mapRequestEnt.xMin = location.getLatitude();
-            // mapRequestEnt.yMin = location.getLongitude();
-            // mapRequestEnt.xMax = location.getLatitude() + 200/1E6;
-            // mapRequestEnt.yMax = location.getLongitude() + 200/1E6;
-            mapRequestEnt.xMin = 2.1475;
-            mapRequestEnt.yMin = 48.9306;
-            mapRequestEnt.xMax = 2.4963;
-            mapRequestEnt.yMax = 48.7924;
-            mapRequestEnt.adsOffset = 100;
-            mapRequestEnt.surfaceMinS = 0 + "";
-            mapRequestEnt.surfaceMaxS = 2000 + "";
-
-            NetworkService.getMap(mapRequestEnt, new Callback<List<MapResponseEnt>>() {
-                @Override
-                public void success(List<MapResponseEnt> mapResponseEnts, Response response) {
-                    if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
-                        List<LatLng> latLngs = new ArrayList<>();
-                        for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
-                            if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
-                                    && mapResponseEnt.elementType != null) {
-                                Marker marker = createMarker(mapResponseEnt);
-                                latLngs.add(marker.getPosition());
-
-                                List<Marker> elementTypeMarkers = markers
-                                        .get(mapResponseEnt.elementType);
-                                if (elementTypeMarkers == null) {
-                                    elementTypeMarkers = new ArrayList<>();
-                                    markers.put(mapResponseEnt.elementType, elementTypeMarkers);
-                                }
-                                elementTypeMarkers.add(marker);
-                            }
-                        }
-
-                        if (latLngs.size() > 0) {
-                            onEventMainThread(new NavigationItemSelectedEvent(
-                                    ((MainActivity) activity).getGroupNavigationItems()
-                                            .getCheckedRadioButtonId()));
-                            moveCameraToBound(latLngs, true);
-                        }
-                    }
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-
-                }
-            });
-        }
+        rootView = touchableWrapper;
 
         return rootView;
     }
@@ -219,6 +185,78 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         }
     }
 
+    private void getMap() {
+        loadingState = Constants.NetworkLoadingState.LOADING;
+
+        final ProgressDialog waitDialog = new ProgressDialog(activity);
+        waitDialog.setMessage("Loading...");
+        waitDialog.setCancelable(false);
+        waitDialog.show();
+
+        final MapRequestEnt mapRequestEnt = new MapRequestEnt();
+        mapRequestEnt.deviceId = RealEstateApplication.deviceId;
+        mapRequestEnt.xMin = currentMin.longitude;
+        mapRequestEnt.yMin = currentMin.latitude;
+        mapRequestEnt.xMax = currentMax.longitude;
+        mapRequestEnt.yMax = currentMax.latitude;
+        mapRequestEnt.adsOffset = 100;
+        mapRequestEnt.surfaceMinS = 0 + "";
+        mapRequestEnt.surfaceMaxS = 2000 + "";
+
+        NetworkService.getMap(mapRequestEnt, new Callback<List<MapResponseEnt>>() {
+            @Override
+            public void success(List<MapResponseEnt> mapResponseEnts, Response response) {
+                markers.clear();
+                map.clear();
+
+                if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
+                    List<LatLng> latLngs = new ArrayList<>();
+                    for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
+                        if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
+                                && mapResponseEnt.elementType != null) {
+                            Marker marker = createMarker(mapResponseEnt);
+                            latLngs.add(marker.getPosition());
+
+                            List<Marker> elementTypeMarkers = markers
+                                    .get(mapResponseEnt.elementType);
+                            if (elementTypeMarkers == null) {
+                                elementTypeMarkers = new ArrayList<>();
+                                markers.put(mapResponseEnt.elementType, elementTypeMarkers);
+                            }
+                            elementTypeMarkers.add(marker);
+                        }
+                    }
+
+                    if (latLngs.size() > 0) {
+                        onEventMainThread(new NavigationItemSelectedEvent(
+                                ((MainActivity) activity).getGroupNavigationItems()
+                                        .getCheckedRadioButtonId()));
+                        moveCameraToBound(latLngs, true);
+                    }
+                }
+
+                loadingState = Constants.NetworkLoadingState.LOADED;
+                waitDialog.dismiss();
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                loadingState = Constants.NetworkLoadingState.NONE;
+                waitDialog.dismiss();
+            }
+        });
+    }
+
+    private void calculateNewMinMaxPoints(LatLng center) {
+        double xMin = center.longitude - (currentMax.longitude - currentMin.longitude) / 2;
+        double yMin = center.latitude - (currentMax.latitude - currentMin.latitude) / 2;
+        currentMin = new LatLng(yMin, xMin);
+
+        double xMax = center.longitude + (currentMax.longitude - currentMin.longitude) / 2;
+        double yMax = center.latitude + (currentMax.latitude - currentMin.latitude) / 2;
+        currentMax = new LatLng(yMax, xMax);
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
@@ -229,6 +267,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         map.getUiSettings().setMapToolbarEnabled(false);
         map.setOnMapClickListener(this);
         map.setOnMarkerClickListener(this);
+        map.setOnCameraChangeListener(this);
+
+        getMap();
     }
 
     private void moveCameraToLocation(Location location) {
@@ -237,6 +278,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     private void moveCameraToBound(List<LatLng> latLngs, boolean animate) {
+        isForceMoveMap = true;
+
         LatLngBounds.Builder builder = new LatLngBounds.Builder();
         for (LatLng latLng : latLngs) {
             builder.include(latLng);
@@ -244,9 +287,31 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         LatLngBounds bounds = builder.build();
 
         if (animate) {
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, BOUNDS_PADDING));
+            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, BOUNDS_PADDING),
+                    new GoogleMap.CancelableCallback() {
+                        @Override
+                        public void onFinish() {
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    isForceMoveMap = false;
+                                }
+                            },1000);
+                        }
+
+                        @Override
+                        public void onCancel() {
+                            new Handler().postDelayed(new Runnable() {
+                                @Override
+                                public void run() {
+                                    isForceMoveMap = false;
+                                }
+                            },1000);
+                        }
+                    });
         } else {
             map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, BOUNDS_PADDING));
+            isForceMoveMap = false;
         }
     }
 
@@ -260,64 +325,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onLocationChanged(Location location) {
-        if (currentLocation == null) {
-            // moveCameraToLocation(location);
-        }
-        currentLocation = location;
-//        if (loadingState != Constants.NetworkLoadingState.LOADING
-//                && loadingState != Constants.NetworkLoadingState.LOADED) {
-//            loadingState = Constants.NetworkLoadingState.LOADING;
-//
-//            final MapRequestEnt mapRequestEnt = new MapRequestEnt();
-//            mapRequestEnt.deviceId = RealEstateApplication.deviceId;
-//            // mapRequestEnt.xMin = location.getLatitude();
-//            // mapRequestEnt.yMin = location.getLongitude();
-//            // mapRequestEnt.xMax = location.getLatitude() + 200/1E6;
-//            // mapRequestEnt.yMax = location.getLongitude() + 200/1E6;
-//            mapRequestEnt.xMin = 2.1475;
-//            mapRequestEnt.yMin = 48.9306;
-//            mapRequestEnt.xMax = 2.4963;
-//            mapRequestEnt.yMax = 48.7924;
-//            mapRequestEnt.adsOffset = 100;
-//            mapRequestEnt.surfaceMinS = 0 + "";
-//            mapRequestEnt.surfaceMaxS = 2000 + "";
-//
-//            NetworkService.getMap(mapRequestEnt, new Callback<List<MapResponseEnt>>() {
-//                @Override
-//                public void success(List<MapResponseEnt> mapResponseEnts, Response response) {
-//                    if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
-//                        List<LatLng> latLngs = new ArrayList<>();
-//                        for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
-//                            if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
-//                                    && mapResponseEnt.elementType != null) {
-//                                Marker marker = createMarker(mapResponseEnt);
-//                                latLngs.add(marker.getPosition());
-//
-//                                List<Marker> elementTypeMarkers = markers
-//                                        .get(mapResponseEnt.elementType);
-//                                if (elementTypeMarkers == null) {
-//                                    elementTypeMarkers = new ArrayList<>();
-//                                    markers.put(mapResponseEnt.elementType, elementTypeMarkers);
-//                                }
-//                                elementTypeMarkers.add(marker);
-//                            }
-//                        }
-//
-//                        if (latLngs.size() > 0) {
-//                            onEventMainThread(new NavigationItemSelectedEvent(
-//                                    ((MainActivity) activity).getGroupNavigationItems()
-//                                            .getCheckedRadioButtonId()));
-//                            moveCameraToBound(latLngs, true);
-//                        }
-//                    }
-//                }
-//
-//                @Override
-//                public void failure(RetrofitError error) {
-//
-//                }
-//            });
-//        }
+        // if (currentLocation == null) {
+        // // moveCameraToLocation(location);
+        // }
+        // currentLocation = location;
     }
 
     @Override
@@ -459,4 +470,61 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     }
 
+    @Override
+    public void onCameraChange(CameraPosition cameraPosition) {
+        if (currentLocation == null) {
+            currentLocation = new Location("manual");
+            currentLocation.setLatitude(cameraPosition.target.latitude);
+            currentLocation.setLongitude(cameraPosition.target.longitude);
+            return;
+        }
+
+        if (!isTouchingMap && !isForceMoveMap
+                && checkDragDistanceValid(cameraPosition.target)) {
+            currentLocation = new Location("manual");
+            currentLocation.setLatitude(cameraPosition.target.latitude);
+            currentLocation.setLongitude(cameraPosition.target.longitude);
+            calculateNewMinMaxPoints(cameraPosition.target);
+            getMap();
+        }
+    }
+
+    private boolean checkDragDistanceValid(LatLng center) {
+        Location newLocation = new Location("manual");
+        newLocation.setLatitude(center.latitude);
+        newLocation.setLongitude(center.longitude);
+
+        return currentLocation.distanceTo(newLocation) > 1000;
+    }
+
+    private class TouchableWrapper extends FrameLayout {
+
+        public TouchableWrapper(Context context) {
+            super(context);
+        }
+
+        public TouchableWrapper(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        public TouchableWrapper(Context context, AttributeSet attrs, int defStyleAttr) {
+            super(context, attrs, defStyleAttr);
+        }
+
+        @Override
+        public boolean dispatchTouchEvent(MotionEvent ev) {
+
+            switch (ev.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    isTouchingMap = true;
+                    break;
+                case MotionEvent.ACTION_UP:
+                    isTouchingMap = false;
+                    break;
+            }
+
+            return super.dispatchTouchEvent(ev);
+        }
+
+    }
 }
