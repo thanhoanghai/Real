@@ -2,6 +2,7 @@
 package com.synova.realestate.utils;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.GridLayoutManager;
@@ -124,6 +125,15 @@ public class DialogUtils {
     //
     // return dialog;
     // }
+
+    public static ProgressDialog showWaitDialog(final Context context, boolean isCancelable) {
+        ProgressDialog dialog = new ProgressDialog(context);
+        dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+        dialog.setCancelable(isCancelable);
+        dialog.setMessage("Loading...");
+        dialog.show();
+        return dialog;
+    }
 
     public static Dialog showDialogFilter(final Context context) {
         final Dialog dialog = createDialogAndSave(context, R.layout.dialog_filter, true);

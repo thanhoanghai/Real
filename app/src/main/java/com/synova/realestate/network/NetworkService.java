@@ -1,6 +1,19 @@
 
 package com.synova.realestate.network;
 
+import com.google.gson.JsonElement;
+import com.google.gson.reflect.TypeToken;
+import com.synova.realestate.base.RealEstateApplication;
+import com.synova.realestate.models.AdsDetailEnt;
+import com.synova.realestate.models.AdsInfoResponseEnt;
+import com.synova.realestate.models.MapResponseEnt;
+import com.synova.realestate.network.model.AdEnt;
+import com.synova.realestate.network.model.AdsInfoEnt;
+import com.synova.realestate.network.model.FavoriteEnt;
+import com.synova.realestate.network.model.MapRequestEnt;
+import com.synova.realestate.network.model.PublisherPropertyEnt;
+import com.synova.realestate.network.model.PublisherRequestEnt;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,26 +25,12 @@ import retrofit.converter.GsonConverter;
 import retrofit.http.Body;
 import retrofit.http.POST;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
-import com.synova.realestate.base.RealEstateApplication;
-import com.synova.realestate.models.AdsInfoResponseEnt;
-import com.synova.realestate.models.MapResponseEnt;
-import com.synova.realestate.network.model.AdEnt;
-import com.synova.realestate.network.model.AdsInfoEnt;
-import com.synova.realestate.network.model.FavoriteEnt;
-import com.synova.realestate.network.model.MapRequestEnt;
-import com.synova.realestate.network.model.PublisherPropertyEnt;
-import com.synova.realestate.network.model.PublisherRequestEnt;
-
 /**
  * Created by ducth on 6/22/15.
  */
 public class NetworkService {
 
     public static final String BASE_URL = "http://115.78.234.253:8080/RealEstateWS/service";
-    private static final Gson GSON = new Gson();
 
     private static RestService restService = new RestAdapter.Builder()
             .setEndpoint(BASE_URL)
@@ -133,10 +132,11 @@ public class NetworkService {
                     public void onSuccess(JsonElement jsonElement) {
                         if (callback != null) {
                             if (jsonElement != null) {
-                                List<GetListFavoriteResult> listResults = GSON.fromJson(
-                                        jsonElement,
-                                        new TypeToken<List<GetListFavoriteResult>>() {
-                                        }.getType());
+                                List<GetListFavoriteResult> listResults = RealEstateApplication.GSON
+                                        .fromJson(
+                                                jsonElement,
+                                                new TypeToken<List<GetListFavoriteResult>>() {
+                                                }.getType());
                                 List<String> publisherIds = new ArrayList<>(listResults.size());
                                 for (GetListFavoriteResult result : listResults) {
                                     publisherIds.add(result.result);
@@ -148,12 +148,38 @@ public class NetworkService {
                             }
                         }
                     }
+
+                    @Override
+                    public void onFail(Throwable error) {
+                        if (callback != null) {
+                            callback.onFail(error);
+                        }
+                    }
                 });
     }
 
-    public static void getListPublisher(PublisherRequestEnt publisherRequestEnt,
-            NetworkCallback<JsonElement> callback) {
+    public static void getPropertyDetails(AdEnt adEnt, final NetworkCallback<AdsDetailEnt> callback) {
+        restService.getPropertyDetail(adEnt, new NetworkCallback<JsonElement>() {
+            @Override
+            public void onSuccess(JsonElement jsonElement) {
+                if (callback != null) {
+                    if (jsonElement != null) {
+                        AdsDetailEnt adsDetailEnt = RealEstateApplication.GSON.fromJson(
+                                jsonElement, AdsDetailEnt.class);
+                        callback.onSuccess(adsDetailEnt);
+                    } else {
+                        callback.onFail(new Exception("Fail to get Ads details."));
+                    }
+                }
+            }
 
+            @Override
+            public void onFail(Throwable error) {
+                if (callback != null) {
+                    callback.onFail(error);
+                }
+            }
+        });
     }
 
     private interface RestService {
@@ -182,7 +208,7 @@ public class NetworkService {
         void getMap(@Body MapRequestEnt mapRequestEnt, Callback<JsonElement> callback);
 
         @POST("/property/getDetails")
-        void getPropertyDetail(@Body AdEnt adEnt, NetworkCallback<String> callback);
+        void getPropertyDetail(@Body AdEnt adEnt, NetworkCallback<JsonElement> callback);
 
         @POST("/property/getAdsInfo")
         void getAdsInfo(@Body AdsInfoEnt adsInfoEnt, Callback<JsonElement> callback);

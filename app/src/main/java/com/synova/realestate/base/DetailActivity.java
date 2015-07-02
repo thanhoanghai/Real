@@ -1,6 +1,7 @@
 
 package com.synova.realestate.base;
 
+import android.app.ProgressDialog;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,8 +35,13 @@ import com.synova.realestate.customviews.AdsImageView;
 import com.synova.realestate.customviews.CustomCirclePageIndicator;
 import com.synova.realestate.customviews.TouchableWrapperView;
 import com.synova.realestate.fragments.RetainMapFragment;
+import com.synova.realestate.models.AdsDetailEnt;
 import com.synova.realestate.models.DetailData;
 import com.synova.realestate.models.Publisher;
+import com.synova.realestate.network.NetworkService;
+import com.synova.realestate.network.model.AdEnt;
+import com.synova.realestate.utils.DialogUtils;
+import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -50,6 +57,10 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
     private AdsImageView adsView;
 
+    private TextView tvTitle;
+    private TextView tvAddress;
+    private TextView tvPrice;
+
     private GoogleMap map;
 
     private AutoScrollViewPager slideShowView;
@@ -60,10 +71,14 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
     private ViewGroup groupData;
     private ViewGroup groupSellers;
 
+    private int adId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
+
+        adId = getIntent().getExtras().getInt("adId");
 
         adsView = (AdsImageView) findViewById(R.id.adsImageView);
         // adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
@@ -75,11 +90,17 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
             }
         });
 
+        tvTitle = (TextView) findViewById(R.id.detail_tvTitle);
+        tvAddress = (TextView) findViewById(R.id.detail_tvAddress);
+        tvPrice = (TextView) findViewById(R.id.detail_tvPrice);
+
         setupMap();
         setupActionBar();
         setupSlideShow();
         setupDataList();
         setupSellerList();
+
+        getDetail();
     }
 
     private void setupActionBar() {
@@ -111,17 +132,6 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         CustomCirclePageIndicator slideShowIndicator = (CustomCirclePageIndicator) findViewById(R.id.detail_slideshow_indicator);
         slideShowIndicator.setViewPager(slideShowView);
         slideShowIndicator.setSnap(true);
-
-        List<String> photoUrls = new ArrayList<>();
-        photoUrls
-                .add("http://imactoy.com/wp-content/uploads/2013/04/modern-homes-often-feature-furniture-with-concrete-details-and-structures-600x300.jpg");
-        photoUrls
-                .add("http://beacont.com/wp-content/uploads/2013/07/Clean-White-Bathroom-with-Gray-and-Purple-Accent-600x300.jpg");
-        photoUrls
-                .add("http://rumahinteriorminimalis.com/wp-content/uploads/2014/09/modern-sunroom-designs-covered-jessica-dauray-with-beige-tones-600x300.jpg");
-
-        slideShowAdapter.setData(photoUrls);
-        onPageSelected(0);
     }
 
     private void setupMap() {
@@ -240,19 +250,55 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
     }
 
+    private void getDetail() {
+        final ProgressDialog waitDialog = DialogUtils.showWaitDialog(this, true);
+
+        AdEnt adEnt = new AdEnt();
+        adEnt.adId = adId;
+        NetworkService.getPropertyDetails(adEnt,
+                new NetworkService.NetworkCallback<AdsDetailEnt>() {
+                    @Override
+                    public void onSuccess(AdsDetailEnt adsDetailEnt) {
+                        waitDialog.dismiss();
+
+                        if (adsDetailEnt == null) {
+                            return;
+                        }
+
+                        List<String> images = new ArrayList<>(adsDetailEnt.images.size());
+                        for (AdsDetailEnt.AdImage image : adsDetailEnt.images) {
+                            images.add(image.imagesUrl);
+                        }
+                        slideShowAdapter.setData(images);
+                        onPageSelected(0);
+
+                        AdsDetailEnt.AdCharac adCharac = adsDetailEnt.characs.get(0);
+                        tvTitle.setText(adCharac.title);
+                        tvPrice.setText(adCharac.minMaxPrice);
+                        tvAddress.setText(adCharac.detailCharac);
+
+                        LatLng latLng = Util.convertPointGeomToLatLng(adCharac.localisation);
+                        if (map != null) {
+                            createMarker(latLng.latitude, latLng.longitude, adCharac.title);
+                            moveCameraToLocation(latLng);
+                        }
+
+                    }
+
+                    @Override
+                    public void onFail(Throwable error) {
+                        waitDialog.dismiss();
+                        Toast.makeText(DetailActivity.this, "Fail to load details",
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Location location = new Location("manual");
-        location.setLatitude(37.30925);
-        location.setLongitude(-122.0436444);
-
         map = googleMap;
         map.getUiSettings().setMapToolbarEnabled(false);
         map.setInfoWindowAdapter(new DetailMapInfoWindowAdapter(this));
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(),
-                location.getLongitude()), 16));
-
-        createMapMockData(location);
     }
 
     private Marker createMarker(double lat, double lng, String title) {
@@ -261,6 +307,10 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 .position(new LatLng(lat, lng))
                 .anchor(0.1f, 0.9f)
                 .title(title));
+    }
+
+    private void moveCameraToLocation(LatLng latLng) {
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
     }
 
     private void createMapMockData(Location loc) {

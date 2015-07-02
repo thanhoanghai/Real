@@ -6,6 +6,6 @@ package com.synova.realestate.network.model;
  */
 public class AdEnt {
 
-    public String adId;
-    public String cellPhoneId;
+    public int adId;
+    public String cellPhoneId = "";
 }

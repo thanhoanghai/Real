@@ -8,10 +8,8 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
-import com.google.gson.Gson;
 import com.synova.realestate.R;
 import com.synova.realestate.models.AdsInfoResponseEnt;
-import com.synova.realestate.models.House;
 import com.synova.realestate.utils.Util;
 
 import java.util.Stack;
@@ -103,9 +101,9 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void showDetailActivity(AdsInfoResponseEnt house) {
+    public void showDetailActivity(AdsInfoResponseEnt ads) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra("house", new Gson().toJson(house));
+        intent.putExtra("adId", ads.id);
         startActivity(intent);
     }
 
