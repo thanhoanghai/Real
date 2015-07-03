@@ -13,14 +13,30 @@
         android:layout_marginTop="60dp"
         android:orientation="vertical">
 
-        <TextView
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="45dp"
-            android:background="@color/cyan"
-            android:gravity="center"
-            android:text="Filter"
-            android:textColor="@color/white"
-            android:textSize="20sp" />
+            android:background="@color/cyan">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:text="Filter"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
+
+            <Button
+                android:id="@+id/dialog_filter_btnClose"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:background="@drawable/selector_action_bar_item_bg"
+                android:text="Close"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+        </RelativeLayout>
 
         <ScrollView
             android:layout_width="match_parent"
