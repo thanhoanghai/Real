@@ -35,6 +35,7 @@ import android.widget.TextView;
 import com.google.android.gms.maps.model.LatLng;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.models.AdsInfoResponseEnt;
 
 import org.joda.time.DateTime;
 
@@ -47,8 +48,10 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -633,8 +636,8 @@ public class Util {
 
     public static LatLng convertPointGeomToLatLng(String pointGeom) {
         String[] point = pointGeom.substring(6, pointGeom.length() - 1).split(" ");
-//        LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
-        //TODO temp switch to fix server wrong response info
+        // LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
+        // TODO temp switch to fix server wrong response info
         LatLng latLng = new LatLng(Double.parseDouble(point[1]), Double.parseDouble(point[0]));
         return latLng;
     }
@@ -644,12 +647,57 @@ public class Util {
         LatLng[] latLngs = new LatLng[points.length];
         for (int i = 0; i < points.length; i++) {
             String[] point = points[i].split(" ");
-//            LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
-            //TODO temp switch to fix server wrong response info
+            // LatLng latLng = new LatLng(Double.parseDouble(point[0]),
+            // Double.parseDouble(point[1]));
+            // TODO temp switch to fix server wrong response info
             LatLng latLng = new LatLng(Double.parseDouble(point[1]), Double.parseDouble(point[0]));
             latLngs[i] = latLng;
         }
         return latLngs;
+    }
+
+    public static int convertMinMaxPriceToPrice(String minMaxPrice) {
+        return Integer.parseInt(minMaxPrice.split("-")[0].replace(" ", ""));
+    }
+
+    public static void sortAdsByDistance(List<AdsInfoResponseEnt> ads, final boolean isSortAsc) {
+        Collections.sort(ads, new Comparator<AdsInfoResponseEnt>() {
+            @Override
+            public int compare(AdsInfoResponseEnt ad1, AdsInfoResponseEnt ad2) {
+                int distance1 = Integer.parseInt(ad1.distance);
+                int distance2 = Integer.parseInt(ad2.distance);
+
+                if (distance1 > distance2) {
+                    return isSortAsc ? 1 : -1;
+                }
+
+                if (distance1 < distance2) {
+                    return isSortAsc ? -1 : 1;
+                }
+
+                return 0;
+            }
+        });
+    }
+
+    public static void sortAdsByPrice(List<AdsInfoResponseEnt> ads, final boolean isSortAsc) {
+        Collections.sort(ads, new Comparator<AdsInfoResponseEnt>() {
+            @Override
+            public int compare(AdsInfoResponseEnt ad1, AdsInfoResponseEnt ad2) {
+                int price1 = Util.convertMinMaxPriceToPrice(ad1.mminMaxPrice);
+                int price2 = Util.convertMinMaxPriceToPrice(ad2.mminMaxPrice);
+
+                if (price1 > price2) {
+                    return isSortAsc ? 1 : -1;
+                }
+
+                if (price1 < price2) {
+                    return isSortAsc ? -1 : 1;
+                }
+
+                return 0;
+            }
+        });
     }
 
     private static class ClickableText extends ClickableSpan {

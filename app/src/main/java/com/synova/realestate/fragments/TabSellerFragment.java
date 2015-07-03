@@ -71,6 +71,7 @@ public class TabSellerFragment extends BaseFragment implements SwipeRefreshLayou
     public void onResume() {
         super.onResume();
         ((MainActivity)activity).disableDrawer();
+        swipeRefreshLayout.setRefreshing(false);
     }
 
     private List<Publisher> createMockData() {

@@ -25,7 +25,8 @@
         <cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager
             android:id="@+id/detail_slideShow"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="match_parent"
+            android:background="@drawable/img_default_list" />
 
         <ImageButton
             android:id="@+id/detail_btnPreSlide"

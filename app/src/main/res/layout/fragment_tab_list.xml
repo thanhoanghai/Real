@@ -5,6 +5,7 @@
     android:orientation="vertical">
 
     <com.synova.realestate.customviews.SortBar
+        android:id="@+id/tab_list_sortBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

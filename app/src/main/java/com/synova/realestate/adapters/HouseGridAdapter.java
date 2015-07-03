@@ -14,7 +14,6 @@ import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.models.AdsInfoResponseEnt;
-import com.synova.realestate.models.House;
 import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
@@ -37,6 +36,10 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void setItems(List<AdsInfoResponseEnt> houses) {
         this.houses = houses;
         notifyDataSetChanged();
+    }
+
+    public List<AdsInfoResponseEnt> getItems(){
+        return houses;
     }
 
     public void addItem(AdsInfoResponseEnt house) {
@@ -95,7 +98,7 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 HouseViewHolder holder = (HouseViewHolder) h;
 
                 ImageLoader.getInstance().displayImage(house.imageUrl, holder.ivPhoto);
-                int price = Integer.parseInt(house.mminMaxPrice.split("-")[0].replace(" ", ""));
+                int price = Util.convertMinMaxPriceToPrice(house.mminMaxPrice);
                 holder.tvPrice.setText(price <= Constants.HOUSE_PRICE_LIMIT ? Util
                         .formatPriceNumber(price) + "€" : "€");
                 holder.tvTitle.setText(house.title);

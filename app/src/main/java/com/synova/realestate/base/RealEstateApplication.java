@@ -45,9 +45,9 @@ public class RealEstateApplication extends Application {
                 .cacheOnDisk(true)
                 .considerExifParams(true)
                 .delayBeforeLoading(500)
-                .showImageForEmptyUri(R.drawable.image_default)
-                .showImageOnLoading(R.drawable.image_default)
-                .showImageOnFail(R.drawable.image_default)
+                .showImageForEmptyUri(R.drawable.img_default_list)
+                .showImageOnLoading(R.drawable.img_default_list)
+                .showImageOnFail(R.drawable.img_default_list)
                 .build();
 
         ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)

@@ -14,7 +14,6 @@ import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.models.AdsInfoResponseEnt;
-import com.synova.realestate.models.House;
 import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
@@ -37,6 +36,10 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void setItems(List<AdsInfoResponseEnt> houses) {
         this.houses = houses;
         notifyDataSetChanged();
+    }
+
+    public List<AdsInfoResponseEnt> getItems(){
+        return houses;
     }
 
     public void addItem(AdsInfoResponseEnt house) {
