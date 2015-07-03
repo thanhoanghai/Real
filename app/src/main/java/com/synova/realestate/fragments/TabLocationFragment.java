@@ -1,6 +1,15 @@
 
 package com.synova.realestate.fragments;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -48,15 +57,7 @@ import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.MapRequestEnt;
 import com.synova.realestate.utils.Util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.greenrobot.event.EventBus;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 /**
  * Created by ducth on 6/16/15.
@@ -87,6 +88,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     private TextView tvPrice;
 
     private Constants.NetworkLoadingState loadingState = Constants.NetworkLoadingState.NONE;
+
+    private boolean isFirstTimeLoadData = true;
 
     private Map<Constants.ElementType, List<Marker>> markers = new HashMap<>();
 
@@ -231,7 +234,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                         onEventMainThread(new NavigationItemSelectedEvent(
                                 ((MainActivity) activity).getGroupNavigationItems()
                                         .getCheckedRadioButtonId()));
-                        moveCameraToBound(latLngs, true);
+                        if (isFirstTimeLoadData) {
+                            isFirstTimeLoadData = false;
+                            moveCameraToBound(latLngs, true);
+                        }
                     }
                 }
 
@@ -287,7 +293,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         LatLngBounds bounds = builder.build();
 
         if (animate) {
-            map.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, BOUNDS_PADDING),
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), 14),
                     new GoogleMap.CancelableCallback() {
                         @Override
                         public void onFinish() {
@@ -296,7 +302,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                                 public void run() {
                                     isForceMoveMap = false;
                                 }
-                            },1000);
+                            }, 1000);
                         }
 
                         @Override
@@ -306,11 +312,11 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                                 public void run() {
                                     isForceMoveMap = false;
                                 }
-                            },1000);
+                            }, 1000);
                         }
                     });
         } else {
-            map.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, BOUNDS_PADDING));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), 14));
             isForceMoveMap = false;
         }
     }
@@ -494,7 +500,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         newLocation.setLatitude(center.latitude);
         newLocation.setLongitude(center.longitude);
 
-        return currentLocation.distanceTo(newLocation) > 1000;
+        return currentLocation.distanceTo(newLocation) > 1500;
     }
 
     private class TouchableWrapper extends FrameLayout {
