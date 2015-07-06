@@ -10,6 +10,7 @@ import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -140,12 +141,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private void setupGroupDetailBottom() {
         groupDetailBottom = (ViewGroup) rootView.findViewById(R.id.tab_location_groupDetailBottom);
-        groupDetailBottom.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-            }
-        });
+        groupDetailBottom.setOnClickListener(this);
         ivThumbnail = (ImageView) rootView.findViewById(R.id.tab_location_bottom_ivThumbnail);
         tvTitle = (TextView) rootView.findViewById(R.id.tab_location_bottom_tvTitle);
         tvDescription = (TextView) rootView.findViewById(R.id.tab_location_bottom_tvDescription);
@@ -380,6 +376,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         // 500);
 
         groupDetailBottom.setVisibility(View.VISIBLE);
+        groupDetailBottom.setTag(mapResponseEnt.id);
+
         ImageLoader
                 .getInstance()
                 .displayImage(
@@ -438,6 +436,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         switch (v.getId()) {
             case R.id.tab_location_btnMenu:
                 ((MainActivity) activity).openDrawer();
+                break;
+            case R.id.tab_location_groupDetailBottom:
+                int adId = (int) groupDetailBottom.getTag();
+//                activity.showDetailActivity(adId);
                 break;
         }
     }

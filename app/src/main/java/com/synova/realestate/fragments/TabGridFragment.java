@@ -156,8 +156,8 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
 
     @Override
     public void onItemClicked(RecyclerView recyclerView, View view, int position, long id,
-            AdsInfoResponseEnt data) {
-        activity.showDetailActivity(data);
+            AdsInfoResponseEnt adEnt) {
+        activity.showDetailActivity(adEnt.id);
     }
 
     @Override

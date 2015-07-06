@@ -13,7 +13,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:background="@color/white"
+        android:background="@drawable/selector_seller_list_item_bg"
         android:orientation="vertical">
 
         <ImageView

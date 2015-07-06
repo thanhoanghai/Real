@@ -101,9 +101,9 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void showDetailActivity(AdsInfoResponseEnt ads) {
+    public void showDetailActivity(int adId) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra("adId", ads.id);
+        intent.putExtra("adId", adId);
         startActivity(intent);
     }
 
