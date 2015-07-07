@@ -54,7 +54,7 @@ import retrofit.RetrofitError;
  * Created by ducth on 6/17/15.
  */
 public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
-        View.OnClickListener, ViewPager.OnPageChangeListener {
+        View.OnClickListener, ViewPager.OnPageChangeListener, GoogleMap.OnMarkerClickListener {
 
     private AdsImageView adsView;
 
@@ -306,6 +306,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         map = googleMap;
         map.getUiSettings().setMapToolbarEnabled(false);
         map.setInfoWindowAdapter(new DetailMapInfoWindowAdapter(this));
+        map.setOnMarkerClickListener(this);
     }
 
     private Marker createMarker(double lat, double lng, String title) {
@@ -464,5 +465,10 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
     @Override
     public void onPageScrollStateChanged(int state) {
 
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return true;
     }
 }
