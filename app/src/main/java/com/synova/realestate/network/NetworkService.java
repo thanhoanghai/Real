@@ -7,6 +7,8 @@ import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.models.AdsDetailEnt;
 import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.MapResponseEnt;
+import com.synova.realestate.models.Publisher;
+import com.synova.realestate.models.PublisherPropertyResponseEnt;
 import com.synova.realestate.network.model.AdEnt;
 import com.synova.realestate.network.model.AdsInfoEnt;
 import com.synova.realestate.network.model.FavoriteEnt;
@@ -84,6 +86,75 @@ public class NetworkService {
         });
     }
 
+    public static void getPropertyDetails(AdEnt adEnt, final NetworkCallback<AdsDetailEnt> callback) {
+        restService.getPropertyDetail(adEnt, new NetworkCallback<JsonElement>() {
+            @Override
+            public void onSuccess(JsonElement jsonElement) {
+                if (callback != null) {
+                    if (jsonElement != null) {
+                        AdsDetailEnt adsDetailEnt = RealEstateApplication.GSON.fromJson(
+                                jsonElement, AdsDetailEnt.class);
+                        callback.onSuccess(adsDetailEnt);
+                    } else {
+                        callback.onFail(new Exception("Fail to get Ads details."));
+                    }
+                }
+            }
+
+            @Override
+            public void onFail(Throwable error) {
+                if (callback != null) {
+                    callback.onFail(error);
+                }
+            }
+        });
+    }
+
+    public static void getListPublisher(PublisherRequestEnt publisherRequestEnt,
+            final NetworkCallback<List<Publisher>> callback) {
+        restService.getListPublisher(publisherRequestEnt, new NetworkCallback<JsonElement>() {
+            @Override
+            public void onSuccess(JsonElement jsonElement) {
+                List<Publisher> publishers = RealEstateApplication.GSON.fromJson(jsonElement,
+                        new TypeToken<List<Publisher>>() {
+                        }.getType());
+                if (callback != null) {
+                    callback.onSuccess(publishers);
+                }
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if (callback != null) {
+                    callback.failure(error);
+                }
+            }
+        });
+    }
+
+    public static void getPublisherProperty(PublisherPropertyEnt publisherPropertyEnt,
+            final NetworkCallback<List<PublisherPropertyResponseEnt>> callback) {
+        restService.getPublisherProperty(publisherPropertyEnt, new NetworkCallback<JsonElement>() {
+            @Override
+            public void onSuccess(JsonElement jsonElement) {
+                List<PublisherPropertyResponseEnt> publisherPropertyResponseEnts = RealEstateApplication.GSON
+                        .fromJson(jsonElement, new TypeToken<List<PublisherPropertyResponseEnt>>() {
+                        }.getType());
+                if (callback != null) {
+                    callback.onSuccess(publisherPropertyResponseEnts);
+                }
+
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                if (callback != null) {
+                    callback.failure(error);
+                }
+            }
+        });
+    }
+
     public static void addFavorite(String deviceId, String propertyId,
             final NetworkCallback<Boolean> callback) {
         restService.addFavorite(new FavoriteEnt(deviceId, propertyId),
@@ -96,6 +167,13 @@ public class NetworkService {
                             } else {
                                 callback.onFail(new Exception("Fail to add favorite."));
                             }
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        if (callback != null) {
+                            callback.failure(error);
                         }
                     }
                 });
@@ -114,6 +192,13 @@ public class NetworkService {
                             } else {
                                 callback.onFail(new Exception("Fail to remove favorite."));
                             }
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        if (callback != null) {
+                            callback.failure(error);
                         }
                     }
                 });
@@ -158,30 +243,6 @@ public class NetworkService {
                 });
     }
 
-    public static void getPropertyDetails(AdEnt adEnt, final NetworkCallback<AdsDetailEnt> callback) {
-        restService.getPropertyDetail(adEnt, new NetworkCallback<JsonElement>() {
-            @Override
-            public void onSuccess(JsonElement jsonElement) {
-                if (callback != null) {
-                    if (jsonElement != null) {
-                        AdsDetailEnt adsDetailEnt = RealEstateApplication.GSON.fromJson(
-                                jsonElement, AdsDetailEnt.class);
-                        callback.onSuccess(adsDetailEnt);
-                    } else {
-                        callback.onFail(new Exception("Fail to get Ads details."));
-                    }
-                }
-            }
-
-            @Override
-            public void onFail(Throwable error) {
-                if (callback != null) {
-                    callback.onFail(error);
-                }
-            }
-        });
-    }
-
     private interface RestService {
 
         @POST("/favorite/AddFavorite")
@@ -198,11 +259,11 @@ public class NetworkService {
                 NetworkCallback<JsonElement> callback);
 
         @POST("/publisher/getDetails")
-        void getPublisherDetail(@Body AdEnt adEnt, NetworkCallback<String> callback);
+        void getPublisherDetail(@Body AdEnt adEnt, NetworkCallback<JsonElement> callback);
 
         @POST("/publisher/getProperty")
         void getPublisherProperty(@Body PublisherPropertyEnt publisherPropertyEnt,
-                NetworkCallback<String> callback);
+                NetworkCallback<JsonElement> callback);
 
         @POST("/property/getMap")
         void getMap(@Body MapRequestEnt mapRequestEnt, Callback<JsonElement> callback);

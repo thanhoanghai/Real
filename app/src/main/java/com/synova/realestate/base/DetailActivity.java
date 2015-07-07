@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Random;
 
 import cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager;
+import retrofit.RetrofitError;
 
 /**
  * Created by ducth on 6/17/15.
@@ -56,6 +57,8 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         View.OnClickListener, ViewPager.OnPageChangeListener {
 
     private AdsImageView adsView;
+
+    private ActionBar actionBar;
 
     private TextView tvTitle;
     private TextView tvAddress;
@@ -72,6 +75,8 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
     private ViewGroup groupSellers;
 
     private int adId;
+
+    private AdsDetailEnt adsDetailEnt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,7 +112,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        ActionBar actionBar = getSupportActionBar();
+        actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
         actionBar.setDisplayShowHomeEnabled(true);
@@ -192,30 +197,30 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         List<Publisher> publishers = new ArrayList<>();
 
         Publisher publisher = new Publisher();
-        publisher.thumbnail = "";
-        publisher.title = "Nom Adresse 1";
-        publisher.website = "http://google.com";
-        publisher.phone = "51-22-48";
+        publisher.logoUrl = "";
+        publisher.name = "Nom Adresse 1";
+        // publisher.website = "http://google.com";
+        publisher.tel = "51-22-48";
         publisher.mail = "mail01@realestate.com";
-        publisher.annonces = 100;
+        publisher.nbAds = 100;
         publishers.add(publisher);
 
         publisher = new Publisher();
-        publisher.thumbnail = "";
-        publisher.title = "Nom Adresse 2";
-        publisher.website = "http://google.com";
-        publisher.phone = "51-22-49";
+        publisher.logoUrl = "";
+        publisher.name = "Nom Adresse 2";
+        // publisher.website = "http://google.com";
+        publisher.tel = "51-22-49";
         publisher.mail = "mail02@realestate.com";
-        publisher.annonces = 100;
+        publisher.nbAds = 100;
         publishers.add(publisher);
 
         publisher = new Publisher();
-        publisher.thumbnail = "";
-        publisher.title = "Nom Adresse 3";
-        publisher.website = "http://google.com";
-        publisher.phone = "51-22-50";
+        publisher.logoUrl = "";
+        publisher.name = "Nom Adresse 3";
+        // publisher.website = "http://google.com";
+        publisher.tel = "51-22-50";
         publisher.mail = "mail03@realestate.com";
-        publisher.annonces = 100;
+        publisher.nbAds = 100;
         publishers.add(publisher);
 
         groupSellers = (ViewGroup) findViewById(R.id.detail_groupSellers);
@@ -233,10 +238,10 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
             ViewGroup groupPhone = (ViewGroup) view.findViewById(R.id.detail_seller_groupPhone);
             ViewGroup groupMail = (ViewGroup) view.findViewById(R.id.detail_seller_groupMail);
 
-            ImageLoader.getInstance().displayImage(s.thumbnail, ivThumbnail);
-            tvTitle.setText(s.title);
+            ImageLoader.getInstance().displayImage(s.logoUrl, ivThumbnail);
+            tvTitle.setText(s.name);
             // tvPrice.setText(s.);
-            tvPhone.setText(s.phone);
+            tvPhone.setText(s.tel);
             tvMail.setText(s.mail);
 
             groupPhone.setTag(s);
@@ -260,6 +265,8 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                     @Override
                     public void onSuccess(AdsDetailEnt adsDetailEnt) {
                         waitDialog.dismiss();
+
+                        DetailActivity.this.adsDetailEnt = adsDetailEnt;
 
                         if (adsDetailEnt == null) {
                             return;
@@ -342,13 +349,73 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == android.R.id.home) {
-            finish();
-            return true;
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        if (adsDetailEnt != null && adsDetailEnt.characs != null
+                && adsDetailEnt.characs.size() > 0) {
+
+            boolean isFavorite = adsDetailEnt.characs.get(0).isFavorite;
+            menu.findItem(R.id.action_favorite).setIcon(
+                    isFavorite ? R.drawable.ico_star_full : R.drawable.ico_star_empty);
         }
-        return super.onOptionsItemSelected(item);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.action_favorite:
+                if (adsDetailEnt != null && adsDetailEnt.characs != null
+                        && adsDetailEnt.characs.size() > 0) {
+
+                    final ProgressDialog waitDialog = DialogUtils.showWaitDialog(this, false);
+
+                    if (adsDetailEnt.characs.get(0).isFavorite) {
+                        NetworkService.removeFavorite(RealEstateApplication.deviceId, "" + adId,
+                                new NetworkService.NetworkCallback<Boolean>() {
+                                    @Override
+                                    public void onSuccess(Boolean isSuccess) {
+                                        waitDialog.dismiss();
+
+                                        adsDetailEnt.characs.get(0).isFavorite = false;
+                                        invalidateOptionsMenu();
+                                    }
+
+                                    @Override
+                                    public void failure(RetrofitError error) {
+                                        waitDialog.dismiss();
+                                        Toast.makeText(DetailActivity.this,
+                                                "Remove favorite fail.",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    } else {
+                        NetworkService.addFavorite(RealEstateApplication.deviceId, "" + adId,
+                                new NetworkService.NetworkCallback<Boolean>() {
+                                    @Override
+                                    public void onSuccess(Boolean isSuccess) {
+                                        waitDialog.dismiss();
+
+                                        adsDetailEnt.characs.get(0).isFavorite = true;
+                                        invalidateOptionsMenu();
+                                    }
+
+                                    @Override
+                                    public void failure(RetrofitError error) {
+                                        waitDialog.dismiss();
+                                        Toast.makeText(DetailActivity.this,
+                                                "Add to favorite fail.",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    }
+                }
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @Override
@@ -366,7 +433,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 break;
             case R.id.detail_seller_groupPhone:
                 Publisher publisher = (Publisher) v.getTag();
-                Snackbar.make(v, "Call " + publisher.phone, Snackbar.LENGTH_SHORT).show();
+                Snackbar.make(v, "Call " + publisher.tel, Snackbar.LENGTH_SHORT).show();
                 break;
             case R.id.detail_seller_groupMail:
                 publisher = (Publisher) v.getTag();

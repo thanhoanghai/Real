@@ -13,7 +13,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
-import com.synova.realestate.models.AdsInfoResponseEnt;
+import com.synova.realestate.models.PublisherPropertyResponseEnt;
 import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
@@ -22,10 +22,11 @@ import java.util.List;
 /**
  * Created by ducth on 6/13/15.
  */
-public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
+public class PublisherPropertyAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>
+        implements
         View.OnClickListener {
 
-    private List<AdsInfoResponseEnt> houses = new ArrayList<>();
+    private List<PublisherPropertyResponseEnt> houses = new ArrayList<>();
 
     private OnRecyclerViewItemClickedListener onItemClickedListener;
 
@@ -33,21 +34,21 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         this.onItemClickedListener = onItemClickedListener;
     }
 
-    public void setItems(List<AdsInfoResponseEnt> houses) {
+    public void setItems(List<PublisherPropertyResponseEnt> houses) {
         this.houses = houses;
         notifyDataSetChanged();
     }
 
-    public List<AdsInfoResponseEnt> getItems() {
+    public List<PublisherPropertyResponseEnt> getItems() {
         return houses;
     }
 
-    public void addItem(AdsInfoResponseEnt house) {
+    public void addItem(PublisherPropertyResponseEnt house) {
         houses.add(house);
         notifyItemInserted(houses.size() - 1);
     }
 
-    public void addItems(List<AdsInfoResponseEnt> houses) {
+    public void addItems(List<PublisherPropertyResponseEnt> houses) {
         int start = this.houses.size();
         this.houses.addAll(houses);
         notifyItemRangeInserted(start, houses.size() - 1);
@@ -99,13 +100,12 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             case HEADER:
                 break;
             case ITEM:
-                AdsInfoResponseEnt house = houses.get(position);
+                PublisherPropertyResponseEnt house = houses.get(position);
                 HouseViewHolder holder = (HouseViewHolder) h;
 
                 ImageLoader.getInstance().displayImage(house.imageUrl, holder.ivPhoto);
-                int price = Util.convertMinMaxPriceToPrice(house.mminMaxPrice);
-                holder.tvPrice.setText(price <= Constants.HOUSE_PRICE_LIMIT ? Util
-                        .formatPriceNumber(price) + "€" : "€");
+                holder.tvPrice.setText(house.price <= Constants.HOUSE_PRICE_LIMIT ? Util
+                        .formatPriceNumber(house.price) + "€" : "€");
                 holder.tvTitle.setText(house.title);
 
                 String description = String.format(

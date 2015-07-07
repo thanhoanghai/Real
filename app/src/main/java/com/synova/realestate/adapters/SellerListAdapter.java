@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.models.Publisher;
 
 import java.util.ArrayList;
@@ -24,6 +25,13 @@ public class SellerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private List<Publisher> publishers = new ArrayList<>();
 
+    private OnRecyclerViewItemClickedListener<Publisher> onRecyclerViewItemClickedListener;
+
+    public void setOnRecyclerViewItemClickedListener(
+            OnRecyclerViewItemClickedListener<Publisher> onRecyclerViewItemClickedListener) {
+        this.onRecyclerViewItemClickedListener = onRecyclerViewItemClickedListener;
+    }
+
     public void setItems(List<Publisher> publishers) {
         this.publishers = publishers;
         notifyDataSetChanged();
@@ -35,9 +43,14 @@ public class SellerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyItemRangeInserted(start, publishers.size() - 1);
     }
 
+    // @Override
+    // public int getItemCount() {
+    // return publishers.size() + 1;
+    // }
+
     @Override
     public int getItemCount() {
-        return publishers.size() + 1;
+        return publishers.size();
     }
 
     @Override
@@ -78,11 +91,11 @@ public class SellerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 Publisher publisher = publishers.get(position);
                 SellerItemViewHolder holder = (SellerItemViewHolder) h;
 
-                ImageLoader.getInstance().displayImage(publisher.thumbnail, holder.ivThumbnail);
-                holder.tvTitle.setText(publisher.title);
-                holder.tvAnnonces.setText(publisher.annonces + " annonces");
-                holder.tvWebsite.setText(publisher.website);
-                holder.tvPhone.setText(publisher.phone);
+                ImageLoader.getInstance().displayImage(publisher.logoUrl, holder.ivThumbnail);
+                holder.tvTitle.setText(publisher.name);
+                holder.tvAnnonces.setText(publisher.nbAds + " annonces");
+                // holder.tvWebsite.setText(publisher.website);
+                holder.tvPhone.setText(publisher.tel);
                 holder.tvMail.setText(publisher.mail);
                 break;
             case FOOTER:
@@ -92,7 +105,12 @@ public class SellerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     @Override
     public void onClick(View v) {
-
+        if (onRecyclerViewItemClickedListener != null) {
+            RecyclerView parent = (RecyclerView) v.getParent();
+            int position = parent.getChildAdapterPosition(v);
+            onRecyclerViewItemClickedListener.onItemClicked(parent, v, position, v.getId(),
+                    publishers.get(position));
+        }
     }
 
     static class SellerItemViewHolder extends RecyclerView.ViewHolder {

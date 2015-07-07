@@ -1,12 +1,11 @@
-
 package com.synova.realestate.models;
 
 import com.synova.realestate.base.Constants;
 
 /**
- * Created by ducth on 30/06/2015.
+ * Created by ducth on 7/7/15.
  */
-public class AdsInfoResponseEnt {
+public class PublisherPropertyResponseEnt {
 
     public boolean isSale;
     public String codePostal;
@@ -17,8 +16,8 @@ public class AdsInfoResponseEnt {
     public String businessType;
     public Constants.PropertyType propertyType;
     public int roomNumber;
-    public int id;
     public String title;
-    public String mminMaxPrice;
     public String rentSale;
+    public int adId;
+    public float price;
 }

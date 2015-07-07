@@ -80,6 +80,7 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
         rvItems.setAdapter(houseAdapter);
 
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
+        toggleSwipeRefreshLayout(true);
         loadNewData();
 
         return rootView;
@@ -89,7 +90,16 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
     public void onResume() {
         super.onResume();
         ((MainActivity) activity).disableDrawer();
-        swipeRefreshLayout.setRefreshing(false);
+        toggleSwipeRefreshLayout(false);
+    }
+
+    private void toggleSwipeRefreshLayout(final boolean isRefreshing) {
+        swipeRefreshLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                swipeRefreshLayout.setRefreshing(isRefreshing);
+            }
+        });
     }
 
     private List<House> createMockData() {
@@ -133,13 +143,13 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
             public void success(List<AdsInfoResponseEnt> adsInfoResponseEnts, Response response) {
                 houseAdapter.setItems(adsInfoResponseEnts);
 
-                swipeRefreshLayout.setRefreshing(false);
+                toggleSwipeRefreshLayout(false);
                 loadingState = Constants.ListLoadingState.NONE;
             }
 
             @Override
             public void failure(RetrofitError error) {
-                swipeRefreshLayout.setRefreshing(false);
+                toggleSwipeRefreshLayout(false);
                 loadingState = Constants.ListLoadingState.NONE;
 
                 Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();

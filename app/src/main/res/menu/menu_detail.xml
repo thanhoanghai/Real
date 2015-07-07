@@ -4,13 +4,13 @@
     tools:context=".MainActivity">
 
     <item
-        android:id="@+id/action_filter"
+        android:id="@+id/action_favorite"
         android:icon="@drawable/ico_star_empty"
         android:title="Favorite"
         app:showAsAction="always" />
 
     <item
-        android:id="@+id/action_overflow"
+        android:id="@+id/action_share"
         android:icon="@drawable/ico_share"
         android:title="Share"
         app:showAsAction="always" />

@@ -1,16 +1,6 @@
 
 package com.synova.realestate.fragments;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -58,7 +48,15 @@ import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.MapRequestEnt;
 import com.synova.realestate.utils.Util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.greenrobot.event.EventBus;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by ducth on 6/16/15.
@@ -173,6 +171,11 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         }
         if (googleApiClient.isConnected()) {
             startRequestLocationUpdate();
+        }
+
+        if (map != null && markers.size() == 0
+                && loadingState == Constants.NetworkLoadingState.NONE) {
+            getMap();
         }
     }
 
@@ -389,7 +392,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 activity.getString(R.string.list_item_description_template), 2, 35, 300);
         tvDescription.setText(Html.fromHtml(description));
 
-        return false;
+        return true;
     }
 
     private Marker createMarker(MapResponseEnt mapResponseEnt) {
@@ -439,7 +442,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 break;
             case R.id.tab_location_groupDetailBottom:
                 int adId = (int) groupDetailBottom.getTag();
-//                activity.showDetailActivity(adId);
+                // activity.showDetailActivity(adId);
                 break;
         }
     }

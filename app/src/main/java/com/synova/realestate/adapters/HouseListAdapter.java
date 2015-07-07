@@ -53,9 +53,14 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemRangeInserted(start, houses.size() - 1);
     }
 
+//    @Override
+//    public int getItemCount() {
+//        return houses.size() + 1;
+//    }
+
     @Override
     public int getItemCount() {
-        return houses.size() + 1;
+        return houses.size();
     }
 
     @Override
