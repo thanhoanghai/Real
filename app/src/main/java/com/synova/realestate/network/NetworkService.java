@@ -157,12 +157,14 @@ public class NetworkService {
 
     public static void addFavorite(String deviceId, String propertyId,
             final NetworkCallback<Boolean> callback) {
+        deviceId = "1";
         restService.addFavorite(new FavoriteEnt(deviceId, propertyId),
-                new NetworkCallback<String>() {
+                new NetworkCallback<JsonElement>() {
                     @Override
-                    public void onSuccess(String s) {
+                    public void onSuccess(JsonElement jsonElement) {
                         if (callback != null) {
-                            if (s != null && s.length() > 0) {
+                            String response = jsonElement.getAsString();
+                            if (response.contains("success")) {
                                 callback.onSuccess(true);
                             } else {
                                 callback.onFail(new Exception("Fail to add favorite."));
@@ -181,16 +183,18 @@ public class NetworkService {
 
     public static void removeFavorite(String deviceId, String propertyId,
             final NetworkCallback<Boolean> callback) {
+        deviceId = "1";
         restService.removeFavorite(new FavoriteEnt(deviceId, propertyId),
-                new NetworkCallback<String>() {
+                new NetworkCallback<JsonElement>() {
 
                     @Override
-                    public void onSuccess(String s) {
+                    public void onSuccess(JsonElement jsonElement) {
                         if (callback != null) {
-                            if (s != null && s.length() > 0) {
+                            String response = jsonElement.getAsString();
+                            if (response.contains("success")) {
                                 callback.onSuccess(true);
                             } else {
-                                callback.onFail(new Exception("Fail to remove favorite."));
+                                callback.onFail(new Exception("Fail to add favorite."));
                             }
                         }
                     }
@@ -205,6 +209,7 @@ public class NetworkService {
     }
 
     public static void getListFavorite(String deviceId, final NetworkCallback<List<String>> callback) {
+        deviceId = "1";
         restService.getListFavorite(new FavoriteEnt(deviceId, "-1"),
                 new NetworkCallback<JsonElement>() {
 
@@ -234,7 +239,7 @@ public class NetworkService {
                     }
 
                     @Override
-                    public void onFail(Throwable error) {
+                    public void failure(RetrofitError error) {
                         if (callback != null) {
                             callback.onFail(error);
                         }
@@ -245,10 +250,10 @@ public class NetworkService {
     private interface RestService {
 
         @POST("/favorite/addFavorite")
-        void addFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<String> callback);
+        void addFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<JsonElement> callback);
 
         @POST("/favorite/removeFavorite")
-        void removeFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<String> callback);
+        void removeFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<JsonElement> callback);
 
         @POST("/favorite/getList")
         void getListFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<JsonElement> callback);

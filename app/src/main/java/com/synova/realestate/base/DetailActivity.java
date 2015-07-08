@@ -385,6 +385,14 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                                     }
 
                                     @Override
+                                    public void onFail(Throwable error) {
+                                        waitDialog.dismiss();
+                                        Toast.makeText(DetailActivity.this,
+                                                "Remove favorite fail.",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
                                     public void failure(RetrofitError error) {
                                         waitDialog.dismiss();
                                         Toast.makeText(DetailActivity.this,
@@ -401,6 +409,14 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
                                         adsDetailEnt.characs.get(0).isFavorite = true;
                                         invalidateOptionsMenu();
+                                    }
+
+                                    @Override
+                                    public void onFail(Throwable error) {
+                                        waitDialog.dismiss();
+                                        Toast.makeText(DetailActivity.this,
+                                                "Add to favorite fail.",
+                                                Toast.LENGTH_SHORT).show();
                                     }
 
                                     @Override

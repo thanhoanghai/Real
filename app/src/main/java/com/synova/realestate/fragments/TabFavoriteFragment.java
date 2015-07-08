@@ -164,20 +164,13 @@ public class TabFavoriteFragment extends BaseFragment implements
                                                     : "";
                                             item.title = charac.title;
                                             item.mminMaxPrice = charac.minMaxPrice;
-//                                            item.roomNumber = charac.
 
-//                                            houseAdapter.addItem(item);
-                                        }
-
-                                        @Override
-                                        public void failure(RetrofitError error) {
-
+                                             houseAdapter.addItem(item);
                                         }
                                     });
-
-                            toggleSwipeRefreshLayout(false);
-                            loadingState = Constants.ListLoadingState.NONE;
                         }
+                        toggleSwipeRefreshLayout(false);
+                        loadingState = Constants.ListLoadingState.NONE;
                     }
 
                     @Override
