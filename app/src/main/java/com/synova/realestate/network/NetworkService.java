@@ -1,17 +1,6 @@
 
 package com.synova.realestate.network;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.converter.GsonConverter;
-import retrofit.http.Body;
-import retrofit.http.POST;
-
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.synova.realestate.base.RealEstateApplication;
@@ -26,6 +15,18 @@ import com.synova.realestate.network.model.FavoriteEnt;
 import com.synova.realestate.network.model.MapRequestEnt;
 import com.synova.realestate.network.model.PublisherPropertyEnt;
 import com.synova.realestate.network.model.PublisherRequestEnt;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.converter.GsonConverter;
+import retrofit.http.Body;
+import retrofit.http.POST;
+import retrofit.mime.TypedByteArray;
 
 /**
  * Created by ducth on 6/22/15.
@@ -159,12 +160,13 @@ public class NetworkService {
             final NetworkCallback<Boolean> callback) {
         deviceId = "1";
         restService.addFavorite(new FavoriteEnt(deviceId, propertyId),
-                new NetworkCallback<JsonElement>() {
+                new NetworkCallback<Response>() {
                     @Override
-                    public void onSuccess(JsonElement jsonElement) {
+                    public void onSuccess(Response response) {
                         if (callback != null) {
-                            String response = jsonElement.getAsString();
-                            if (response.contains("success")) {
+                            String responseString = new String(
+                                    ((TypedByteArray) response.getBody()).getBytes());
+                            if (responseString.contains("success")) {
                                 callback.onSuccess(true);
                             } else {
                                 callback.onFail(new Exception("Fail to add favorite."));
@@ -185,16 +187,19 @@ public class NetworkService {
             final NetworkCallback<Boolean> callback) {
         deviceId = "1";
         restService.removeFavorite(new FavoriteEnt(deviceId, propertyId),
-                new NetworkCallback<JsonElement>() {
+                new NetworkCallback<Response>() {
 
                     @Override
-                    public void onSuccess(JsonElement jsonElement) {
+                    public void onSuccess(Response response) {
                         if (callback != null) {
-                            String response = jsonElement.getAsString();
-                            if (response.contains("success")) {
-                                callback.onSuccess(true);
-                            } else {
-                                callback.onFail(new Exception("Fail to add favorite."));
+                            if (callback != null) {
+                                String responseString = new String(
+                                        ((TypedByteArray) response.getBody()).getBytes());
+                                if (responseString.contains("success")) {
+                                    callback.onSuccess(true);
+                                } else {
+                                    callback.onFail(new Exception("Fail to remove favorite."));
+                                }
                             }
                         }
                     }
@@ -250,10 +255,10 @@ public class NetworkService {
     private interface RestService {
 
         @POST("/favorite/addFavorite")
-        void addFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<JsonElement> callback);
+        void addFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<Response> callback);
 
         @POST("/favorite/removeFavorite")
-        void removeFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<JsonElement> callback);
+        void removeFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<Response> callback);
 
         @POST("/favorite/getList")
         void getListFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<JsonElement> callback);

@@ -45,6 +45,13 @@ public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.
 
     @Override
     public void onBindViewHolder(RadioButtonHolder holder, final int position) {
+        if (position == 0){
+            holder.itemView.setVisibility(View.GONE);
+            return;
+        }
+
+        holder.itemView.setVisibility(View.VISIBLE);
+
         String item = items.get(position);
 
         holder.radioButton.setText(item);

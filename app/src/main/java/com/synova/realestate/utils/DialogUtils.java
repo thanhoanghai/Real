@@ -163,6 +163,8 @@ public class DialogUtils {
         recyclerView.setAdapter(adapter);
 
         List<String> items = new ArrayList<>();
+        items.add("");
+        items.add("All");
         items.add("Appartement");
         items.add("Maison");
         items.add("Parking");
