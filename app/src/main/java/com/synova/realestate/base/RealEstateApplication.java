@@ -44,7 +44,7 @@ public class RealEstateApplication extends Application {
                 .cacheInMemory(true)
                 .cacheOnDisk(true)
                 .considerExifParams(true)
-                .delayBeforeLoading(500)
+                .delayBeforeLoading(300)
                 .showImageForEmptyUri(R.drawable.img_default_list)
                 .showImageOnLoading(R.drawable.img_default_list)
                 .showImageOnFail(R.drawable.img_default_list)

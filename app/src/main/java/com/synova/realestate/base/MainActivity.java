@@ -23,6 +23,7 @@ import android.widget.TabHost;
 import com.synova.realestate.R;
 import com.synova.realestate.customviews.AdsImageView;
 import com.synova.realestate.customviews.ReclickableTabHost;
+import com.synova.realestate.fragments.TabFavoriteFragment;
 import com.synova.realestate.fragments.TabGridFragment;
 import com.synova.realestate.fragments.TabListFragment;
 import com.synova.realestate.fragments.TabLocationFragment;
@@ -178,7 +179,7 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
                     pushFragment(new TabSellerFragment(), Constants.TransitionType.NONE, true);
                     break;
                 case FAVORITE:
-                    pushFragment(new TabListFragment(), Constants.TransitionType.NONE, true);
+                    pushFragment(new TabFavoriteFragment(), Constants.TransitionType.NONE, true);
                     break;
             }
         } else {
