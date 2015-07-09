@@ -144,14 +144,6 @@ public class DialogUtils {
     public static Dialog showDialogFilter(final Context context) {
         final Dialog dialog = createDialogAndSave(context, R.layout.dialog_filter, true);
 
-        Button btnClose = (Button) dialog.findViewById(R.id.dialog_filter_btnClose);
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
         final DialogFilterPrixDataHolder prixData = new DialogFilterPrixDataHolder();
         final RangeBar priceBar = (RangeBar) dialog.findViewById(R.id.dialog_filter_priceBar);
 
@@ -288,7 +280,7 @@ public class DialogUtils {
         surfaceBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onIndexChangeListener(RangeBar rangeBar, int leftThumbIndex,
-                    int rightThumbIndex) {
+                                              int rightThumbIndex) {
                 String text;
                 if (leftThumbIndex == rightThumbIndex) {
                     text = (minSurfaceValue + leftThumbIndex * stepSurfaceValue) + "";
@@ -302,9 +294,18 @@ public class DialogUtils {
         });
         surfaceBar.setThumbIndices(minSurfaceIndex, maxSurfaceIndex);
 
-        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+        Button btnClose = (Button) dialog.findViewById(R.id.dialog_filter_btnClose);
+        btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onDismiss(DialogInterface dialog) {
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        Button btnApply = (Button) dialog.findViewById(R.id.dialog_filter_btnApply);
+        btnApply.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 PrefUtil.setAchatLocatioin(
                         groupAchatLocation.getCheckedRadioButtonId() == R.id.dialog_filter_btnAchat
                                 ? Constants.AchatLocation.ACHAT : Constants.AchatLocation.LOCATION);
@@ -325,6 +326,8 @@ public class DialogUtils {
                         (minSurfaceValue + surfaceBar.getLeftIndex() * stepSurfaceValue)
                                 + "-"
                                 + (minSurfaceValue + surfaceBar.getRightIndex() * stepSurfaceValue));
+
+                dialog.dismiss();
             }
         });
 
