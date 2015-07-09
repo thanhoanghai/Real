@@ -1,6 +1,9 @@
 
 package com.synova.realestate.adapters;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,9 +11,6 @@ import android.view.ViewGroup;
 import android.widget.RadioButton;
 
 import com.synova.realestate.R;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.RadioButtonHolder>
         implements View.OnClickListener {
@@ -31,6 +31,15 @@ public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.
         notifyDataSetChanged();
     }
 
+    public void selectItem(int position){
+        this.mSelectedPosition = position;
+        notifyDataSetChanged();
+    }
+
+    public int getSelectedPosition() {
+        return mSelectedPosition;
+    }
+
     @Override
     public int getItemCount() {
         return items.size();
@@ -45,7 +54,7 @@ public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.
 
     @Override
     public void onBindViewHolder(RadioButtonHolder holder, final int position) {
-        if (position == 0){
+        if (position == 0) {
             holder.itemView.setVisibility(View.GONE);
             return;
         }

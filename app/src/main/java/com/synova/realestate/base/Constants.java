@@ -50,19 +50,41 @@ public class Constants {
         NOTAIRE
     }
 
+    public enum AchatLocation {
+        ACHAT, LOCATION
+    }
+
     public enum PropertyType {
+        /** For UI purpose only */
+        NONE(""),
+
+        ALL("All"),
         @SerializedName("Appartement")
-        APPARTEMENT,
+        APPARTEMENT("Appartement"),
         @SerializedName("Maison")
-        MAISON,
+        MAISON("Maison"),
         @SerializedName("Parking")
-        PARKING,
+        PARKING("Parking"),
         @SerializedName("Bureau")
-        BUREAU,
+        BUREAU("Bureau"),
         @SerializedName("Terrain")
-        TERRAIN,
+        TERRAIN("Terrain"),
         @SerializedName("Commerce")
-        COMMERCE;
+        COMMERCE("Commerce");
+
+        private String name;
+
+        PropertyType(String name) {
+            this.name = name;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
     }
 
     public enum FilterOrderType {

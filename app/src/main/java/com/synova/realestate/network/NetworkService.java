@@ -1,6 +1,18 @@
 
 package com.synova.realestate.network;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.RestAdapter;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+import retrofit.converter.GsonConverter;
+import retrofit.http.Body;
+import retrofit.http.POST;
+import retrofit.mime.TypedByteArray;
+
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
 import com.synova.realestate.base.RealEstateApplication;
@@ -15,18 +27,6 @@ import com.synova.realestate.network.model.FavoriteEnt;
 import com.synova.realestate.network.model.MapRequestEnt;
 import com.synova.realestate.network.model.PublisherPropertyEnt;
 import com.synova.realestate.network.model.PublisherRequestEnt;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import retrofit.Callback;
-import retrofit.RestAdapter;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-import retrofit.converter.GsonConverter;
-import retrofit.http.Body;
-import retrofit.http.POST;
-import retrofit.mime.TypedByteArray;
 
 /**
  * Created by ducth on 6/22/15.

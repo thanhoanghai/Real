@@ -142,33 +142,33 @@ public class TabFavoriteFragment extends BaseFragment implements
                 new NetworkService.NetworkCallback<List<String>>() {
                     @Override
                     public void onSuccess(List<String> adIds) {
-                        for (final String adId : adIds) {
-                            AdEnt adEnt = new AdEnt();
-                            adEnt.adId = Integer.parseInt(adId);
-                            NetworkService.getPropertyDetails(adEnt,
-                                    new NetworkService.NetworkCallback<AdsDetailEnt>() {
-                                        @Override
-                                        public void onSuccess(AdsDetailEnt adsDetailEnt) {
-                                            if (adsDetailEnt == null
-                                                    || adsDetailEnt.characs == null
-                                                    || adsDetailEnt.characs.size() == 0) {
-                                                return;
-                                            }
-
-                                            AdsDetailEnt.AdCharac charac = adsDetailEnt.characs
-                                                    .get(0);
-                                            AdsInfoResponseEnt item = new AdsInfoResponseEnt();
-                                            item.id = Integer.parseInt(adId);
-                                            item.imageUrl = (adsDetailEnt.images != null && adsDetailEnt.images
-                                                    .size() > 0) ? adsDetailEnt.images.get(0).imagesUrl
-                                                    : "";
-                                            item.title = charac.title;
-                                            item.mminMaxPrice = charac.minMaxPrice;
-
-                                             houseAdapter.addItem(item);
-                                        }
-                                    });
-                        }
+//                        for (final String adId : adIds) {
+//                            AdEnt adEnt = new AdEnt();
+//                            adEnt.adId = Integer.parseInt(adId);
+//                            NetworkService.getPropertyDetails(adEnt,
+//                                    new NetworkService.NetworkCallback<AdsDetailEnt>() {
+//                                        @Override
+//                                        public void onSuccess(AdsDetailEnt adsDetailEnt) {
+//                                            if (adsDetailEnt == null
+//                                                    || adsDetailEnt.characs == null
+//                                                    || adsDetailEnt.characs.size() == 0) {
+//                                                return;
+//                                            }
+//
+//                                            AdsDetailEnt.AdCharac charac = adsDetailEnt.characs
+//                                                    .get(0);
+//                                            AdsInfoResponseEnt item = new AdsInfoResponseEnt();
+//                                            item.id = Integer.parseInt(adId);
+//                                            item.imageUrl = (adsDetailEnt.images != null && adsDetailEnt.images
+//                                                    .size() > 0) ? adsDetailEnt.images.get(0).imagesUrl
+//                                                    : "";
+//                                            item.title = charac.title;
+//                                            item.mminMaxPrice = charac.minMaxPrice;
+//
+//                                             houseAdapter.addItem(item);
+//                                        }
+//                                    });
+//                        }
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;
                     }

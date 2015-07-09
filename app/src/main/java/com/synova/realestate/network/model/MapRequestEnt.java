@@ -1,5 +1,7 @@
 package com.synova.realestate.network.model;
 
+import com.synova.realestate.utils.PrefUtil;
+
 /**
  * Created by ducth on 23/06/2015.
  */
@@ -10,8 +12,8 @@ public class MapRequestEnt {
     public double xMax;
     public double yMax;
     public int adsOffset;
-    public String surfaceMinS;
-    public String surfaceMaxS;
+    public String surfaceMinS = PrefUtil.getSurfaceMinMax().split("-")[0];
+    public String surfaceMaxS = PrefUtil.getSurfaceMinMax().split("-")[1];
     public String deviceId;
 
 }

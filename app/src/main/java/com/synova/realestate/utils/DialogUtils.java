@@ -1,9 +1,13 @@
 
 package com.synova.realestate.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,6 +15,8 @@ import android.text.Html;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -21,10 +27,9 @@ import com.facebook.rebound.SpringUtil;
 import com.nineoldandroids.view.ViewHelper;
 import com.synova.realestate.R;
 import com.synova.realestate.adapters.RadioButtonAdapter;
+import com.synova.realestate.base.Constants;
 import com.synova.realestate.customviews.rangebar.RangeBar;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.synova.realestate.models.DialogFilterPrixDataHolder;
 
 /**
  * Created by ducth on 3/25/15.
@@ -139,15 +144,7 @@ public class DialogUtils {
     public static Dialog showDialogFilter(final Context context) {
         final Dialog dialog = createDialogAndSave(context, R.layout.dialog_filter, true);
 
-        View rootView = dialog.findViewById(R.id.dialog_rootView);
-        rootView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        Button btnClose = (Button) rootView.findViewById(R.id.dialog_filter_btnClose);
+        Button btnClose = (Button) dialog.findViewById(R.id.dialog_filter_btnClose);
         btnClose.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -155,32 +152,88 @@ public class DialogUtils {
             }
         });
 
+        final DialogFilterPrixDataHolder prixData = new DialogFilterPrixDataHolder();
+        final RangeBar priceBar = (RangeBar) dialog.findViewById(R.id.dialog_filter_priceBar);
+
+        final TextView tvMinPrix = (TextView) dialog.findViewById(R.id.dialog_filter_tvMinPrix);
+        final TextView tvMaxPrix = (TextView) dialog.findViewById(R.id.dialog_filter_tvMaxPrix);
+
+        final RadioGroup groupAchatLocation = (RadioGroup) dialog
+                .findViewById(R.id.dialog_filter_groupAchatLocation);
+        groupAchatLocation.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if (checkedId == -1) {
+                    return;
+                }
+
+                switch (checkedId) {
+                    case R.id.dialog_filter_btnAchat:
+                        prixData.minPrixValue = 50;
+                        prixData.maxPrixValue = 2000;
+                        prixData.prixStep = 50;
+                        prixData.prixCurrency = "k";
+
+                        tvMinPrix.setText("< 50k");
+                        tvMaxPrix.setText("> 2M");
+                        break;
+                    case R.id.dialog_filter_btnLocation:
+                        prixData.minPrixValue = 100;
+                        prixData.maxPrixValue = 4000;
+                        prixData.prixStep = 100;
+                        prixData.prixCurrency = "";
+
+                        tvMinPrix.setText("< 100");
+                        tvMaxPrix.setText("> 4000");
+                        break;
+                }
+                priceBar.setTickCount(prixData.maxPrixValue / prixData.prixStep);
+
+                if (prixData.checkedId != checkedId) {
+                    prixData.checkedId = checkedId;
+
+                    PrefUtil.setPrixMinMax("200-600");
+                    String[] minMaxPrix = PrefUtil.getPrixMinMax().split("-");
+                    int minPrixIndex = (Integer.parseInt(minMaxPrix[0]) - prixData.minPrixValue)
+                            / prixData.prixStep;
+                    final int maxPrixIndex = (Integer.parseInt(minMaxPrix[1]) - prixData.minPrixValue)
+                            / prixData.prixStep;
+
+                    priceBar.setThumbIndices(minPrixIndex, maxPrixIndex);
+                }
+            }
+        });
+        prixData.checkedId = groupAchatLocation.getChildAt(PrefUtil.getAchatLocation().ordinal())
+                .getId();
+        groupAchatLocation.check(prixData.checkedId);
+
+        final EditText etMotsCles = (EditText) dialog.findViewById(R.id.dialog_filter_etMotsCles);
+        etMotsCles.setText(PrefUtil.getMotsCles());
+
         RecyclerView recyclerView = (RecyclerView) dialog.findViewById(R.id.dialog_filter_rvType);
         GridLayoutManager manager = new GridLayoutManager(context, 2, GridLayoutManager.VERTICAL,
                 false);
         recyclerView.setLayoutManager(manager);
-        RadioButtonAdapter adapter = new RadioButtonAdapter(recyclerView);
+        final RadioButtonAdapter adapter = new RadioButtonAdapter(recyclerView);
         recyclerView.setAdapter(adapter);
 
+        adapter.selectItem(PrefUtil.getTypeDeBiens().ordinal());
+
         List<String> items = new ArrayList<>();
-        items.add("");
-        items.add("All");
-        items.add("Appartement");
-        items.add("Maison");
-        items.add("Parking");
-        items.add("Bureau");
-        items.add("Terrain");
-        items.add("Commerce");
+        for (Constants.PropertyType type : Constants.PropertyType.values()) {
+            items.add(type.getName());
+        }
         adapter.setData(items);
 
-        recyclerView.setMinimumHeight(Util.dpToPx(context, 90));
+        recyclerView.setMinimumHeight(Util.dpToPx(context, 120));
 
+        final int distanceStep = 100;
         final TextView tvDistance = (TextView) dialog.findViewById(R.id.dialog_filter_tvDistance);
-        SeekBar distanceBar = (SeekBar) dialog.findViewById(R.id.dialog_filter_distanceBar);
+        final SeekBar distanceBar = (SeekBar) dialog.findViewById(R.id.dialog_filter_distanceBar);
         distanceBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                tvDistance.setText((200 + 100 * progress) + "m");
+                tvDistance.setText((progress * distanceStep) + "m");
             }
 
             @Override
@@ -193,42 +246,85 @@ public class DialogUtils {
 
             }
         });
+        distanceBar.setProgress(Integer.parseInt(PrefUtil.getDistance()) / distanceStep);
+
+        String[] minMaxPrix = PrefUtil.getPrixMinMax().split("-");
+        int minPrixIndex = (Integer.parseInt(minMaxPrix[0]) - prixData.minPrixValue)
+                / prixData.prixStep;
+        final int maxPrixIndex = (Integer.parseInt(minMaxPrix[1]) - prixData.minPrixValue)
+                / prixData.prixStep;
 
         final TextView tvPrice = (TextView) dialog.findViewById(R.id.dialog_filter_tvPrice);
-        RangeBar priceBar = (RangeBar) dialog.findViewById(R.id.dialog_filter_priceBar);
-        priceBar.setThumbIndices(3, 11);
         priceBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onIndexChangeListener(RangeBar rangeBar, int leftThumbIndex,
                     int rightThumbIndex) {
-                String text = "";
+                String text;
                 if (leftThumbIndex == rightThumbIndex) {
-                    text = (50 + leftThumbIndex * 50) + "k €";
+                    text = (prixData.minPrixValue + leftThumbIndex * prixData.prixStep)
+                            + prixData.prixCurrency + " €";
                 } else {
-                    text = (50 + leftThumbIndex * 50) + "k à " + (50 + rightThumbIndex * 50)
-                            + "k €";
+                    text = (prixData.minPrixValue + leftThumbIndex * prixData.prixStep)
+                            + prixData.prixCurrency + " à "
+                            + (prixData.minPrixValue + rightThumbIndex * prixData.prixStep)
+                            + prixData.prixCurrency + " €";
                 }
                 tvPrice.setText(text);
             }
         });
+        priceBar.setThumbIndices(minPrixIndex, maxPrixIndex);
+
+        final int minSurfaceValue = 10;
+        final int stepSurfaceValue = 10;
+
+        String[] minMaxSurface = PrefUtil.getSurfaceMinMax().split("-");
+        final int minSurfaceIndex = (Integer.parseInt(minMaxSurface[0]) - minSurfaceValue)
+                / stepSurfaceValue;
+        int maxSurfaceIndex = (Integer.parseInt(minMaxSurface[1]) - minSurfaceValue)
+                / stepSurfaceValue;
 
         final TextView tvSurface = (TextView) dialog.findViewById(R.id.dialog_filter_tvSurface);
-        tvSurface.setText(Html.fromHtml(String.format(context.getString(R.string.surface_unit),
-                "10 à 300")));
-        RangeBar surfaceBar = (RangeBar) dialog.findViewById(R.id.dialog_filter_surfaceBar);
-        surfaceBar.setThumbIndices(0, surfaceBar.getRightIndex());
+        final RangeBar surfaceBar = (RangeBar) dialog.findViewById(R.id.dialog_filter_surfaceBar);
         surfaceBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onIndexChangeListener(RangeBar rangeBar, int leftThumbIndex,
                     int rightThumbIndex) {
-                String text = "";
+                String text;
                 if (leftThumbIndex == rightThumbIndex) {
-                    text = (10 + leftThumbIndex * 10) + "";
+                    text = (minSurfaceValue + leftThumbIndex * stepSurfaceValue) + "";
                 } else {
-                    text = (10 + leftThumbIndex * 10) + " à " + (10 + rightThumbIndex * 10);
+                    text = (minSurfaceValue + leftThumbIndex * stepSurfaceValue) + " à "
+                            + (minSurfaceValue + rightThumbIndex * stepSurfaceValue);
                 }
                 tvSurface.setText(Html.fromHtml(String.format(
                         context.getString(R.string.surface_unit), text)));
+            }
+        });
+        surfaceBar.setThumbIndices(minSurfaceIndex, maxSurfaceIndex);
+
+        dialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                PrefUtil.setAchatLocatioin(
+                        groupAchatLocation.getCheckedRadioButtonId() == R.id.dialog_filter_btnAchat
+                                ? Constants.AchatLocation.ACHAT : Constants.AchatLocation.LOCATION);
+
+                PrefUtil.setMotsCles(etMotsCles.getText().toString());
+
+                PrefUtil.setTypeDeBiens(Constants.PropertyType.values()[adapter
+                        .getSelectedPosition()]);
+
+                PrefUtil.setDistance("" + (distanceBar.getProgress() * distanceStep));
+
+                PrefUtil.setPrixMinMax((prixData.minPrixValue + priceBar.getLeftIndex()
+                        * prixData.prixStep)
+                        + "-"
+                        + (prixData.minPrixValue + priceBar.getRightIndex() * prixData.prixStep));
+
+                PrefUtil.setSurfaceMinMax(
+                        (minSurfaceValue + surfaceBar.getLeftIndex() * stepSurfaceValue)
+                                + "-"
+                                + (minSurfaceValue + surfaceBar.getRightIndex() * stepSurfaceValue));
             }
         });
 

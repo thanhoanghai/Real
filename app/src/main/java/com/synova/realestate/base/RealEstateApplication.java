@@ -13,6 +13,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.synova.realestate.R;
+import com.synova.realestate.utils.PrefUtil;
 import com.synova.realestate.utils.Util;
 
 /**
@@ -30,6 +31,7 @@ public class RealEstateApplication extends Application {
         super.onCreate();
         initImageLoader();
         deviceId = Util.getDeviceID(this);
+        PrefUtil.init(this);
     }
 
     @Override

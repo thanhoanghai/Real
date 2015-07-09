@@ -1,6 +1,8 @@
 
 package com.synova.realestate.network.model;
 
+import com.synova.realestate.utils.PrefUtil;
+
 /**
  * Created by ducth on 6/23/15.
  */
@@ -15,10 +17,10 @@ public class PublisherRequestEnt {
     public String propertyTypeS;
     public String rentSaleS;
     public String businessTypeS;
-    public String surfaceMinS;
-    public String surfaceMaxS;
-    public String priceMinS;
-    public String priceMaxS;
+    public String surfaceMinS = PrefUtil.getSurfaceMinMax().split("-")[0];
+    public String surfaceMaxS = PrefUtil.getSurfaceMinMax().split("-")[1];
+    public String priceMinS = PrefUtil.getPrixMinMax().split("-")[0];
+    public String priceMaxS = PrefUtil.getPrixMinMax().split("-")[1];
     public String codePostalS;
     public String roomNumberS;
     public String keyWordS;
