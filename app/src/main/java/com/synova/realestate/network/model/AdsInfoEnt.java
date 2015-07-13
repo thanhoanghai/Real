@@ -17,7 +17,7 @@ public class AdsInfoEnt {
     public int adminId;
     public int offsetS;
     public Constants.PropertyType propertyTypeS = Constants.PropertyType.APPARTEMENT;
-    public String rentSaleS;
+    public String rentSaleS = PrefUtil.getAchatLocation().name();
     public String businessTypeS;
     public String surfaceMinS = PrefUtil.getSurfaceMinMax().split("-")[0];
     public String surfaceMaxS = PrefUtil.getSurfaceMinMax().split("-")[1];
@@ -25,7 +25,7 @@ public class AdsInfoEnt {
     public String priceMaxS = PrefUtil.getPrixMinMax().split("-")[1];
     public String codePostalS;
     public String roomNumberS;
-    public String keyWordS;
+    public String keyWordS = PrefUtil.getMotsCles();
     public Constants.FilterOrderType orderByS = Constants.FilterOrderType.DISTANCE;
 
 }

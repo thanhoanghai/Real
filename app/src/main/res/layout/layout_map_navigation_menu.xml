@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/darker_cyan"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:paddingLeft="10dp"
+        android:text="Filtrer par"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <CheckBox
+        android:id="@+id/navigation_btnBien"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/selector_drawer_menu_item_bg"
+        android:button="@null"
+        android:checked="true"
+        android:drawableLeft="@drawable/ico_marker_bien_small"
+        android:drawablePadding="10dp"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="Bien"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <CheckBox
+        android:id="@+id/navigation_btnAgence"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:background="@drawable/selector_drawer_menu_item_bg"
+        android:button="@null"
+        android:checked="true"
+        android:drawableLeft="@drawable/ico_marker_agence_small"
+        android:drawablePadding="10dp"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="Agence"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <CheckBox
+        android:id="@+id/navigation_btnParticulier"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:background="@drawable/selector_drawer_menu_item_bg"
+        android:button="@null"
+        android:checked="true"
+        android:drawableLeft="@drawable/ico_marker_particulier_small"
+        android:drawablePadding="10dp"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="Particulier"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+    <CheckBox
+        android:id="@+id/navigation_btnNotaire"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:background="@drawable/selector_drawer_menu_item_bg"
+        android:button="@null"
+        android:checked="true"
+        android:drawableLeft="@drawable/ico_marker_notaire_small"
+        android:drawablePadding="10dp"
+        android:gravity="center_vertical"
+        android:padding="10dp"
+        android:text="Notaire"
+        android:textColor="@color/white"
+        android:textSize="16sp" />
+
+</LinearLayout>

@@ -230,9 +230,12 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                     }
 
                     if (latLngs.size() > 0) {
-                        onEventMainThread(new NavigationItemSelectedEvent(
-                                ((MainActivity) activity).getGroupNavigationItems()
-                                        .getCheckedRadioButtonId()));
+                        for (Constants.ElementType key : MainActivity.markersVisibility.keySet()) {
+                            if (!MainActivity.markersVisibility.get(key)) {
+                                setMarkersVisible(key, false);
+                            }
+                        }
+
                         if (isFirstTimeLoadData) {
                             isFirstTimeLoadData = false;
                             moveCameraToBound(latLngs, true);
@@ -447,12 +450,14 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         }
     }
 
-    private void setMarkersVisible(Constants.ElementType visibleType) {
-        for (Constants.ElementType type : markers.keySet()) {
-            List<Marker> elementTypeMarkers = markers.get(type);
-            for (Marker childMarker : elementTypeMarkers) {
-                childMarker.setVisible(type == visibleType);
-            }
+    private void setMarkersVisible(Constants.ElementType type, boolean isChecked) {
+        List<Marker> elementTypeMarkers = markers.get(type);
+        if (elementTypeMarkers == null){
+            return;
+        }
+        
+        for (Marker childMarker : elementTypeMarkers) {
+            childMarker.setVisible(isChecked);
         }
 
         if (selectedMarkerCircle != null) {
@@ -464,21 +469,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     public void onEventMainThread(NavigationItemSelectedEvent event) {
-        switch (event.checkedId) {
-            case R.id.navigation_btnBien:
-                setMarkersVisible(Constants.ElementType.BIEN);
-                break;
-            case R.id.navigation_btnAgence:
-                setMarkersVisible(Constants.ElementType.AGENCE);
-                break;
-            case R.id.navigation_btnParticulier:
-                setMarkersVisible(Constants.ElementType.PARTICULIER);
-                break;
-            case R.id.navigation_btnNotaire:
-                setMarkersVisible(Constants.ElementType.NOTAIRE);
-                break;
-        }
-
+        setMarkersVisible(event.type, event.isChecked);
     }
 
     @Override

@@ -1,20 +1,16 @@
 
 package com.synova.realestate.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
@@ -30,6 +26,9 @@ import com.synova.realestate.adapters.RadioButtonAdapter;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.customviews.rangebar.RangeBar;
 import com.synova.realestate.models.DialogFilterPrixDataHolder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ducth on 3/25/15.
@@ -142,7 +141,7 @@ public class DialogUtils {
     }
 
     public static Dialog showDialogFilter(final Context context) {
-        final Dialog dialog = createDialogAndSave(context, R.layout.dialog_filter, true);
+        final Dialog dialog = createDialogAndSave(context, R.layout.dialog_filter, false);
 
         final DialogFilterPrixDataHolder prixData = new DialogFilterPrixDataHolder();
         final RangeBar priceBar = (RangeBar) dialog.findViewById(R.id.dialog_filter_priceBar);
@@ -280,7 +279,7 @@ public class DialogUtils {
         surfaceBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onIndexChangeListener(RangeBar rangeBar, int leftThumbIndex,
-                                              int rightThumbIndex) {
+                    int rightThumbIndex) {
                 String text;
                 if (leftThumbIndex == rightThumbIndex) {
                     text = (minSurfaceValue + leftThumbIndex * stepSurfaceValue) + "";
@@ -294,16 +293,8 @@ public class DialogUtils {
         });
         surfaceBar.setThumbIndices(minSurfaceIndex, maxSurfaceIndex);
 
-        Button btnClose = (Button) dialog.findViewById(R.id.dialog_filter_btnClose);
-        btnClose.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        Button btnApply = (Button) dialog.findViewById(R.id.dialog_filter_btnApply);
-        btnApply.setOnClickListener(new View.OnClickListener() {
+        ViewGroup groupTitle = (ViewGroup) dialog.findViewById(R.id.dialog_filter_groupTitle);
+        groupTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 PrefUtil.setAchatLocatioin(

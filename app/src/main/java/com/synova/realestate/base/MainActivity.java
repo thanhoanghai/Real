@@ -2,7 +2,6 @@
 package com.synova.realestate.base;
 
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -16,8 +15,9 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
-import android.widget.RadioGroup;
 import android.widget.TabHost;
 
 import com.synova.realestate.R;
@@ -37,13 +37,12 @@ import java.util.Stack;
 import de.greenrobot.event.EventBus;
 
 public class MainActivity extends BaseActivity implements TabHost.OnTabChangeListener,
-        RadioGroup.OnCheckedChangeListener {
+        CompoundButton.OnCheckedChangeListener {
 
     private HashMap<String, Stack<BaseFragment>> fragmentStacks;
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
-    private RadioGroup groupNavigationItems;
     private ReclickableTabHost tabHost;
     private String currentTabTag = Constants.TabBar.GRID.name();
 
@@ -52,10 +51,18 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
 
     private AdsImageView adsView;
 
+    public static HashMap<Constants.ElementType, Boolean> markersVisibility;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        markersVisibility = new HashMap<>();
+        markersVisibility.put(Constants.ElementType.BIEN, true);
+        markersVisibility.put(Constants.ElementType.AGENCE, true);
+        markersVisibility.put(Constants.ElementType.PARTICULIER, true);
+        markersVisibility.put(Constants.ElementType.NOTAIRE, true);
 
         setupActionBar();
         setupDrawer();
@@ -89,9 +96,9 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         setSupportActionBar(toolbar);
 
         actionBar = getSupportActionBar();
-//        actionBar.setDisplayHomeAsUpEnabled(true);
-//        actionBar.setHomeButtonEnabled(true);
-//        actionBar.setDisplayShowHomeEnabled(true);
+        // actionBar.setDisplayHomeAsUpEnabled(true);
+        // actionBar.setHomeButtonEnabled(true);
+        // actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setIcon(R.drawable.ico_navbar_logo);
     }
@@ -115,11 +122,15 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         drawerToggle.setDrawerIndicatorEnabled(true);
         drawerLayout.setDrawerListener(drawerToggle);
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view);
-        groupNavigationItems = (RadioGroup) navigationView
-                .findViewById(R.id.navigation_groupNavigationItems);
-        groupNavigationItems.setOnCheckedChangeListener(this);
-        selectNavigationItem(R.id.navigation_btnBien);
+        CheckBox ckbBien = (CheckBox) findViewById(R.id.navigation_btnBien);
+        CheckBox ckbAgence = (CheckBox) findViewById(R.id.navigation_btnAgence);
+        CheckBox ckbParticulier = (CheckBox) findViewById(R.id.navigation_btnParticulier);
+        CheckBox ckbNotaire = (CheckBox) findViewById(R.id.navigation_btnNotaire);
+
+        ckbBien.setOnCheckedChangeListener(this);
+        ckbAgence.setOnCheckedChangeListener(this);
+        ckbParticulier.setOnCheckedChangeListener(this);
+        ckbNotaire.setOnCheckedChangeListener(this);
     }
 
     private void setupTabHost() {
@@ -305,18 +316,33 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         return super.onOptionsItemSelected(item);
     }
 
-    public RadioGroup getGroupNavigationItems() {
-        return groupNavigationItems;
-    }
-
-    public void selectNavigationItem(int id) {
-        groupNavigationItems.check(-1);
-        groupNavigationItems.check(id);
-    }
-
     @Override
-    public void onCheckedChanged(RadioGroup group, int checkedId) {
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
         closeDrawer();
-        EventBus.getDefault().post(new NavigationItemSelectedEvent(checkedId));
+
+        Constants.ElementType type = null;
+        switch (buttonView.getId()) {
+            case R.id.navigation_btnBien:
+                type = Constants.ElementType.BIEN;
+                markersVisibility.put(Constants.ElementType.BIEN, isChecked);
+                break;
+            case R.id.navigation_btnAgence:
+                type = Constants.ElementType.AGENCE;
+                markersVisibility.put(Constants.ElementType.AGENCE, isChecked);
+                break;
+            case R.id.navigation_btnParticulier:
+                type = Constants.ElementType.PARTICULIER;
+                markersVisibility.put(Constants.ElementType.PARTICULIER, isChecked);
+                break;
+            case R.id.navigation_btnNotaire:
+                type = Constants.ElementType.NOTAIRE;
+                markersVisibility.put(Constants.ElementType.NOTAIRE, isChecked);
+                break;
+
+        }
+
+        if (type != null) {
+            EventBus.getDefault().post(new NavigationItemSelectedEvent(type, isChecked));
+        }
     }
 }
