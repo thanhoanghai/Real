@@ -58,7 +58,6 @@
             android:layout_marginRight="5dp"
             android:layout_toRightOf="@+id/tab_location_bottom_ivThumbnail"
             android:paddingTop="5dp"
-            android:text="2 piece(s) | 35 m2 | 300 m"
             android:textColor="@color/text_gray" />
 
     </RelativeLayout>

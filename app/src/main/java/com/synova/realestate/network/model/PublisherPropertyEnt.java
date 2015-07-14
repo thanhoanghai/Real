@@ -16,7 +16,8 @@ public class PublisherPropertyEnt {
     public int adminId;
     public int offsetS;
     public String propertyTypeS;
-    public String rentSaleS = PrefUtil.getAchatLocation().name();
+    // public String rentSaleS = PrefUtil.getAchatLocation().name();
+    public String rentSaleS = "";
     public String businessTypeS;
     public String surfaceMinS = PrefUtil.getSurfaceMinMax().split("-")[0];
     public String surfaceMaxS = PrefUtil.getSurfaceMinMax().split("-")[1];

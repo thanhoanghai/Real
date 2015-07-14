@@ -8,7 +8,6 @@ import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.text.Html;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -45,7 +44,9 @@ import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.models.MapResponseEnt;
 import com.synova.realestate.models.eventbus.NavigationItemSelectedEvent;
 import com.synova.realestate.network.NetworkService;
+import com.synova.realestate.network.model.AdEnt;
 import com.synova.realestate.network.model.MapRequestEnt;
+import com.synova.realestate.network.model.PublisherDetailEnt;
 import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
@@ -381,19 +382,33 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         // addSelectedMarkerCircle(marker.getPosition().latitude, marker.getPosition().longitude,
         // 500);
 
-        groupDetailBottom.setVisibility(View.VISIBLE);
+//        groupDetailBottom.setVisibility(View.VISIBLE);
         groupDetailBottom.setTag(mapResponseEnt.id);
 
-        ImageLoader
-                .getInstance()
-                .displayImage(
-                        "http://images.travelpod.com/tripwow/photos2/ta-02e0-d424-1301/alimetov-yambol-bulgaria+13162716848-tpweb11w-19996.jpg",
-                        ivThumbnail);
-        tvTitle.setText(marker.getTitle());
-        tvPrice.setText("750€");
-        String description = String.format(
-                activity.getString(R.string.list_item_description_template), 2, 35, 300);
-        tvDescription.setText(Html.fromHtml(description));
+        AdEnt adEnt = new AdEnt();
+        adEnt.adId = mapResponseEnt.id;
+
+        NetworkService.getPublisherDetails(adEnt,
+                new NetworkService.NetworkCallback<List<PublisherDetailEnt>>() {
+                    @Override
+                    public void onSuccess(List<PublisherDetailEnt> detailEnts) {
+                        if (detailEnts != null && detailEnts.size() > 0){
+                            groupDetailBottom.setVisibility(View.VISIBLE);
+
+                            PublisherDetailEnt detailEnt = detailEnts.get(0);
+                            ImageLoader.getInstance().displayImage(detailEnt.logoUrl,
+                                    ivThumbnail);
+                            tvTitle.setText(detailEnt.name);
+                            tvPrice.setText(detailEnt.price);
+                            tvDescription.setText(detailEnt.address);
+                        }
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+
+                    }
+                });
 
         return true;
     }
@@ -452,10 +467,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private void setMarkersVisible(Constants.ElementType type, boolean isChecked) {
         List<Marker> elementTypeMarkers = markers.get(type);
-        if (elementTypeMarkers == null){
+        if (elementTypeMarkers == null) {
             return;
         }
-        
+
         for (Marker childMarker : elementTypeMarkers) {
             childMarker.setVisible(isChecked);
         }
