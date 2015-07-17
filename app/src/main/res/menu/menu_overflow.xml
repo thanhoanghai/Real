@@ -8,7 +8,7 @@
         app:showAsAction="withText" />
 
     <item
-        android:id="@+id/action_post_fb"
+        android:id="@+id/action_share_fb"
         android:title="Partager sur Facebook"
         app:showAsAction="withText" />
 

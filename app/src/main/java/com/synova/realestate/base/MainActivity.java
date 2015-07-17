@@ -1,6 +1,7 @@
 
 package com.synova.realestate.base;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentManager;
@@ -304,9 +305,15 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
-                            Snackbar.make(drawerLayout, item.getTitle(), Snackbar.LENGTH_SHORT)
-                                    .show();
-                            return false;
+                            switch (item.getItemId()){
+                                case R.id.action_share_fb:
+                                    Intent intent = new Intent(Intent.ACTION_SEND);
+                                    intent.setType("text/plain");
+                                    intent.putExtra(Intent.EXTRA_TEXT, "http://www.google.com/");
+                                    startActivity(Intent.createChooser(intent, "Share via"));
+                                    break;
+                            }
+                            return true;
                         }
                     });
                 }
