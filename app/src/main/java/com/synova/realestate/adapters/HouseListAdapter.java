@@ -6,6 +6,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -38,7 +39,7 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyDataSetChanged();
     }
 
-    public List<AdsInfoResponseEnt> getItems(){
+    public List<AdsInfoResponseEnt> getItems() {
         return houses;
     }
 
@@ -53,19 +54,14 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         notifyItemRangeInserted(start, houses.size() - 1);
     }
 
-//    @Override
-//    public int getItemCount() {
-//        return houses.size() + 1;
-//    }
-
     @Override
     public int getItemCount() {
-        return houses.size();
+        return houses.size() + 1;
     }
 
     @Override
     public int getItemViewType(int position) {
-        return position == houses.size() ? Constants.RecyclerViewType.FOOTER.ordinal()
+        return position == 0 ? Constants.RecyclerViewType.HEADER.ordinal()
                 : Constants.RecyclerViewType.ITEM.ordinal();
     }
 
@@ -75,7 +71,12 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         Constants.RecyclerViewType type = Constants.RecyclerViewType.values()[viewType];
         switch (type) {
             case HEADER:
-                break;
+                view = new View(viewGroup.getContext());
+                view.setLayoutParams(new AbsListView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        Util.dpToPx(viewGroup.getContext(), 60)));
+                return new RecyclerView.ViewHolder(view) {
+                };
             case ITEM:
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(
                         R.layout.layout_tab_list_item, viewGroup, false);
@@ -99,7 +100,7 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             case HEADER:
                 break;
             case ITEM:
-                AdsInfoResponseEnt house = houses.get(position);
+                AdsInfoResponseEnt house = houses.get(position - 1);
                 HouseListAdapter.HouseViewHolder holder = (HouseViewHolder) h;
 
                 ImageLoader.getInstance().displayImage(house.imageUrl, holder.ivPhoto);
@@ -123,7 +124,7 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     public void onClick(View v) {
         if (onItemClickedListener != null) {
             RecyclerView parent = (RecyclerView) v.getParent();
-            int position = parent.getChildAdapterPosition(v);
+            int position = parent.getChildAdapterPosition(v) - 1;
             onItemClickedListener.onItemClicked(parent, v, position, v.getId(),
                     houses.get(position));
         }

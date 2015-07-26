@@ -37,9 +37,9 @@ import com.synova.realestate.customviews.TouchableWrapperView;
 import com.synova.realestate.fragments.RetainMapFragment;
 import com.synova.realestate.models.AdsDetailEnt;
 import com.synova.realestate.models.DetailData;
-import com.synova.realestate.models.Publisher;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.AdEnt;
+import com.synova.realestate.network.model.PublisherDetailEnt;
 import com.synova.realestate.utils.DialogUtils;
 import com.synova.realestate.utils.Util;
 
@@ -103,7 +103,6 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         setupActionBar();
         setupSlideShow();
         setupDataList();
-        setupSellerList();
 
         getDetail();
     }
@@ -193,40 +192,11 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         }
     }
 
-    private void setupSellerList() {
-        List<Publisher> publishers = new ArrayList<>();
-
-        Publisher publisher = new Publisher();
-        publisher.logoUrl = "";
-        publisher.name = "Nom Adresse 1";
-        // publisher.website = "http://google.com";
-        publisher.tel = "51-22-48";
-        publisher.mail = "mail01@realestate.com";
-        publisher.nbAds = 100;
-        publishers.add(publisher);
-
-        publisher = new Publisher();
-        publisher.logoUrl = "";
-        publisher.name = "Nom Adresse 2";
-        // publisher.website = "http://google.com";
-        publisher.tel = "51-22-49";
-        publisher.mail = "mail02@realestate.com";
-        publisher.nbAds = 100;
-        publishers.add(publisher);
-
-        publisher = new Publisher();
-        publisher.logoUrl = "";
-        publisher.name = "Nom Adresse 3";
-        // publisher.website = "http://google.com";
-        publisher.tel = "51-22-50";
-        publisher.mail = "mail03@realestate.com";
-        publisher.nbAds = 100;
-        publishers.add(publisher);
-
+    private void addSellerList(List<PublisherDetailEnt> publishers) {
         groupSellers = (ViewGroup) findViewById(R.id.detail_groupSellers);
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        for (Publisher s : publishers) {
+        for (PublisherDetailEnt publisher : publishers) {
             View view = inflater.inflate(R.layout.layout_detail_seller_list_item,
                     groupSellers, false);
 
@@ -238,65 +208,76 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
             ViewGroup groupPhone = (ViewGroup) view.findViewById(R.id.detail_seller_groupPhone);
             ViewGroup groupMail = (ViewGroup) view.findViewById(R.id.detail_seller_groupMail);
 
-            ImageLoader.getInstance().displayImage(s.logoUrl, ivThumbnail);
-            tvTitle.setText(s.name);
-            // tvPrice.setText(s.);
-            tvPhone.setText(s.tel);
-            tvMail.setText(s.mail);
+            ImageLoader.getInstance().displayImage(publisher.logoUrl, ivThumbnail);
+            tvTitle.setText(publisher.name);
+            tvPrice.setText(publisher.price);
+            tvPhone.setText(publisher.tel);
+            tvMail.setText(publisher.mail);
 
-            groupPhone.setTag(s);
+            groupPhone.setTag(publisher);
             groupPhone.setOnClickListener(this);
 
-            groupMail.setTag(s);
+            groupMail.setTag(publisher);
             groupMail.setOnClickListener(this);
 
             groupSellers.addView(view);
         }
-
     }
 
     private void getDetail() {
         final ProgressDialog waitDialog = DialogUtils.showWaitDialog(this, true);
 
-        AdEnt adEnt = new AdEnt();
+        final AdEnt adEnt = new AdEnt();
         adEnt.adId = adId;
-        NetworkService.getPropertyDetails(adEnt,
-                new NetworkService.NetworkCallback<AdsDetailEnt>() {
+        NetworkService.getPublisherDetails(adEnt,
+                new NetworkService.NetworkCallback<List<PublisherDetailEnt>>() {
                     @Override
-                    public void onSuccess(AdsDetailEnt adsDetailEnt) {
-                        waitDialog.dismiss();
+                    public void onSuccess(List<PublisherDetailEnt> publisherDetailEnts) {
+                        addSellerList(publisherDetailEnts);
 
-                        DetailActivity.this.adsDetailEnt = adsDetailEnt;
+                        NetworkService.getPropertyDetails(adEnt,
+                                new NetworkService.NetworkCallback<AdsDetailEnt>() {
+                                    @Override
+                                    public void onSuccess(AdsDetailEnt adsDetailEnt) {
+                                        waitDialog.dismiss();
 
-                        if (adsDetailEnt == null) {
-                            return;
-                        }
+                                        DetailActivity.this.adsDetailEnt = adsDetailEnt;
 
-                        List<String> images = new ArrayList<>(adsDetailEnt.images.size());
-                        for (AdsDetailEnt.AdImage image : adsDetailEnt.images) {
-                            images.add(image.imagesUrl);
-                        }
-                        slideShowAdapter.setData(images);
-                        onPageSelected(0);
+                                        if (adsDetailEnt == null) {
+                                            return;
+                                        }
 
-                        AdsDetailEnt.AdCharac adCharac = adsDetailEnt.characs.get(0);
-                        tvTitle.setText(adCharac.title);
-                        tvPrice.setText(adCharac.minMaxPrice);
-                        tvAddress.setText(adCharac.detailCharac);
+                                        List<String> images = new ArrayList<>(adsDetailEnt.images
+                                                .size());
+                                        for (AdsDetailEnt.AdImage image : adsDetailEnt.images) {
+                                            images.add(image.imagesUrl);
+                                        }
+                                        slideShowAdapter.setData(images);
+                                        onPageSelected(0);
 
-                        LatLng latLng = Util.convertPointGeomToLatLng(adCharac.localisation);
-                        if (map != null) {
-                            createMarker(latLng.latitude, latLng.longitude, adCharac.title);
-                            moveCameraToLocation(latLng);
-                        }
+                                        AdsDetailEnt.AdCharac adCharac = adsDetailEnt.characs
+                                                .get(0);
+                                        tvTitle.setText(adCharac.title);
+                                        tvPrice.setText(adCharac.minMaxPrice);
+                                        tvAddress.setText(adCharac.detailCharac);
 
-                    }
+                                        LatLng latLng = Util
+                                                .convertPointGeomToLatLng(adCharac.localisation);
+                                        if (map != null) {
+                                            createMarker(latLng.latitude, latLng.longitude,
+                                                    adCharac.title);
+                                            moveCameraToLocation(latLng);
+                                        }
 
-                    @Override
-                    public void onFail(Throwable error) {
-                        waitDialog.dismiss();
-                        Toast.makeText(DetailActivity.this, "Fail to load details",
-                                Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onFail(Throwable error) {
+                                        waitDialog.dismiss();
+                                        Toast.makeText(DetailActivity.this, "Fail to load details",
+                                                Toast.LENGTH_SHORT).show();
+                                    }
+                                });
                     }
                 });
     }
@@ -449,11 +430,11 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 slideShowView.startAutoScroll();
                 break;
             case R.id.detail_seller_groupPhone:
-                Publisher publisher = (Publisher) v.getTag();
+                PublisherDetailEnt publisher = (PublisherDetailEnt) v.getTag();
                 Snackbar.make(v, "Call " + publisher.tel, Snackbar.LENGTH_SHORT).show();
                 break;
             case R.id.detail_seller_groupMail:
-                publisher = (Publisher) v.getTag();
+                publisher = (PublisherDetailEnt) v.getTag();
                 Snackbar.make(v, "Send mail to " + publisher.mail, Snackbar.LENGTH_SHORT).show();
                 break;
         }

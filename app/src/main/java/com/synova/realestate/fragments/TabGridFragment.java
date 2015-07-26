@@ -19,12 +19,10 @@ import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.customviews.SortBar;
 import com.synova.realestate.models.AdsInfoResponseEnt;
-import com.synova.realestate.models.House;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.AdsInfoEnt;
 import com.synova.realestate.utils.Util;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Callback;
@@ -62,6 +60,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
                 .findViewById(R.id.tab_grid_swipeRefreshLayout);
         swipeRefreshLayout.setColorSchemeResources(R.color.cyan);
         swipeRefreshLayout.setOnRefreshListener(this);
+        swipeRefreshLayout.setProgressViewOffset(false, 0, Util.dpToPx(activity, 60));
 
         rvItems = (RecyclerView) rootView.findViewById(R.id.tab_grid_rvItems);
         GridLayoutManager manager = new GridLayoutManager(activity, GRID_COLUMN_COUNT,
@@ -73,7 +72,23 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (loadingState == Constants.ListLoadingState.NONE
                         && !recyclerView.canScrollVertically(1)) {
-                    loadMore();
+//                    loadMore();
+                }
+
+                if (dy > 0) {
+                    if (sortBar.getY() > -sortBar.getHeight()) {
+                        sortBar.setY(sortBar.getY() - dy);
+                    } else {
+                        sortBar.setY(-sortBar.getHeight());
+                    }
+                } else if (dy < 0) {
+                    if (sortBar.getY() < 0) {
+                        sortBar.setY(sortBar.getY() - dy);
+                    } else {
+                        sortBar.setY(0);
+                    }
+                } else {
+                    sortBar.setY(0);
                 }
             }
         });
@@ -102,38 +117,6 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
                 swipeRefreshLayout.setRefreshing(isRefreshing);
             }
         });
-    }
-
-    private List<House> createMockData() {
-        List<House> houses = new ArrayList<>();
-
-        for (int i = 0; i < 30; i++) {
-            House house = new House();
-            house.price = 750;
-            house.photo = i % 2 == 0 ? "http://images.travelpod.com/tripwow/photos2/ta-02e0-d424-1301/alimetov-yambol-bulgaria+13162716848-tpweb11w-19996.jpg"
-                    : "http://www.meta-project.org/wp-content/uploads/2011/07/SR_DB-2.jpg";
-            house.title = "Test long house title name";
-            house.pieces = 2;
-            house.surface = 30.5f;
-            house.distance = "500";
-            houses.add(house);
-        }
-
-        return houses;
-    }
-
-    private void loadMore() {
-        // loadingState = Constants.ListLoadingState.LOAD_MORE;
-        //
-        // new Handler().postDelayed(new Runnable() {
-        // @Override
-        // public void run() {
-        // List<House> houses = createMockData();
-        // houseAdapter.addItems(houses);
-        //
-        // loadingState = Constants.ListLoadingState.NONE;
-        // }
-        // }, 2000);
     }
 
     private void loadNewData() {
