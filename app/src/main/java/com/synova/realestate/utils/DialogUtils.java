@@ -1,6 +1,9 @@
 
 package com.synova.realestate.utils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -26,9 +29,9 @@ import com.synova.realestate.adapters.RadioButtonAdapter;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.customviews.rangebar.RangeBar;
 import com.synova.realestate.models.DialogFilterPrixDataHolder;
+import com.synova.realestate.models.eventbus.ChangeDialogFilterValuesEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by ducth on 3/25/15.
@@ -187,7 +190,8 @@ public class DialogUtils {
                     String[] minMaxPrix = PrefUtil.getPrixMinMax().split("-");
                     int minPrixIndex = (Integer.parseInt(minMaxPrix[0]) - prixData.minPrixValue)
                             / prixData.prixStep;
-                    final int maxPrixIndex = (Integer.parseInt(minMaxPrix[1]) - prixData.minPrixValue)
+                    final int maxPrixIndex = (Integer.parseInt(minMaxPrix[1])
+                            - prixData.minPrixValue)
                             / prixData.prixStep;
 
                     priceBar.setThumbIndices(minPrixIndex, maxPrixIndex);
@@ -297,26 +301,56 @@ public class DialogUtils {
         groupTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PrefUtil.setAchatLocatioin(
-                        groupAchatLocation.getCheckedRadioButtonId() == R.id.dialog_filter_btnAchat
-                                ? Constants.AchatLocation.ACHAT : Constants.AchatLocation.LOCATION);
+                boolean isChanged = false;
 
-                PrefUtil.setMotsCles(etMotsCles.getText().toString());
+                Constants.AchatLocation selectedAchatLocation = groupAchatLocation
+                        .getCheckedRadioButtonId() == R.id.dialog_filter_btnAchat
+                                ? Constants.AchatLocation.ACHAT : Constants.AchatLocation.LOCATION;
+                if (selectedAchatLocation != PrefUtil.getAchatLocation()) {
+                    isChanged = true;
+                }
+                PrefUtil.setAchatLocatioin(selectedAchatLocation);
 
-                PrefUtil.setTypeDeBiens(Constants.PropertyType.values()[adapter
-                        .getSelectedPosition()]);
+                String selectedMotCles = etMotsCles.getText().toString();
+                if (!selectedMotCles.equals(PrefUtil.getMotsCles())) {
+                    isChanged = true;
+                }
+                PrefUtil.setMotsCles(selectedMotCles);
 
-                PrefUtil.setDistance("" + (distanceBar.getProgress() * distanceStep));
+                Constants.PropertyType selectedPropertyType = Constants.PropertyType
+                        .values()[adapter
+                                .getSelectedPosition()];
+                if (selectedPropertyType != PrefUtil.getTypeDeBiens()) {
+                    isChanged = true;
+                }
+                PrefUtil.setTypeDeBiens(selectedPropertyType);
 
-                PrefUtil.setPrixMinMax((prixData.minPrixValue + priceBar.getLeftIndex()
-                        * prixData.prixStep)
-                        + "-"
-                        + (prixData.minPrixValue + priceBar.getRightIndex() * prixData.prixStep));
+                String selectedDistance = "" + (distanceBar.getProgress() * distanceStep);
+                if (!selectedDistance.equals(PrefUtil.getDistance())) {
+                    isChanged = true;
+                }
+                PrefUtil.setDistance(selectedDistance);
 
-                PrefUtil.setSurfaceMinMax(
-                        (minSurfaceValue + surfaceBar.getLeftIndex() * stepSurfaceValue)
-                                + "-"
-                                + (minSurfaceValue + surfaceBar.getRightIndex() * stepSurfaceValue));
+                String selectedPrixMinMax = (prixData.minPrixValue
+                        + priceBar.getLeftIndex() * prixData.prixStep) + "-"
+                        + (prixData.minPrixValue + priceBar.getRightIndex() * prixData.prixStep);
+                if (!selectedPrixMinMax.equals(PrefUtil.getPrixMinMax())) {
+                    isChanged = true;
+                }
+                PrefUtil.setPrixMinMax(selectedPrixMinMax);
+
+                String selectedSurfaceMinMax = (minSurfaceValue
+                        + surfaceBar.getLeftIndex() * stepSurfaceValue) + "-"
+                        + (minSurfaceValue + surfaceBar.getRightIndex() * stepSurfaceValue);
+                if (!selectedSurfaceMinMax.equals(PrefUtil.getSurfaceMinMax())) {
+                    isChanged = true;
+                }
+                PrefUtil.setSurfaceMinMax(selectedSurfaceMinMax);
+
+                if (isChanged) {
+                    EventBus.getDefault().postSticky(
+                            new ChangeDialogFilterValuesEvent(System.currentTimeMillis()));
+                }
 
                 dialog.dismiss();
             }

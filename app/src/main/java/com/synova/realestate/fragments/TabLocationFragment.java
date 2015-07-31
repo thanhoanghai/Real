@@ -1,6 +1,15 @@
 
 package com.synova.realestate.fragments;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
+
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -49,15 +58,7 @@ import com.synova.realestate.network.model.MapRequestEnt;
 import com.synova.realestate.network.model.PublisherDetailEnt;
 import com.synova.realestate.utils.Util;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import de.greenrobot.event.EventBus;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 /**
  * Created by ducth on 6/16/15.
@@ -256,13 +257,21 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         });
     }
 
-    private void calculateNewMinMaxPoints(LatLng center) {
-        double xMin = center.longitude - (currentMax.longitude - currentMin.longitude) / 2;
-        double yMin = center.latitude - (currentMax.latitude - currentMin.latitude) / 2;
+    private void calculateNewMinMaxPoints(LatLng center, LatLngBounds bounds) {
+        // double xMin = center.longitude - (currentMax.longitude - currentMin.longitude) / 2;
+        // double yMin = center.latitude - (currentMax.latitude - currentMin.latitude) / 2;
+        // currentMin = new LatLng(yMin, xMin);
+        //
+        // double xMax = center.longitude + (currentMax.longitude - currentMin.longitude) / 2;
+        // double yMax = center.latitude + (currentMax.latitude - currentMin.latitude) / 2;
+        // currentMax = new LatLng(yMax, xMax);
+
+        double xMin = bounds.northeast.longitude;
+        double yMin = bounds.northeast.latitude;
         currentMin = new LatLng(yMin, xMin);
 
-        double xMax = center.longitude + (currentMax.longitude - currentMin.longitude) / 2;
-        double yMax = center.latitude + (currentMax.latitude - currentMin.latitude) / 2;
+        double xMax = bounds.southwest.longitude;
+        double yMax = bounds.southwest.latitude;
         currentMax = new LatLng(yMax, xMax);
     }
 
@@ -376,13 +385,15 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         MapResponseEnt mapResponseEnt = RealEstateApplication.GSON.fromJson(marker.getSnippet(),
                 MapResponseEnt.class);
 
-        LatLng[] polygon = Util.convertZoneGeomToLatLngs(mapResponseEnt.zoneGeom);
-        addSelectedMarkerPolygon(polygon);
+        if (mapResponseEnt.zoneGeom != null) {
+            LatLng[] polygon = Util.convertZoneGeomToLatLngs(mapResponseEnt.zoneGeom);
+            addSelectedMarkerPolygon(polygon);
+        }
 
         // addSelectedMarkerCircle(marker.getPosition().latitude, marker.getPosition().longitude,
         // 500);
 
-//        groupDetailBottom.setVisibility(View.VISIBLE);
+        // groupDetailBottom.setVisibility(View.VISIBLE);
         groupDetailBottom.setTag(mapResponseEnt.id);
 
         AdEnt adEnt = new AdEnt();
@@ -392,7 +403,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 new NetworkService.NetworkCallback<List<PublisherDetailEnt>>() {
                     @Override
                     public void onSuccess(List<PublisherDetailEnt> detailEnts) {
-                        if (detailEnts != null && detailEnts.size() > 0){
+                        if (detailEnts != null && detailEnts.size() > 0) {
                             groupDetailBottom.setVisibility(View.VISIBLE);
 
                             PublisherDetailEnt detailEnt = detailEnts.get(0);
@@ -487,6 +498,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         setMarkersVisible(event.type, event.isChecked);
     }
 
+    float limitX, limitY;
+
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         if (currentLocation == null) {
@@ -498,10 +511,24 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
         if (!isTouchingMap && !isForceMoveMap
                 && checkDragDistanceValid(cameraPosition.target)) {
+            LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
+
             currentLocation = new Location("manual");
             currentLocation.setLatitude(cameraPosition.target.latitude);
             currentLocation.setLongitude(cameraPosition.target.longitude);
-            calculateNewMinMaxPoints(cameraPosition.target);
+            calculateNewMinMaxPoints(cameraPosition.target, bounds);
+
+            float[] distanceX = new float[1];
+            Location.distanceBetween(bounds.northeast.latitude, bounds.northeast.longitude,
+                    bounds.northeast.latitude, bounds.southwest.longitude, distanceX);
+
+            float[] distanceY = new float[1];
+            Location.distanceBetween(bounds.northeast.latitude, bounds.northeast.longitude,
+                    bounds.southwest.latitude, bounds.northeast.longitude, distanceY);
+
+            limitX = distanceX[0] * 0.1f;
+            limitY = distanceY[0] * 0.1f;
+
             getMap();
         }
     }
@@ -511,7 +538,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         newLocation.setLatitude(center.latitude);
         newLocation.setLongitude(center.longitude);
 
-        return currentLocation.distanceTo(newLocation) > 1500;
+        // return currentLocation.distanceTo(newLocation) > 1500;
+        float distance = currentLocation.distanceTo(newLocation);
+        return distance > limitX || distance > limitY;
     }
 
     private class TouchableWrapper extends FrameLayout {
