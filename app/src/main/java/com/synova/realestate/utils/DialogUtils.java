@@ -309,7 +309,7 @@ public class DialogUtils {
                 if (selectedAchatLocation != PrefUtil.getAchatLocation()) {
                     isChanged = true;
                 }
-                PrefUtil.setAchatLocatioin(selectedAchatLocation);
+                PrefUtil.setAchatLocation(selectedAchatLocation);
 
                 String selectedMotCles = etMotsCles.getText().toString();
                 if (!selectedMotCles.equals(PrefUtil.getMotsCles())) {

@@ -25,7 +25,7 @@ public class PrefUtil {
         pref = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE);
     }
 
-    public static void setAchatLocatioin(Constants.AchatLocation type) {
+    public static void setAchatLocation(Constants.AchatLocation type) {
         SharedPreferences.Editor editor = pref.edit();
         editor.putString(KEY_ACHAT_LOCATION, type.name());
         editor.commit();

@@ -51,7 +51,17 @@ public class Constants {
     }
 
     public enum AchatLocation {
-        ACHAT, LOCATION
+        ACHAT("t"), LOCATION("f");
+
+        private String paramName;
+
+        AchatLocation(String paramName) {
+            this.paramName = paramName;
+        }
+
+        public String getParamName() {
+            return paramName;
+        }
     }
 
     public enum PropertyType {
@@ -90,9 +100,9 @@ public class Constants {
     public enum FilterOrderType {
         @SerializedName("distance")
         DISTANCE,
-        @SerializedName("price")
+        @SerializedName("amount")
         PRICE,
-        @SerializedName("date")
+        @SerializedName("extract_time")
         DATE
     }
 

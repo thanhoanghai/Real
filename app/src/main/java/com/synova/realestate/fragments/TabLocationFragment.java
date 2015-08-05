@@ -192,10 +192,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     private void getMap() {
         loadingState = Constants.NetworkLoadingState.LOADING;
 
-        final ProgressDialog waitDialog = new ProgressDialog(activity);
-        waitDialog.setMessage("Loading...");
-        waitDialog.setCancelable(false);
-        waitDialog.show();
+//        final ProgressDialog waitDialog = new ProgressDialog(activity);
+//        waitDialog.setMessage("Loading...");
+//        waitDialog.setCancelable(false);
+//        waitDialog.show();
 
         final MapRequestEnt mapRequestEnt = new MapRequestEnt();
         mapRequestEnt.deviceId = RealEstateApplication.deviceId;
@@ -246,13 +246,13 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 }
 
                 loadingState = Constants.NetworkLoadingState.LOADED;
-                waitDialog.dismiss();
+//                waitDialog.dismiss();
             }
 
             @Override
             public void failure(RetrofitError error) {
                 loadingState = Constants.NetworkLoadingState.NONE;
-                waitDialog.dismiss();
+//                waitDialog.dismiss();
             }
         });
     }

@@ -17,7 +17,7 @@ public class AdsInfoEnt {
     public int adminId;
     public int offsetS;
     public Constants.PropertyType propertyTypeS = Constants.PropertyType.APPARTEMENT;
-//    public String rentSaleS = PrefUtil.getAchatLocation().name();
+    public String isSale = PrefUtil.getAchatLocation().getParamName();
     public String rentSaleS = "";
     public String businessTypeS;
     public String surfaceMinS = PrefUtil.getSurfaceMinMax().split("-")[0];
