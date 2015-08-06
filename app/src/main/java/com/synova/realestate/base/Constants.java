@@ -51,7 +51,7 @@ public class Constants {
     }
 
     public enum AchatLocation {
-        ACHAT("t"), LOCATION("f");
+        ACHAT("true"), LOCATION("false");
 
         private String paramName;
 

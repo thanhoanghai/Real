@@ -1,6 +1,11 @@
 
 package com.synova.realestate.adapters;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -17,16 +22,14 @@ import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.utils.Util;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by ducth on 6/13/15.
  */
-public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
+public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>implements
         View.OnClickListener {
 
     private List<AdsInfoResponseEnt> houses = new ArrayList<>();
+    private Set<Integer> selectedItems = new HashSet<>();
 
     private OnRecyclerViewItemClickedListener onItemClickedListener;
 
@@ -111,9 +114,13 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
                 String description = String.format(
                         holder.tvDescription.getContext().getString(
-                                R.string.list_item_description_template), house.roomNumber,
+                                R.string.list_item_description_template),
+                        house.roomNumber,
                         house.surface, house.distance);
                 holder.tvDescription.setText(Html.fromHtml(description));
+
+                holder.containerView.setBackgroundResource(selectedItems.contains(house.id)
+                        ? R.drawable.shape_grid_item_pressed_bg : R.drawable.selector_grid_item_bg);
                 break;
             case FOOTER:
                 if (position == houses.size()) {
@@ -130,13 +137,18 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         if (onItemClickedListener != null) {
             RecyclerView parent = (RecyclerView) v.getParent();
             int position = parent.getChildAdapterPosition(v) - 3;
-            onItemClickedListener.onItemClicked(parent, v, position, v.getId(),
-                    houses.get(position));
+
+            AdsInfoResponseEnt adsInfoResponseEnt = houses.get(position);
+            selectedItems.add(adsInfoResponseEnt.id);
+            notifyDataSetChanged();
+
+            onItemClickedListener.onItemClicked(parent, v, position, v.getId(), adsInfoResponseEnt);
         }
     }
 
     static class HouseViewHolder extends RecyclerView.ViewHolder {
 
+        public ViewGroup containerView;
         public ImageView ivPhoto;
         public TextView tvPrice;
         public TextView tvTitle;
@@ -144,6 +156,7 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         public HouseViewHolder(View itemView) {
             super(itemView);
+            containerView = (ViewGroup) itemView.findViewById(R.id.grid_item_container);
             ivPhoto = (ImageView) itemView.findViewById(R.id.grid_item_ivPhoto);
             tvPrice = (TextView) itemView.findViewById(R.id.grid_item_tvPrice);
             tvTitle = (TextView) itemView.findViewById(R.id.grid_item_tvTitle);
