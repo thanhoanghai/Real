@@ -8,8 +8,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
 
-import com.synova.realestate.R;
-import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.utils.Util;
 
 import java.util.Stack;
@@ -41,7 +39,7 @@ public class BaseActivity extends AppCompatActivity {
         FragmentTransaction ft = manager.beginTransaction();
         ft.setCustomAnimations(transitionType.transitionInResId,
                 transitionType.transitionOutResId);
-        ft.replace(R.id.container, fragment);
+//        ft.replace(R.id.container, fragment);
         ft.commit();
     }
 
@@ -61,7 +59,7 @@ public class BaseActivity extends AppCompatActivity {
         Constants.TransitionType transitionType = reverseTransitionType(currentFragment.transitionInType);
         ft.setCustomAnimations(transitionType.transitionInResId,
                 transitionType.transitionOutResId);
-        ft.replace(R.id.container, fragment);
+//        ft.replace(R.id.container, fragment);
         ft.commit();
     }
 

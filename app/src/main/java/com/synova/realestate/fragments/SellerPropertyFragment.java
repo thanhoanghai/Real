@@ -15,7 +15,6 @@ import com.synova.realestate.R;
 import com.synova.realestate.adapters.PublisherPropertyAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
-import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.models.PublisherPropertyResponseEnt;
@@ -83,7 +82,6 @@ public class SellerPropertyFragment extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity) activity).disableDrawer();
         toggleSwipeRefreshLayout(false);
     }
 

@@ -4,53 +4,43 @@ package com.synova.realestate.base;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.TabHost;
 
 import com.synova.realestate.R;
+import com.synova.realestate.adapters.TabsPagerAdapter;
 import com.synova.realestate.customviews.AdsImageView;
-import com.synova.realestate.customviews.ReclickableTabHost;
-import com.synova.realestate.fragments.TabFavoriteFragment;
-import com.synova.realestate.fragments.TabGridFragment;
-import com.synova.realestate.fragments.TabListFragment;
-import com.synova.realestate.fragments.TabLocationFragment;
-import com.synova.realestate.fragments.TabSellerFragment;
+import com.synova.realestate.customviews.CustomTabPageIndicator;
 import com.synova.realestate.models.eventbus.NavigationItemSelectedEvent;
 import com.synova.realestate.utils.DialogUtils;
 
 import java.util.HashMap;
-import java.util.Stack;
 
 import de.greenrobot.event.EventBus;
 
-public class MainActivity extends BaseActivity implements TabHost.OnTabChangeListener,
-        CompoundButton.OnCheckedChangeListener {
-
-    private HashMap<String, Stack<BaseFragment>> fragmentStacks;
+public class MainActivity extends BaseActivity implements CompoundButton.OnCheckedChangeListener {
 
     private DrawerLayout drawerLayout;
     private ActionBarDrawerToggle drawerToggle;
-    private ReclickableTabHost tabHost;
-    private String currentTabTag = Constants.TabBar.GRID.name();
 
     private ActionBar actionBar;
     private PopupMenu popupMenu;
 
     private AdsImageView adsView;
+
+    private ViewPager viewPager;
+    private TabsPagerAdapter pagerAdapter;
+    private CustomTabPageIndicator tabPageIndicator;
 
     public static HashMap<Constants.ElementType, Boolean> markersVisibility;
 
@@ -67,7 +57,32 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
 
         setupActionBar();
         setupDrawer();
-        setupTabHost();
+
+        pagerAdapter = new TabsPagerAdapter(getSupportFragmentManager());
+
+        viewPager = (ViewPager) findViewById(R.id.viewPager);
+        viewPager.setAdapter(pagerAdapter);
+
+        tabPageIndicator = (CustomTabPageIndicator) findViewById(R.id.pager_indicator);
+        tabPageIndicator.setFillViewport(true);
+        tabPageIndicator.setViewPager(viewPager);
+        tabPageIndicator.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                BaseFragment baseFragment = pagerAdapter.getPageAtIndex(position);
+                baseFragment.onPageSelected(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+            }
+        });
 
         adsView = (AdsImageView) findViewById(R.id.adsImageView);
         // adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
@@ -81,12 +96,6 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        disableDrawer();
-    }
-
-    @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         drawerToggle.syncState();
@@ -97,15 +106,13 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         setSupportActionBar(toolbar);
 
         actionBar = getSupportActionBar();
-        // actionBar.setDisplayHomeAsUpEnabled(true);
-        // actionBar.setHomeButtonEnabled(true);
-        // actionBar.setDisplayShowHomeEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
         actionBar.setIcon(R.drawable.ico_navbar_logo);
     }
 
     private void setupDrawer() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.string.open_drawer,
                 R.string.close_drawer) {
             @Override
@@ -134,142 +141,12 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
         ckbNotaire.setOnCheckedChangeListener(this);
     }
 
-    private void setupTabHost() {
-        fragmentStacks = new HashMap<>();
-        fragmentStacks.put(Constants.TabBar.GRID.name(), new Stack<BaseFragment>());
-        fragmentStacks.put(Constants.TabBar.LIST.name(), new Stack<BaseFragment>());
-        fragmentStacks.put(Constants.TabBar.LOCATION.name(), new Stack<BaseFragment>());
-        fragmentStacks.put(Constants.TabBar.ALERT.name(), new Stack<BaseFragment>());
-        fragmentStacks.put(Constants.TabBar.FAVORITE.name(), new Stack<BaseFragment>());
-
-        tabHost = (ReclickableTabHost) findViewById(android.R.id.tabhost);
-        tabHost.setup();
-        tabHost.setOnTabChangedListener(this);
-
-        addTab(Constants.TabBar.GRID.name(), R.drawable.ico_tabbar_grid);
-        addTab(Constants.TabBar.LIST.name(), R.drawable.ico_tabbar_list);
-        addTab(Constants.TabBar.LOCATION.name(), R.drawable.ico_tabbar_location);
-        addTab(Constants.TabBar.ALERT.name(), R.drawable.ico_tabbar_sellers_list);
-        addTab(Constants.TabBar.FAVORITE.name(), R.drawable.ico_star_empty);
-    }
-
-    private void addTab(String title, int iconRes) {
-        TabHost.TabSpec spec = tabHost.newTabSpec(title);
-        spec.setContent(new TabHost.TabContentFactory() {
-            public View createTabContent(String tag) {
-                return findViewById(R.id.container);
-            }
-        });
-        spec.setIndicator(createTabView(iconRes));
-        tabHost.addTab(spec);
-    }
-
-    private View createTabView(int iconRes) {
-        View view = LayoutInflater.from(this)
-                .inflate(R.layout.layout_tab_item, null);
-        ImageView tabIcon = (ImageView) view.findViewById(R.id.tab_ivIcon);
-        tabIcon.setImageResource(iconRes);
-        return view;
-    }
-
-    @Override
-    public void onTabChanged(String tag) {
-        currentTabTag = tag;
-        Constants.TabBar tab = Constants.TabBar.valueOf(tag);
-        if (fragmentStacks.get(tag).size() == 0) {
-            switch (tab) {
-                case GRID:
-                    pushFragment(new TabGridFragment(), Constants.TransitionType.NONE, true);
-                    break;
-                case LIST:
-                    pushFragment(new TabListFragment(), Constants.TransitionType.NONE, true);
-                    break;
-                case LOCATION:
-                    pushFragment(new TabLocationFragment(), Constants.TransitionType.NONE, true);
-                    break;
-                case ALERT:
-                    pushFragment(new TabSellerFragment(), Constants.TransitionType.NONE, true);
-                    break;
-                case FAVORITE:
-                    pushFragment(new TabFavoriteFragment(), Constants.TransitionType.NONE, true);
-                    break;
-            }
-        } else {
-            pushFragment(getCurrentFragment(), Constants.TransitionType.NONE, false);
-        }
-    }
-
-    public void pushFragment(BaseFragment fragment,
-            Constants.TransitionType transitionType,
-            boolean addToStack) {
-        fragment.transitionInType = transitionType;
-
-        if (addToStack) {
-            fragmentStacks.get(currentTabTag).push(fragment);
-        }
-
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction ft = manager.beginTransaction();
-        ft.setCustomAnimations(transitionType.transitionInResId,
-                transitionType.transitionOutResId);
-        ft.replace(R.id.container, fragment);
-        ft.commit();
-    }
-
-    public void popFragment() {
-        /* Select the second last fragment in stack */
-        BaseFragment fragment = fragmentStacks.get(currentTabTag).elementAt(
-                fragmentStacks.get(currentTabTag).size() - 2);
-
-        /* Remove current fragment from manually managed stack */
-        BaseFragment currentFragment = fragmentStacks.get(currentTabTag).pop();
-
-        FragmentManager manager = getSupportFragmentManager();
-        FragmentTransaction ft = manager.beginTransaction();
-
-        Constants.TransitionType transitionType = reverseTransitionType(currentFragment.transitionInType);
-        ft.setCustomAnimations(transitionType.transitionInResId,
-                transitionType.transitionOutResId);
-        ft.replace(R.id.container, fragment);
-        ft.commit();
-    }
-
-    public void enableDrawer() {
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-    }
-
-    public void disableDrawer() {
-        drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-    }
-
     public void openDrawer() {
         drawerLayout.openDrawer(GravityCompat.START);
     }
 
     public void closeDrawer() {
         drawerLayout.closeDrawer(GravityCompat.START);
-    }
-
-    private BaseFragment getCurrentFragment() {
-        return fragmentStacks.get(currentTabTag).peek();
-    }
-
-    @Override
-    public void onBackPressed() {
-        BaseFragment currentFragment = getCurrentFragment();
-        if (!currentFragment.onBackPressed()) {
-            if (fragmentStacks.get(currentTabTag).size() > 1) {
-                popFragment();
-            } else {
-                // DialogUtils.showOKCancelDialog(this, getString(R.string.notice),
-                // getString(R.string.quit_app_prompt), new View.OnClickListener() {
-                // @Override
-                // public void onClick(View v) {
-                finish();
-                // }
-                // }, null);
-            }
-        }
     }
 
     @Override
@@ -305,7 +182,7 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
                     popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         @Override
                         public boolean onMenuItemClick(MenuItem item) {
-                            switch (item.getItemId()){
+                            switch (item.getItemId()) {
                                 case R.id.action_share_fb:
                                     Intent intent = new Intent(Intent.ACTION_SEND);
                                     intent.setType("text/plain");
@@ -350,6 +227,19 @@ public class MainActivity extends BaseActivity implements TabHost.OnTabChangeLis
 
         if (type != null) {
             EventBus.getDefault().post(new NavigationItemSelectedEvent(type, isChecked));
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        BaseFragment currentTabFragment = pagerAdapter.getPageAtIndex(viewPager.getCurrentItem());
+        if (currentTabFragment != null && !currentTabFragment.onBackPressed()) {
+            if (currentTabFragment.childFragments != null
+                    && currentTabFragment.childFragments.size() > 1) {
+                currentTabFragment.popChildFragment();
+            } else {
+                finish();
+            }
         }
     }
 }

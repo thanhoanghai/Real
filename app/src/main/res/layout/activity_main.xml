@@ -19,57 +19,40 @@
         android:minHeight="45dp"
         app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
 
-    <com.synova.realestate.customviews.ReclickableTabHost
-        android:id="@android:id/tabhost"
+    <LinearLayout
+        android:id="@+id/root_view_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar">
+        android:layout_below="@id/toolbar"
+        android:orientation="vertical">
 
-        <LinearLayout
-            android:id="@+id/root_view_container"
+        <android.support.v4.widget.DrawerLayout
+            android:id="@+id/drawer_layout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
-            <FrameLayout
-                android:id="@android:id/tabcontent"
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="0" />
-
-            <android.support.v4.widget.DrawerLayout
-                android:id="@+id/drawer_layout"
+            <android.support.v4.view.ViewPager
+                android:id="@+id/viewPager"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1">
+                android:layout_height="match_parent" />
 
-                <FrameLayout
-                    android:id="@+id/container"
-                    android:layout_width="fill_parent"
-                    android:layout_height="match_parent" />
+            <android.support.design.widget.NavigationView
+                android:id="@+id/navigation_view"
+                android:layout_width="200dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="start">
 
-                <android.support.design.widget.NavigationView
-                    android:id="@+id/navigation_view"
-                    android:layout_width="200dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="start">
+                <include layout="@layout/layout_map_navigation_menu" />
 
-                    <include layout="@layout/layout_map_navigation_menu" />
+            </android.support.design.widget.NavigationView>
+        </android.support.v4.widget.DrawerLayout>
 
-                </android.support.design.widget.NavigationView>
-            </android.support.v4.widget.DrawerLayout>
-
-            <TabWidget
-                android:id="@android:id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:background="@color/cyan"
-                android:divider="@drawable/shape_tab_item_divider"
-                android:dividerPadding="0dp"
-                android:orientation="horizontal" />
-        </LinearLayout>
-
-    </com.synova.realestate.customviews.ReclickableTabHost>
+        <com.synova.realestate.customviews.CustomTabPageIndicator
+            android:id="@+id/pager_indicator"
+            android:layout_width="match_parent"
+            android:layout_height="45dp" />
+    </LinearLayout>
 
     <View
         android:layout_width="match_parent"

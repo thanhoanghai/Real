@@ -20,7 +20,19 @@ public class Constants {
     public static final int HOUSE_PRICE_LIMIT = 10000;
 
     public enum TabBar {
-        GRID, LIST, LOCATION, ALERT, FAVORITE
+        GRID(R.drawable.ico_tabbar_grid), LIST(R.drawable.ico_tabbar_list),
+        LOCATION(R.drawable.ico_tabbar_location), ALERT(R.drawable.ico_tabbar_sellers_list),
+        FAVORITE(R.drawable.ico_star_empty);
+
+        private int resId;
+
+        TabBar(int resId) {
+            this.resId = resId;
+        }
+
+        public int getResId() {
+            return resId;
+        }
     }
 
     public enum TransitionType {

@@ -1,12 +1,6 @@
 
 package com.synova.realestate.fragments;
 
-import java.util.List;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -21,7 +15,6 @@ import com.synova.realestate.R;
 import com.synova.realestate.adapters.HouseGridAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
-import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.customviews.SortBar;
 import com.synova.realestate.models.AdsInfoResponseEnt;
@@ -30,7 +23,12 @@ import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.AdsInfoEnt;
 import com.synova.realestate.utils.Util;
 
+import java.util.List;
+
 import de.greenrobot.event.EventBus;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by ducth on 6/12/15.
@@ -109,7 +107,6 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity) activity).disableDrawer();
         toggleSwipeRefreshLayout(false);
     }
 

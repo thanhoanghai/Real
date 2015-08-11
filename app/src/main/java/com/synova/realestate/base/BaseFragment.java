@@ -16,6 +16,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.synova.realestate.R;
 import com.synova.realestate.utils.Util;
 
 import java.util.Stack;
@@ -27,7 +28,7 @@ public abstract class BaseFragment extends Fragment {
 
     private static final String TAG = BaseFragment.class.getName();
 
-    private Stack<BaseFragment> childFragments = null;
+    public Stack<BaseFragment> childFragments = null;
 
     protected BaseActivity activity;
     public View rootView;
@@ -91,9 +92,7 @@ public abstract class BaseFragment extends Fragment {
 
         FragmentManager manager = getChildFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
-        ft.setCustomAnimations(transitionType.transitionInResId,
-                transitionType.transitionOutResId);
-//        ft.replace(R.id.child_container, fragment);
+        ft.replace(R.id.child_container, fragment);
         ft.commit();
     }
 
@@ -105,15 +104,11 @@ public abstract class BaseFragment extends Fragment {
                 childFragments.size() - 2);
 
         /* Remove current fragment from manually managed stack */
-        BaseFragment currentFragment = childFragments.pop();
+        childFragments.pop();
 
         FragmentManager manager = getChildFragmentManager();
         FragmentTransaction ft = manager.beginTransaction();
-
-        Constants.TransitionType transitionType = reverseTransitionType(currentFragment.transitionInType);
-        ft.setCustomAnimations(transitionType.transitionInResId,
-                transitionType.transitionOutResId);
-//        ft.replace(R.id.child_container, fragment);
+        ft.replace(R.id.child_container, fragment);
         ft.commit();
     }
 
@@ -170,6 +165,9 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected void onFragmentTransitionEnd() {
+    }
+
+    protected void onPageSelected(int position) {
     }
 
     private BaseFragment getCurrentFragment() {

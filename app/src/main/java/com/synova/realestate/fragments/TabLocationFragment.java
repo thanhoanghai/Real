@@ -1,16 +1,6 @@
 
 package com.synova.realestate.fragments;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
-
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
@@ -58,7 +48,15 @@ import com.synova.realestate.network.model.MapRequestEnt;
 import com.synova.realestate.network.model.PublisherDetailEnt;
 import com.synova.realestate.utils.Util;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import de.greenrobot.event.EventBus;
+import retrofit.Callback;
+import retrofit.RetrofitError;
+import retrofit.client.Response;
 
 /**
  * Created by ducth on 6/16/15.
@@ -166,8 +164,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     public void onResume() {
         super.onResume();
 
-        ((MainActivity) activity).enableDrawer();
-
         if (!Util.isLocationEnabled(activity)) {
             // DialogUtils.showOpenLocationSettingDialog(activity);
         }
@@ -192,10 +188,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     private void getMap() {
         loadingState = Constants.NetworkLoadingState.LOADING;
 
-//        final ProgressDialog waitDialog = new ProgressDialog(activity);
-//        waitDialog.setMessage("Loading...");
-//        waitDialog.setCancelable(false);
-//        waitDialog.show();
+        // final ProgressDialog waitDialog = new ProgressDialog(activity);
+        // waitDialog.setMessage("Loading...");
+        // waitDialog.setCancelable(false);
+        // waitDialog.show();
 
         final MapRequestEnt mapRequestEnt = new MapRequestEnt();
         mapRequestEnt.deviceId = RealEstateApplication.deviceId;
@@ -246,13 +242,13 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 }
 
                 loadingState = Constants.NetworkLoadingState.LOADED;
-//                waitDialog.dismiss();
+                // waitDialog.dismiss();
             }
 
             @Override
             public void failure(RetrofitError error) {
                 loadingState = Constants.NetworkLoadingState.NONE;
-//                waitDialog.dismiss();
+                // waitDialog.dismiss();
             }
         });
     }

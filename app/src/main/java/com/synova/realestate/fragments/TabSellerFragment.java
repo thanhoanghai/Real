@@ -15,7 +15,6 @@ import com.synova.realestate.R;
 import com.synova.realestate.adapters.SellerListAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
-import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.customviews.DividerDecoration;
 import com.synova.realestate.models.Publisher;
@@ -79,7 +78,6 @@ public class TabSellerFragment extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
-        ((MainActivity) activity).disableDrawer();
         toggleSwipeRefreshLayout(false);
     }
 
@@ -155,8 +153,7 @@ public class TabSellerFragment extends BaseFragment implements
     @Override
     public void onItemClicked(RecyclerView recyclerView, View view, int position, long id,
             Publisher publisher) {
-        SellerPropertyFragment fragment = new SellerPropertyFragment();
-        fragment.setPublisherRequestEnt(publisherRequestEnt);
-        activity.pushFragment(fragment, Constants.TransitionType.SLIDE_IN_RIGHT_TO_LEFT, true);
+        ((TabSellerBaseFragment) getParentFragment())
+                .showSellerPropertyFragment(publisherRequestEnt);
     }
 }
