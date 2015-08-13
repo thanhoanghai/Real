@@ -283,7 +283,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         map.setOnMarkerClickListener(this);
         map.setOnCameraChangeListener(this);
 
-        getMap();
+        // getMap();
     }
 
     private void moveCameraToLocation(Location location) {
@@ -339,10 +339,11 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onLocationChanged(Location location) {
-        // if (currentLocation == null) {
-        // // moveCameraToLocation(location);
-        // }
-        // currentLocation = location;
+        if (currentLocation == null) {
+            currentLocation = location;
+            moveCameraToLocation(location);
+        }
+//        currentLocation = location;
     }
 
     @Override
@@ -498,14 +499,14 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        if (currentLocation == null) {
-            currentLocation = new Location("manual");
-            currentLocation.setLatitude(cameraPosition.target.latitude);
-            currentLocation.setLongitude(cameraPosition.target.longitude);
-            return;
-        }
+//        if (currentLocation == null) {
+//            currentLocation = new Location("manual");
+//            currentLocation.setLatitude(cameraPosition.target.latitude);
+//            currentLocation.setLongitude(cameraPosition.target.longitude);
+//            return;
+//        }
 
-        if (!isTouchingMap && !isForceMoveMap
+        if (currentLocation != null && !isTouchingMap && !isForceMoveMap
                 && checkDragDistanceValid(cameraPosition.target)) {
             LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
 
