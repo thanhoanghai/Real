@@ -106,6 +106,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
             @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_tab_location, container, false);
 
+        currentLocation = new Location("manual");
+        currentLocation.setLatitude(48.864716);
+        currentLocation.setLongitude(2.349014);
+
         setupMap();
         setupGroupDetailBottom();
 
@@ -498,12 +502,12 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        if (currentLocation == null) {
-            currentLocation = new Location("manual");
-            currentLocation.setLatitude(cameraPosition.target.latitude);
-            currentLocation.setLongitude(cameraPosition.target.longitude);
-            return;
-        }
+//        if (currentLocation == null) {
+//            currentLocation = new Location("manual");
+//            currentLocation.setLatitude(cameraPosition.target.latitude);
+//            currentLocation.setLongitude(cameraPosition.target.longitude);
+//            return;
+//        }
 
         if (!isTouchingMap && !isForceMoveMap
                 && checkDragDistanceValid(cameraPosition.target)) {
