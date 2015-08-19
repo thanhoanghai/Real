@@ -44,6 +44,8 @@ public class SellerPropertyFragment extends BaseFragment implements
 
     private PublisherRequestEnt publisherRequestEnt;
 
+    private static final int PAGE_LIMIT = 30;
+
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
@@ -98,20 +100,6 @@ public class SellerPropertyFragment extends BaseFragment implements
         });
     }
 
-    private void loadMore() {
-        // loadingState = Constants.ListLoadingState.LOAD_MORE;
-        //
-        // new Handler().postDelayed(new Runnable() {
-        // @Override
-        // public void run() {
-        // List<House> houses = createMockData();
-        // houseAdapter.addItems(houses);
-        //
-        // loadingState = Constants.ListLoadingState.NONE;
-        // }
-        // }, 2000);
-    }
-
     private void loadNewData() {
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
@@ -140,6 +128,50 @@ public class SellerPropertyFragment extends BaseFragment implements
                     public void onSuccess(
                             List<PublisherPropertyResponseEnt> publisherPropertyResponseEnt) {
                         houseAdapter.setItems(publisherPropertyResponseEnt);
+
+                        toggleSwipeRefreshLayout(false);
+                        loadingState = Constants.ListLoadingState.NONE;
+                    }
+
+                    @Override
+                    public void failure(RetrofitError error) {
+                        toggleSwipeRefreshLayout(false);
+                        loadingState = Constants.ListLoadingState.NONE;
+
+                        Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void loadMore() {
+        loadingState = Constants.ListLoadingState.LOAD_MORE;
+
+        PublisherPropertyEnt requestEnt = new PublisherPropertyEnt();
+        requestEnt.cellPhoneIdI = RealEstateApplication.deviceId;
+        requestEnt.publisherIdI = publisherRequestEnt.publisherId;
+        requestEnt.xLocalisation = publisherRequestEnt.xLocalisation;
+        requestEnt.yLocalisation = publisherRequestEnt.yLocalisation;
+        requestEnt.polygon = publisherRequestEnt.polygon;
+        requestEnt.adminId = publisherRequestEnt.adminId;
+        requestEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
+        requestEnt.propertyTypeS = publisherRequestEnt.propertyTypeS;
+        requestEnt.rentSaleS = publisherRequestEnt.rentSaleS;
+        requestEnt.businessTypeS = publisherRequestEnt.businessTypeS;
+        requestEnt.surfaceMinS = publisherRequestEnt.surfaceMinS;
+        requestEnt.surfaceMaxS = publisherRequestEnt.surfaceMaxS;
+        requestEnt.priceMinS = publisherRequestEnt.priceMinS;
+        requestEnt.priceMaxS = publisherRequestEnt.priceMaxS;
+        requestEnt.codePostalS = publisherRequestEnt.codePostalS;
+        requestEnt.roomNumberS = publisherRequestEnt.roomNumberS;
+        requestEnt.keyWordS = publisherRequestEnt.keyWordS;
+
+        NetworkService.getPublisherProperty(requestEnt,
+                new NetworkService.NetworkCallback<List<PublisherPropertyResponseEnt>>() {
+                    @Override
+                    public void onSuccess(
+                            List<PublisherPropertyResponseEnt> publisherPropertyResponseEnts) {
+                        houseAdapter.getItems().addAll(publisherPropertyResponseEnts);
+                        houseAdapter.notifyDataSetChanged();
 
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;

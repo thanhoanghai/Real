@@ -17,7 +17,18 @@
         android:background="@color/cyan"
         android:gravity="center_vertical"
         android:minHeight="45dp"
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar" />
+        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+        <!--<ProgressBar-->
+            <!--android:id="@+id/tab_location_progressBar"-->
+            <!--style="@android:style/Widget.Holo.ProgressBar"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:layout_gravity="right"-->
+            <!--android:indeterminate="true"-->
+            <!--android:padding="10dp"-->
+            <!--android:visibility="gone" />-->
+    </android.support.v7.widget.Toolbar>
 
     <LinearLayout
         android:id="@+id/root_view_container"

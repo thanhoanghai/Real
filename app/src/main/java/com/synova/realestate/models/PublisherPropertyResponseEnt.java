@@ -1,6 +1,5 @@
-package com.synova.realestate.models;
 
-import com.synova.realestate.base.Constants;
+package com.synova.realestate.models;
 
 /**
  * Created by ducth on 7/7/15.
@@ -14,10 +13,11 @@ public class PublisherPropertyResponseEnt {
     public String distance;
     public String imageUrl;
     public String businessType;
-    public Constants.PropertyType propertyType;
+    public String propertyType = "";
     public int roomNumber;
     public String title;
     public String rentSale;
     public int adId;
     public float price;
+
 }

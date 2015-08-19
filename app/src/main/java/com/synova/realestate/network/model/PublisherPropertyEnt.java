@@ -1,7 +1,10 @@
 
 package com.synova.realestate.network.model;
 
+import com.synova.realestate.base.Constants;
 import com.synova.realestate.utils.PrefUtil;
+
+import java.util.List;
 
 /**
  * Created by ducth on 6/23/15.
@@ -26,4 +29,19 @@ public class PublisherPropertyEnt {
     public String codePostalS;
     public String roomNumberS;
     public String keyWordS = PrefUtil.getMotsCles();
+
+    public PublisherPropertyEnt() {
+        List<Constants.PropertyType> types = PrefUtil.getTypeDeBiens();
+        if (types.contains(Constants.PropertyType.ALL)) {
+            for (int i = 2; i < Constants.PropertyType.values().length; i++) {
+                propertyTypeS += Constants.PropertyType.values()[i].getName() + ",";
+            }
+        } else {
+            for (Constants.PropertyType type : types) {
+                propertyTypeS += type.getName() + ",";
+            }
+        }
+        propertyTypeS = propertyTypeS.length() > 0 ? propertyTypeS.substring(0,
+                propertyTypeS.length() - 1) : "";
+    }
 }

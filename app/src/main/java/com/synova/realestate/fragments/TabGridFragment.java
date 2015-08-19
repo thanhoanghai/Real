@@ -48,6 +48,8 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
 
     private Constants.ListLoadingState loadingState = Constants.ListLoadingState.NONE;
 
+    private static final int PAGE_LIMIT = 30;
+
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
@@ -73,7 +75,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (loadingState == Constants.ListLoadingState.NONE
                         && !recyclerView.canScrollVertically(1)) {
-                    // loadMore();
+                    loadMore();
                 }
 
                 if (dy > 0) {
@@ -127,6 +129,31 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
             @Override
             public void success(List<AdsInfoResponseEnt> adsInfoResponseEnts, Response response) {
                 houseAdapter.setItems(adsInfoResponseEnts);
+
+                toggleSwipeRefreshLayout(false);
+                loadingState = Constants.ListLoadingState.NONE;
+            }
+
+            @Override
+            public void failure(RetrofitError error) {
+                toggleSwipeRefreshLayout(false);
+                loadingState = Constants.ListLoadingState.NONE;
+
+                Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void loadMore() {
+        loadingState = Constants.ListLoadingState.LOAD_MORE;
+
+        AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
+        adsInfoEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
+        NetworkService.getAdsInfo(adsInfoEnt, new Callback<List<AdsInfoResponseEnt>>() {
+            @Override
+            public void success(List<AdsInfoResponseEnt> adsInfoResponseEnts, Response response) {
+                houseAdapter.getItems().addAll(adsInfoResponseEnts);
+                houseAdapter.notifyDataSetChanged();
 
                 toggleSwipeRefreshLayout(false);
                 loadingState = Constants.ListLoadingState.NONE;

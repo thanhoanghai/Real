@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Real Estate</string>
+    <string name="app_name">Roof</string>
     <string name="MAP_MAC_DEBUG_API_KEY">AIzaSyCjMPx2K4HHUHzCQbl1HyfP4RCNBJqdE70</string>
     <string name="MAP_PC_DEBUG_API_KEY">AIzaSyA6NVab7JRZS37d5OkxSafTn5J2Nm227eE</string>
     <string name="MAP_RELEASE_API_KEY">AIzaSyAmWl0ohxUeEWcxJpfgkYKq9ZkhlGqJaH0</string>
