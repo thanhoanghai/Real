@@ -1,24 +1,26 @@
 
 package com.synova.realestate.adapters;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.RadioButton;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 
 import com.synova.realestate.R;
+import com.synova.realestate.base.Constants;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.RadioButtonHolder>
-        implements View.OnClickListener {
-
-    private RadioButton mSelectedRB;
-    private int mSelectedPosition = 0;
+        implements CompoundButton.OnCheckedChangeListener {
 
     private List<String> items = new ArrayList<>();
+    private Set<Integer> selectedItems = new HashSet<>();
 
     private RecyclerView recyclerView;
 
@@ -31,13 +33,18 @@ public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.
         notifyDataSetChanged();
     }
 
-    public void selectItem(int position){
-        this.mSelectedPosition = position;
-        notifyDataSetChanged();
+    public void selectItem(int position) {
+        if (position == 1) {
+            checkAll();
+        } else {
+            selectedItems.remove(1);
+            selectedItems.add(position);
+            notifyDataSetChanged();
+        }
     }
 
-    public int getSelectedPosition() {
-        return mSelectedPosition;
+    public Set<Integer> getSelectedItems() {
+        return selectedItems;
     }
 
     @Override
@@ -64,35 +71,53 @@ public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.
         String item = items.get(position);
 
         holder.radioButton.setText(item);
-        holder.radioButton.setOnClickListener(this);
 
-        if (mSelectedPosition != position) {
-            holder.radioButton.setChecked(false);
-        } else {
-            holder.radioButton.setChecked(true);
-            if (holder.radioButton != mSelectedRB) {
-                mSelectedRB = holder.radioButton;
-            }
-        }
+        holder.radioButton.setOnCheckedChangeListener(null);
+        holder.radioButton.setChecked(selectedItems.contains(position));
+        holder.radioButton.setOnCheckedChangeListener(this);
     }
 
     @Override
-    public void onClick(View v) {
+    public void onCheckedChanged(CompoundButton v, boolean isChecked) {
         int position = recyclerView.getChildAdapterPosition(v);
-        if ((position != mSelectedPosition && mSelectedRB != null)) {
-            mSelectedRB.setChecked(false);
+        if (position == 1) {
+            if (v.isChecked()) {
+                checkAll();
+            } else {
+                uncheckAll();
+            }
+        } else {
+            selectedItems.remove(1);
+            if (v.isChecked()) {
+                selectedItems.add(position);
+                if (selectedItems.size() == Constants.PropertyType.values().length - 2) {
+                    checkAll();
+                }
+            } else {
+                selectedItems.remove(position);
+            }
         }
+        notifyDataSetChanged();
+    }
 
-        mSelectedPosition = position;
-        mSelectedRB = (RadioButton) v;
+    private void checkAll() {
+        for (int i = 1; i < Constants.PropertyType.values().length; i++) {
+            selectedItems.add(i);
+        }
+        notifyDataSetChanged();
+    }
+
+    private void uncheckAll() {
+        selectedItems.clear();
+        notifyDataSetChanged();
     }
 
     class RadioButtonHolder extends RecyclerView.ViewHolder {
-        RadioButton radioButton;
+        CheckBox radioButton;
 
         public RadioButtonHolder(View itemView) {
             super(itemView);
-            radioButton = (RadioButton) itemView.findViewById(R.id.radio_button);
+            radioButton = (CheckBox) itemView.findViewById(R.id.radio_button);
         }
     }
 

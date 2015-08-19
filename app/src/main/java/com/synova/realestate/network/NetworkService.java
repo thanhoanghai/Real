@@ -28,6 +28,9 @@ import retrofit.converter.GsonConverter;
 import retrofit.http.Body;
 import retrofit.http.POST;
 import retrofit.mime.TypedByteArray;
+import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by ducth on 6/22/15.
@@ -65,27 +68,9 @@ public class NetworkService {
         });
     }
 
-    public static void getMap(MapRequestEnt mapRequestEnt,
-            final Callback<List<MapResponseEnt>> callback) {
-        restService.getMap(mapRequestEnt, new Callback<JsonElement>() {
-
-            @Override
-            public void success(JsonElement jsonElement, Response response) {
-                List<MapResponseEnt> result = RealEstateApplication.GSON.fromJson(jsonElement,
-                        new TypeToken<List<MapResponseEnt>>() {
-                        }.getType());
-                if (callback != null) {
-                    callback.success(result, response);
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if (callback != null) {
-                    callback.failure(error);
-                }
-            }
-        });
+    public static Observable<List<MapResponseEnt>> getMap(final MapRequestEnt mapRequestEnt) {
+        return restService.getMap(mapRequestEnt).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     public static void getPropertyDetails(AdEnt adEnt, final NetworkCallback<AdsDetailEnt> callback) {
@@ -285,7 +270,7 @@ public class NetworkService {
         void getPropertyDetail(@Body AdEnt adEnt, NetworkCallback<JsonElement> callback);
 
         @POST("/property/getMap")
-        void getMap(@Body MapRequestEnt mapRequestEnt, Callback<JsonElement> callback);
+        Observable<List<MapResponseEnt>> getMap(@Body MapRequestEnt mapRequestEnt);
 
         @POST("/publisher/getList")
         void getListPublisher(@Body PublisherRequestEnt publisherRequestEnt,

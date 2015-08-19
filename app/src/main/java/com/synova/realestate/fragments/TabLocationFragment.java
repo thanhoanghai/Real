@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -54,9 +55,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
-import retrofit.Callback;
 import retrofit.RetrofitError;
-import retrofit.client.Response;
+import rx.functions.Action1;
 
 /**
  * Created by ducth on 6/16/15.
@@ -101,6 +101,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private boolean isForceMoveMap;
 
+    private ProgressBar progressBar;
+
+    private int currentZoomLevel = 14;
+
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
@@ -115,6 +119,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
         btnMenu = (ImageView) rootView.findViewById(R.id.tab_location_btnMenu);
         btnMenu.setOnClickListener(this);
+
+        progressBar = (ProgressBar) rootView.findViewById(R.id.tab_location_progressBar);
 
         TouchableWrapper touchableWrapper = new TouchableWrapper(getActivity());
         touchableWrapper.addView(rootView);
@@ -192,6 +198,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     private void getMap() {
         loadingState = Constants.NetworkLoadingState.LOADING;
 
+        progressBar.setVisibility(View.VISIBLE);
+
         // final ProgressDialog waitDialog = new ProgressDialog(activity);
         // waitDialog.setMessage("Loading...");
         // waitDialog.setCancelable(false);
@@ -207,9 +215,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         mapRequestEnt.surfaceMinS = 0 + "";
         mapRequestEnt.surfaceMaxS = 2000 + "";
 
-        NetworkService.getMap(mapRequestEnt, new Callback<List<MapResponseEnt>>() {
+        NetworkService.getMap(mapRequestEnt).subscribe(new Action1<List<MapResponseEnt>>() {
             @Override
-            public void success(List<MapResponseEnt> mapResponseEnts, Response response) {
+            public void call(List<MapResponseEnt> mapResponseEnts) {
                 markers.clear();
                 map.clear();
 
@@ -246,12 +254,14 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 }
 
                 loadingState = Constants.NetworkLoadingState.LOADED;
+                progressBar.setVisibility(View.GONE);
                 // waitDialog.dismiss();
             }
-
+        }, new Action1<Throwable>() {
             @Override
-            public void failure(RetrofitError error) {
+            public void call(Throwable throwable) {
                 loadingState = Constants.NetworkLoadingState.NONE;
+                progressBar.setVisibility(View.GONE);
                 // waitDialog.dismiss();
             }
         });
@@ -287,7 +297,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         map.setOnMarkerClickListener(this);
         map.setOnCameraChangeListener(this);
 
-        getMap();
+//        getMap();
     }
 
     private void moveCameraToLocation(Location location) {
@@ -305,7 +315,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         LatLngBounds bounds = builder.build();
 
         if (animate) {
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), 14),
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), currentZoomLevel),
                     new GoogleMap.CancelableCallback() {
                         @Override
                         public void onFinish() {
@@ -314,7 +324,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                                 public void run() {
                                     isForceMoveMap = false;
                                 }
-                            }, 1000);
+                            }, 2000);
                         }
 
                         @Override
@@ -324,11 +334,11 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                                 public void run() {
                                     isForceMoveMap = false;
                                 }
-                            }, 1000);
+                            }, 2000);
                         }
                     });
         } else {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), 14));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), currentZoomLevel));
             isForceMoveMap = false;
         }
     }
@@ -502,15 +512,16 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-//        if (currentLocation == null) {
-//            currentLocation = new Location("manual");
-//            currentLocation.setLatitude(cameraPosition.target.latitude);
-//            currentLocation.setLongitude(cameraPosition.target.longitude);
-//            return;
-//        }
+        // if (currentLocation == null) {
+        // currentLocation = new Location("manual");
+        // currentLocation.setLatitude(cameraPosition.target.latitude);
+        // currentLocation.setLongitude(cameraPosition.target.longitude);
+        // return;
+        // }
 
-        if (!isTouchingMap && !isForceMoveMap
-                && checkDragDistanceValid(cameraPosition.target)) {
+        if (!isTouchingMap
+                && !isForceMoveMap
+                && (checkDragDistanceValid(cameraPosition.target) || cameraPosition.zoom != currentZoomLevel)) {
             LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
 
             currentLocation = new Location("manual");

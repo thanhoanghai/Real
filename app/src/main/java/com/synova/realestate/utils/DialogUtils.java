@@ -1,9 +1,6 @@
 
 package com.synova.realestate.utils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -30,6 +27,10 @@ import com.synova.realestate.base.Constants;
 import com.synova.realestate.customviews.rangebar.RangeBar;
 import com.synova.realestate.models.DialogFilterPrixDataHolder;
 import com.synova.realestate.models.eventbus.ChangeDialogFilterValuesEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import de.greenrobot.event.EventBus;
 
@@ -212,13 +213,16 @@ public class DialogUtils {
         final RadioButtonAdapter adapter = new RadioButtonAdapter(recyclerView);
         recyclerView.setAdapter(adapter);
 
-        adapter.selectItem(PrefUtil.getTypeDeBiens().ordinal());
-
         List<String> items = new ArrayList<>();
         for (Constants.PropertyType type : Constants.PropertyType.values()) {
             items.add(type.getName());
         }
         adapter.setData(items);
+
+        List<Constants.PropertyType> types = PrefUtil.getTypeDeBiens();
+        for (Constants.PropertyType type : types) {
+            adapter.selectItem(type.ordinal());
+        }
 
         recyclerView.setMinimumHeight(Util.dpToPx(context, 120));
 
@@ -305,7 +309,7 @@ public class DialogUtils {
 
                 Constants.AchatLocation selectedAchatLocation = groupAchatLocation
                         .getCheckedRadioButtonId() == R.id.dialog_filter_btnAchat
-                                ? Constants.AchatLocation.ACHAT : Constants.AchatLocation.LOCATION;
+                        ? Constants.AchatLocation.ACHAT : Constants.AchatLocation.LOCATION;
                 if (selectedAchatLocation != PrefUtil.getAchatLocation()) {
                     isChanged = true;
                 }
@@ -317,13 +321,34 @@ public class DialogUtils {
                 }
                 PrefUtil.setMotsCles(selectedMotCles);
 
-                Constants.PropertyType selectedPropertyType = Constants.PropertyType
-                        .values()[adapter
-                                .getSelectedPosition()];
-                if (selectedPropertyType != PrefUtil.getTypeDeBiens()) {
-                    isChanged = true;
+                List<Constants.PropertyType> selectedTypes = new ArrayList<>();
+                Set<Integer> selectedItems = adapter.getSelectedItems();
+                if (selectedItems.contains(Constants.PropertyType.ALL.ordinal())) {
+                    selectedTypes.add(Constants.PropertyType.ALL);
+                } else {
+                    for (Integer position : selectedItems) {
+                        Constants.PropertyType type = Constants.PropertyType.values()[position];
+                        selectedTypes.add(type);
+                    }
                 }
-                PrefUtil.setTypeDeBiens(selectedPropertyType);
+
+                List<Constants.PropertyType> temp = new ArrayList<>(selectedTypes);
+                List<Constants.PropertyType> cachedTypes = PrefUtil.getTypeDeBiens();
+                if (temp.size() > cachedTypes.size()) {
+                    temp.removeAll(cachedTypes);
+                    if(temp.size() > 0){
+                        isChanged = true;
+                    }
+                } else {
+                    cachedTypes.removeAll(temp);
+                    if(cachedTypes.size() > 0){
+                        isChanged = true;
+                    }
+                }
+
+                if (isChanged) {
+                    PrefUtil.setTypeDeBiens(selectedTypes);
+                }
 
                 String selectedDistance = "" + (distanceBar.getProgress() * distanceStep);
                 if (!selectedDistance.equals(PrefUtil.getDistance())) {

@@ -7,7 +7,7 @@ android {
     defaultConfig {
         applicationId "com.synova.realestate"
         minSdkVersion 14
-        targetSdkVersion 22
+        targetSdkVersion 18
         versionCode 1
         versionName "1.0"
     }
@@ -38,4 +38,5 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.9.0'
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.viewpagerindicator:library:2.4.1'
+    compile 'io.reactivex:rxandroid:1.0.1'
 }

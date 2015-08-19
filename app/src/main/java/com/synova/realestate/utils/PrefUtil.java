@@ -4,7 +4,12 @@ package com.synova.realestate.utils;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.google.gson.reflect.TypeToken;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.RealEstateApplication;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by ducth on 12/06/2015.
@@ -32,7 +37,7 @@ public class PrefUtil {
     }
 
     public static Constants.AchatLocation getAchatLocation() {
-        String type = pref.getString(KEY_ACHAT_LOCATION, Constants.AchatLocation.ACHAT.name());
+        String type = pref.getString(KEY_ACHAT_LOCATION, Constants.AchatLocation.LOCATION.name());
         return Constants.AchatLocation.valueOf(type);
     }
 
@@ -46,15 +51,23 @@ public class PrefUtil {
         return pref.getString(KEY_MOTS_CLES, "");
     }
 
-    public static void setTypeDeBiens(Constants.PropertyType type) {
+    public static void setTypeDeBiens(List<Constants.PropertyType> types) {
         SharedPreferences.Editor editor = pref.edit();
-        editor.putString(KEY_TYPE_DE_BIENS, type.name());
+        editor.putString(KEY_TYPE_DE_BIENS, RealEstateApplication.GSON.toJson(types));
         editor.commit();
     }
 
-    public static Constants.PropertyType getTypeDeBiens() {
-        String type = pref.getString(KEY_TYPE_DE_BIENS, Constants.PropertyType.ALL.name());
-        return Constants.PropertyType.valueOf(type);
+    public static List<Constants.PropertyType> getTypeDeBiens() {
+        String json = pref.getString(KEY_TYPE_DE_BIENS, "");
+        if (json.length() == 0) {
+            List<Constants.PropertyType> types = new ArrayList<>();
+            types.add(Constants.PropertyType.ALL);
+            return types;
+        }
+
+        return RealEstateApplication.GSON.fromJson(json,
+                new TypeToken<List<Constants.PropertyType>>() {
+                }.getType());
     }
 
     public static void setDistance(String distance) {

@@ -5,6 +5,8 @@ import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.utils.PrefUtil;
 
+import java.util.List;
+
 /**
  * Created by ducth on 6/23/15.
  */
@@ -16,7 +18,7 @@ public class AdsInfoEnt {
     public String polygon;
     public int adminId;
     public int offsetS;
-    public Constants.PropertyType propertyTypeS = Constants.PropertyType.APPARTEMENT;
+    public String propertyTypeS = "";
     // public String isSale = PrefUtil.getAchatLocation().getParamName();
     public String rentSaleS = PrefUtil.getAchatLocation().getParamName();
     public String businessTypeS;
@@ -29,4 +31,18 @@ public class AdsInfoEnt {
     public String keyWordS = PrefUtil.getMotsCles();
     public Constants.FilterOrderType orderByS = Constants.FilterOrderType.DISTANCE;
 
+    public AdsInfoEnt() {
+        List<Constants.PropertyType> types = PrefUtil.getTypeDeBiens();
+        if (types.contains(Constants.PropertyType.ALL)) {
+            for (int i = 2; i < Constants.PropertyType.values().length; i++) {
+                propertyTypeS += Constants.PropertyType.values()[i].getName() + ",";
+            }
+        } else {
+            for (Constants.PropertyType type : types) {
+                propertyTypeS += type.getName() + ",";
+            }
+        }
+        propertyTypeS = propertyTypeS.length() > 0 ? propertyTypeS.substring(0,
+                propertyTypeS.length() - 1) : "";
+    }
 }
