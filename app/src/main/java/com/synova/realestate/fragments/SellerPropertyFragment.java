@@ -44,7 +44,7 @@ public class SellerPropertyFragment extends BaseFragment implements
 
     private PublisherRequestEnt publisherRequestEnt;
 
-    private static final int PAGE_LIMIT = 30;
+    private static final int PAGE_LIMIT = 49;
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -110,7 +110,7 @@ public class SellerPropertyFragment extends BaseFragment implements
         requestEnt.yLocalisation = publisherRequestEnt.yLocalisation;
         requestEnt.polygon = publisherRequestEnt.polygon;
         requestEnt.adminId = publisherRequestEnt.adminId;
-        requestEnt.offsetS = publisherRequestEnt.offsetS;
+        requestEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
         requestEnt.propertyTypeS = publisherRequestEnt.propertyTypeS;
         requestEnt.rentSaleS = publisherRequestEnt.rentSaleS;
         requestEnt.businessTypeS = publisherRequestEnt.businessTypeS;
