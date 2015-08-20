@@ -3,7 +3,6 @@ package com.synova.realestate.base;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -16,6 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 
 import com.synova.realestate.R;
 import com.synova.realestate.adapters.TabsPagerAdapter;
@@ -25,6 +25,8 @@ import com.synova.realestate.models.eventbus.NavigationItemSelectedEvent;
 import com.synova.realestate.utils.DialogUtils;
 
 import java.util.HashMap;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import de.greenrobot.event.EventBus;
 
@@ -90,7 +92,8 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnCheck
         adsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Snackbar.make(adsView, "You've clicked ads banner!", Snackbar.LENGTH_SHORT).show();
+                // Snackbar.make(adsView, "You've clicked ads banner!",
+                // Snackbar.LENGTH_SHORT).show();
             }
         });
     }
@@ -230,6 +233,8 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnCheck
         }
     }
 
+    private int backPressedCount = 0;
+
     @Override
     public void onBackPressed() {
         BaseFragment currentTabFragment = pagerAdapter.getPageAtIndex(viewPager.getCurrentItem());
@@ -238,7 +243,19 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnCheck
                     && currentTabFragment.childFragments.size() > 1) {
                 currentTabFragment.popChildFragment();
             } else {
-                finish();
+                backPressedCount++;
+                if (backPressedCount == 2) {
+                    backPressedCount = 0;
+                    finish();
+                } else {
+                    Toast.makeText(this, "Press back again to quit app", Toast.LENGTH_SHORT).show();
+                    new Timer().schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            backPressedCount = 0;
+                        }
+                    }, 2000);
+                }
             }
         }
     }

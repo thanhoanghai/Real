@@ -48,7 +48,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
 
     private Constants.ListLoadingState loadingState = Constants.ListLoadingState.NONE;
 
-    private static final int PAGE_LIMIT = 30;
+    private static final int PAGE_LIMIT = 49;
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -125,6 +125,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
         AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
+        adsInfoEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
         NetworkService.getAdsInfo(adsInfoEnt, new Callback<List<AdsInfoResponseEnt>>() {
             @Override
             public void success(List<AdsInfoResponseEnt> adsInfoResponseEnts, Response response) {
