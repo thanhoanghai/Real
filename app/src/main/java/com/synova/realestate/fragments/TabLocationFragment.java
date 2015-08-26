@@ -2,7 +2,6 @@
 package com.synova.realestate.fragments;
 
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -17,6 +16,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -103,16 +103,26 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private boolean isForceMoveMap;
 
+    private ProgressBar progressBar;
+
+    private int currentZoomLevel = 14;
+
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_tab_location, container, false);
+
+        currentLocation = new Location("manual");
+        currentLocation.setLatitude(48.864716);
+        currentLocation.setLongitude(2.349014);
 
         setupMap();
         setupGroupDetailBottom();
 
         btnMenu = (ImageView) rootView.findViewById(R.id.tab_location_btnMenu);
         btnMenu.setOnClickListener(this);
+
+        progressBar = (ProgressBar) rootView.findViewById(R.id.tab_location_progressBar);
 
         TouchableWrapper touchableWrapper = new TouchableWrapper(getActivity());
         touchableWrapper.addView(rootView);
@@ -200,10 +210,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     private void getMap() {
         loadingState = Constants.NetworkLoadingState.LOADING;
 
-        final ProgressDialog waitDialog = new ProgressDialog(activity);
-        waitDialog.setMessage("Loading...");
-        waitDialog.setCancelable(false);
-        waitDialog.show();
+        progressBar.setVisibility(View.VISIBLE);
 
         final MapRequestEnt mapRequestEnt = new MapRequestEnt();
         mapRequestEnt.deviceId = RealEstateApplication.deviceId;
@@ -254,26 +261,18 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 }
 
                 loadingState = Constants.NetworkLoadingState.LOADED;
-                waitDialog.dismiss();
+                progressBar.setVisibility(View.GONE);
             }
         }, new Action1<Throwable>() {
             @Override
             public void call(Throwable throwable) {
                 loadingState = Constants.NetworkLoadingState.NONE;
-                waitDialog.dismiss();
+                progressBar.setVisibility(View.GONE);
             }
         });
     }
 
     private void calculateNewMinMaxPoints(LatLng center, LatLngBounds bounds) {
-        // double xMin = center.longitude - (currentMax.longitude - currentMin.longitude) / 2;
-        // double yMin = center.latitude - (currentMax.latitude - currentMin.latitude) / 2;
-        // currentMin = new LatLng(yMin, xMin);
-        //
-        // double xMax = center.longitude + (currentMax.longitude - currentMin.longitude) / 2;
-        // double yMax = center.latitude + (currentMax.latitude - currentMin.latitude) / 2;
-        // currentMax = new LatLng(yMax, xMax);
-
         double xMin = bounds.northeast.longitude;
         double yMin = bounds.northeast.latitude;
         currentMin = new LatLng(yMin, xMin);
@@ -288,7 +287,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         map = googleMap;
         map.setMyLocationEnabled(true);
         map.getUiSettings().setMyLocationButtonEnabled(true);
-        // map.getUiSettings().setCompassEnabled(true);
         map.getUiSettings().setZoomControlsEnabled(true);
         map.getUiSettings().setMapToolbarEnabled(false);
         map.setOnMapClickListener(this);
@@ -300,7 +298,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private void moveCameraToLocation(Location location) {
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(location.getLatitude(), location.getLongitude()), lastZoomLevel));
+                new LatLng(location.getLatitude(), location.getLongitude()), 15));
     }
 
     private void moveCameraToBound(List<LatLng> latLngs, boolean animate) {
@@ -313,7 +311,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         LatLngBounds bounds = builder.build();
 
         if (animate) {
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), lastZoomLevel),
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), currentZoomLevel),
                     new GoogleMap.CancelableCallback() {
                         @Override
                         public void onFinish() {
@@ -322,7 +320,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                                 public void run() {
                                     isForceMoveMap = false;
                                 }
-                            }, 1000);
+                            }, 2000);
                         }
 
                         @Override
@@ -332,11 +330,11 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                                 public void run() {
                                     isForceMoveMap = false;
                                 }
-                            }, 1000);
+                            }, 2000);
                         }
                     });
         } else {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), lastZoomLevel));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), currentZoomLevel));
             isForceMoveMap = false;
         }
     }
@@ -351,10 +349,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onLocationChanged(Location location) {
-        if (currentLocation == null) {
-            currentLocation = location;
-            moveCameraToLocation(location);
-        }
+        // if (currentLocation == null) {
+        // // moveCameraToLocation(location);
+        // }
         // currentLocation = location;
     }
 
@@ -509,8 +506,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     float limitX, limitY;
 
-    private float lastZoomLevel = 14;
-
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
         // if (currentLocation == null) {
@@ -520,12 +515,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         // return;
         // }
 
-        if (currentLocation != null
-                && !isTouchingMap
+        if (!isTouchingMap
                 && !isForceMoveMap
-                && (checkDragDistanceValid(cameraPosition.target) || lastZoomLevel != cameraPosition.zoom)) {
-            lastZoomLevel = cameraPosition.zoom;
-
+                && (checkDragDistanceValid(cameraPosition.target) || cameraPosition.zoom != currentZoomLevel)) {
             LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
 
             currentLocation = new Location("manual");

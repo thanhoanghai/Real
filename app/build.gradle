@@ -39,4 +39,5 @@ dependencies {
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.viewpagerindicator:library:2.4.1'
     compile 'io.reactivex:rxandroid:1.0.1'
+    compile 'com.facebook.fresco:fresco:0.6.1'
 }

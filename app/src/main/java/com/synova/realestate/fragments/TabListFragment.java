@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.synova.realestate.R;
@@ -48,10 +49,14 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
 
     private static final int PAGE_LIMIT = 49;
 
+    private ProgressBar progressBar;
+
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_tab_list, container, false);
+
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
 
         sortBar = (SortBar) rootView.findViewById(R.id.tab_list_sortBar);
         sortBar.setOnSortBarItemSelectedListener(this);
@@ -145,6 +150,7 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
 
     private void loadMore() {
         loadingState = Constants.ListLoadingState.LOAD_MORE;
+        progressBar.setVisibility(View.VISIBLE);
 
         AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
         adsInfoEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
@@ -156,12 +162,14 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
 
                 toggleSwipeRefreshLayout(false);
                 loadingState = Constants.ListLoadingState.NONE;
+                progressBar.setVisibility(View.GONE);
             }
 
             @Override
             public void failure(RetrofitError error) {
                 toggleSwipeRefreshLayout(false);
                 loadingState = Constants.ListLoadingState.NONE;
+                progressBar.setVisibility(View.GONE);
 
                 Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
             }

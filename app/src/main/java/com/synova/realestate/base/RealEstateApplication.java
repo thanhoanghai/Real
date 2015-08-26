@@ -4,6 +4,7 @@ package com.synova.realestate.base;
 import android.app.Application;
 import android.graphics.Bitmap;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -30,6 +31,7 @@ public class RealEstateApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fresco.initialize(this);
         initImageLoader();
         deviceId = Util.getDeviceID(this);
         PrefUtil.init(this);

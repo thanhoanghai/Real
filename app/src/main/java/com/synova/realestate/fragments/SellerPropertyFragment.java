@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.synova.realestate.R;
@@ -46,10 +47,14 @@ public class SellerPropertyFragment extends BaseFragment implements
 
     private static final int PAGE_LIMIT = 49;
 
+    private ProgressBar progressBar;
+
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_seller_property, container, false);
+
+        progressBar = (ProgressBar) rootView.findViewById(R.id.progressBar);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView
                 .findViewById(R.id.seller_property_swipeRefreshLayout);
@@ -145,6 +150,7 @@ public class SellerPropertyFragment extends BaseFragment implements
 
     private void loadMore() {
         loadingState = Constants.ListLoadingState.LOAD_MORE;
+        progressBar.setVisibility(View.VISIBLE);
 
         PublisherPropertyEnt requestEnt = new PublisherPropertyEnt();
         requestEnt.cellPhoneIdI = RealEstateApplication.deviceId;
@@ -175,12 +181,14 @@ public class SellerPropertyFragment extends BaseFragment implements
 
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;
+                        progressBar.setVisibility(View.GONE);
                     }
 
                     @Override
                     public void failure(RetrofitError error) {
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;
+                        progressBar.setVisibility(View.GONE);
 
                         Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
                     }
