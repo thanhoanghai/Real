@@ -1,7 +1,10 @@
 
 package com.synova.realestate.fragments;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.os.Bundle;
@@ -54,9 +57,8 @@ import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
-import retrofit.Callback;
 import retrofit.RetrofitError;
-import retrofit.client.Response;
+import rx.functions.Action1;
 
 /**
  * Created by ducth on 6/16/15.
@@ -165,7 +167,17 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         super.onResume();
 
         if (!Util.isLocationEnabled(activity)) {
-            // DialogUtils.showOpenLocationSettingDialog(activity);
+            new AlertDialog.Builder(activity)
+                    .setTitle("Notice")
+                    .setMessage("Location service not enabled! Do you want to enable?")
+                    .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            Util.openLocationSetting(activity);
+                        }
+                    })
+                    .setNegativeButton("Close", null)
+                    .show();
         }
         if (googleApiClient.isConnected()) {
             startRequestLocationUpdate();
@@ -188,10 +200,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     private void getMap() {
         loadingState = Constants.NetworkLoadingState.LOADING;
 
-        // final ProgressDialog waitDialog = new ProgressDialog(activity);
-        // waitDialog.setMessage("Loading...");
-        // waitDialog.setCancelable(false);
-        // waitDialog.show();
+        final ProgressDialog waitDialog = new ProgressDialog(activity);
+        waitDialog.setMessage("Loading...");
+        waitDialog.setCancelable(false);
+        waitDialog.show();
 
         final MapRequestEnt mapRequestEnt = new MapRequestEnt();
         mapRequestEnt.deviceId = RealEstateApplication.deviceId;
@@ -203,9 +215,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         mapRequestEnt.surfaceMinS = 0 + "";
         mapRequestEnt.surfaceMaxS = 2000 + "";
 
-        NetworkService.getMap(mapRequestEnt, new Callback<List<MapResponseEnt>>() {
+        NetworkService.getMap(mapRequestEnt).subscribe(new Action1<List<MapResponseEnt>>() {
             @Override
-            public void success(List<MapResponseEnt> mapResponseEnts, Response response) {
+            public void call(List<MapResponseEnt> mapResponseEnts) {
                 markers.clear();
                 map.clear();
 
@@ -242,13 +254,13 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 }
 
                 loadingState = Constants.NetworkLoadingState.LOADED;
-                // waitDialog.dismiss();
+                waitDialog.dismiss();
             }
-
+        }, new Action1<Throwable>() {
             @Override
-            public void failure(RetrofitError error) {
+            public void call(Throwable throwable) {
                 loadingState = Constants.NetworkLoadingState.NONE;
-                // waitDialog.dismiss();
+                waitDialog.dismiss();
             }
         });
     }
@@ -288,7 +300,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private void moveCameraToLocation(Location location) {
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(
-                new LatLng(location.getLatitude(), location.getLongitude()), 15));
+                new LatLng(location.getLatitude(), location.getLongitude()), lastZoomLevel));
     }
 
     private void moveCameraToBound(List<LatLng> latLngs, boolean animate) {
@@ -301,7 +313,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         LatLngBounds bounds = builder.build();
 
         if (animate) {
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), 14),
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), lastZoomLevel),
                     new GoogleMap.CancelableCallback() {
                         @Override
                         public void onFinish() {
@@ -324,7 +336,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                         }
                     });
         } else {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), 14));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), lastZoomLevel));
             isForceMoveMap = false;
         }
     }
@@ -343,7 +355,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
             currentLocation = location;
             moveCameraToLocation(location);
         }
-//        currentLocation = location;
+        // currentLocation = location;
     }
 
     @Override
@@ -497,17 +509,23 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     float limitX, limitY;
 
+    private float lastZoomLevel = 14;
+
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-//        if (currentLocation == null) {
-//            currentLocation = new Location("manual");
-//            currentLocation.setLatitude(cameraPosition.target.latitude);
-//            currentLocation.setLongitude(cameraPosition.target.longitude);
-//            return;
-//        }
+        // if (currentLocation == null) {
+        // currentLocation = new Location("manual");
+        // currentLocation.setLatitude(cameraPosition.target.latitude);
+        // currentLocation.setLongitude(cameraPosition.target.longitude);
+        // return;
+        // }
 
-        if (currentLocation != null && !isTouchingMap && !isForceMoveMap
-                && checkDragDistanceValid(cameraPosition.target)) {
+        if (currentLocation != null
+                && !isTouchingMap
+                && !isForceMoveMap
+                && (checkDragDistanceValid(cameraPosition.target) || lastZoomLevel != cameraPosition.zoom)) {
+            lastZoomLevel = cameraPosition.zoom;
+
             LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
 
             currentLocation = new Location("manual");

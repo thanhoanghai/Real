@@ -34,13 +34,13 @@ public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.
     }
 
     public void selectItem(int position) {
-        // if (position == 1) {
-        // checkAll();
-        // } else {
-        // selectedItems.remove(1);
-        selectedItems.add(position);
-        notifyDataSetChanged();
-        // }
+        if (position == 1) {
+            checkAll();
+        } else {
+            selectedItems.remove(1);
+            selectedItems.add(position);
+            notifyDataSetChanged();
+        }
     }
 
     public Set<Integer> getSelectedItems() {
@@ -80,23 +80,23 @@ public class RadioButtonAdapter extends RecyclerView.Adapter<RadioButtonAdapter.
     @Override
     public void onCheckedChanged(CompoundButton v, boolean isChecked) {
         int position = recyclerView.getChildAdapterPosition(v);
-        // if (position == 1) {
-        // if (v.isChecked()) {
-        // checkAll();
-        // } else {
-        // uncheckAll();
-        // }
-        // } else {
-        // selectedItems.remove(1);
-        if (v.isChecked()) {
-            selectedItems.add(position);
-            // if (selectedItems.size() == Constants.PropertyType.values().length - 2) {
-            // checkAll();
-            // }
+        if (position == 1) {
+            if (v.isChecked()) {
+                checkAll();
+            } else {
+                uncheckAll();
+            }
         } else {
-            selectedItems.remove(position);
+            selectedItems.remove(1);
+            if (v.isChecked()) {
+                selectedItems.add(position);
+                if (selectedItems.size() == Constants.PropertyType.values().length - 2) {
+                    checkAll();
+                }
+            } else {
+                selectedItems.remove(position);
+            }
         }
-        // }
         notifyDataSetChanged();
     }
 
