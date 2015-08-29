@@ -17,8 +17,6 @@ import com.synova.realestate.R;
  */
 public class SplashActivity extends Activity {
 
-    private static final String TAG = SplashActivity.class.getSimpleName();
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -27,23 +25,11 @@ public class SplashActivity extends Activity {
         final SimpleDraweeView splashView = (SimpleDraweeView) findViewById(R.id.splashView);
         Uri uri = new Uri.Builder()
                 .scheme(UriUtil.LOCAL_RESOURCE_SCHEME)
-                .path(String.valueOf(R.drawable.splash))
+                .path(String.valueOf(R.drawable.anim_splash))
                 .build();
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setUri(uri)
                 .setAutoPlayAnimations(true)
-                // .setControllerListener(new BaseControllerListener<ImageInfo>() {
-                //
-                // @Override
-                // public void onFinalImageSet(String id, ImageInfo imageInfo,
-                // Animatable animatable) {
-                // super.onFinalImageSet(id, imageInfo, animatable);
-                // if (animatable != null) {
-                // animatable.start();
-                // }
-                //
-                // }
-                // })
                 .build();
         splashView.setController(controller);
 

@@ -88,12 +88,12 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         adsView = (AdsImageView) findViewById(R.id.adsImageView);
         // adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
         adsView.setImageResource(R.drawable.img_ads_banner);
-        adsView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Snackbar.make(adsView, "You've clicked ads banner!", Snackbar.LENGTH_SHORT).show();
-            }
-        });
+//        adsView.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Snackbar.make(adsView, "You've clicked ads banner!", Snackbar.LENGTH_SHORT).show();
+//            }
+//        });
 
         tvTitle = (TextView) findViewById(R.id.detail_tvTitle);
         tvAddress = (TextView) findViewById(R.id.detail_tvAddress);
