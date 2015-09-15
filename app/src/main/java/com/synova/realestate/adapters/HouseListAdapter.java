@@ -1,11 +1,6 @@
 
 package com.synova.realestate.adapters;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -22,10 +17,15 @@ import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.utils.Util;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Created by ducth on 6/13/15.
  */
-public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>implements
+public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
         View.OnClickListener {
 
     private List<AdsInfoResponseEnt> houses = new ArrayList<>();
@@ -59,7 +59,7 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public int getItemCount() {
-        return houses.size() + 1;
+        return houses != null ? houses.size() + 1 : 0;
     }
 
     @Override
@@ -107,9 +107,13 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 HouseListAdapter.HouseViewHolder holder = (HouseViewHolder) h;
 
                 ImageLoader.getInstance().displayImage(house.imageUrl, holder.ivPhoto);
-                int price = Integer.parseInt(house.mminMaxPrice.split("-")[0].replace(" ", ""));
-                holder.tvPrice.setText(price <= Constants.HOUSE_PRICE_LIMIT ? Util
-                        .formatPriceNumber(price) + "€" : "€");
+
+                if (!Util.isNullOrEmpty(house.mminMaxPrice)) {
+                    int price = Integer.parseInt(house.mminMaxPrice.split("-")[0].replace(" ", ""));
+                    holder.tvPrice.setText(price <= Constants.HOUSE_PRICE_LIMIT ? Util
+                            .formatPriceNumber(price) + "€" : "€");
+                }
+
                 holder.tvTitle.setText(house.title);
 
                 String description = String.format(

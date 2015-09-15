@@ -18,7 +18,6 @@ import com.synova.realestate.network.model.PublisherDetailEnt;
 import com.synova.realestate.network.model.PublisherPropertyEnt;
 import com.synova.realestate.network.model.PublisherRequestEnt;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Callback;
@@ -170,7 +169,6 @@ public class NetworkService {
 
     public static void addFavorite(String deviceId, String propertyId,
             final NetworkCallback<Boolean> callback) {
-        deviceId = "1";
         restService.addFavorite(new FavoriteEnt(deviceId, propertyId),
                 new NetworkCallback<Response>() {
                     @Override
@@ -197,7 +195,6 @@ public class NetworkService {
 
     public static void removeFavorite(String deviceId, String propertyId,
             final NetworkCallback<Boolean> callback) {
-        deviceId = "1";
         restService.removeFavorite(new FavoriteEnt(deviceId, propertyId),
                 new NetworkCallback<Response>() {
 
@@ -225,30 +222,21 @@ public class NetworkService {
                 });
     }
 
-    public static void getListFavorite(String deviceId, final NetworkCallback<List<String>> callback) {
-        deviceId = "1";
+    public static void getListFavorite(String deviceId,
+            final NetworkCallback<List<AdsInfoResponseEnt>> callback) {
         restService.getListFavorite(new FavoriteEnt(deviceId, "-1"),
                 new NetworkCallback<JsonElement>() {
-
-                    class GetListFavoriteResult {
-                        String result;
-                    }
 
                     @Override
                     public void onSuccess(JsonElement jsonElement) {
                         if (callback != null) {
                             if (jsonElement != null) {
-                                List<GetListFavoriteResult> listResults = RealEstateApplication.GSON
-                                        .fromJson(
-                                                jsonElement,
-                                                new TypeToken<List<GetListFavoriteResult>>() {
+                                List<AdsInfoResponseEnt> listFavorite = RealEstateApplication.GSON
+                                        .fromJson(jsonElement,
+                                                new TypeToken<List<AdsInfoResponseEnt>>() {
                                                 }.getType());
-                                List<String> publisherIds = new ArrayList<>(listResults.size());
-                                for (GetListFavoriteResult result : listResults) {
-                                    publisherIds.add(result.result);
-                                }
 
-                                callback.onSuccess(publisherIds);
+                                callback.onSuccess(listFavorite);
                             } else {
                                 callback.onFail(new Exception("Fail to get list favorite."));
                             }

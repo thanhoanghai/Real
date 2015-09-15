@@ -24,8 +24,6 @@ import com.synova.realestate.utils.Util;
 
 import java.util.List;
 
-import retrofit.RetrofitError;
-
 /**
  * Created by ducth on 6/12/15.
  */
@@ -68,7 +66,7 @@ public class TabFavoriteFragment extends BaseFragment implements
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (loadingState == Constants.ListLoadingState.NONE
                         && !recyclerView.canScrollVertically(1)) {
-//                    loadMore();
+                    // loadMore();
                 }
 
                 if (dy > 0) {
@@ -118,42 +116,17 @@ public class TabFavoriteFragment extends BaseFragment implements
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
         NetworkService.getListFavorite(RealEstateApplication.deviceId,
-                new NetworkService.NetworkCallback<List<String>>() {
+                new NetworkService.NetworkCallback<List<AdsInfoResponseEnt>>() {
                     @Override
-                    public void onSuccess(List<String> adIds) {
-                        // for (final String adId : adIds) {
-                        // AdEnt adEnt = new AdEnt();
-                        // adEnt.adId = Integer.parseInt(adId);
-                        // NetworkService.getPropertyDetails(adEnt,
-                        // new NetworkService.NetworkCallback<AdsDetailEnt>() {
-                        // @Override
-                        // public void onSuccess(AdsDetailEnt adsDetailEnt) {
-                        // if (adsDetailEnt == null
-                        // || adsDetailEnt.characs == null
-                        // || adsDetailEnt.characs.size() == 0) {
-                        // return;
-                        // }
-                        //
-                        // AdsDetailEnt.AdCharac charac = adsDetailEnt.characs
-                        // .get(0);
-                        // AdsInfoResponseEnt item = new AdsInfoResponseEnt();
-                        // item.id = Integer.parseInt(adId);
-                        // item.imageUrl = (adsDetailEnt.images != null && adsDetailEnt.images
-                        // .size() > 0) ? adsDetailEnt.images.get(0).imagesUrl
-                        // : "";
-                        // item.title = charac.title;
-                        // item.mminMaxPrice = charac.minMaxPrice;
-                        //
-                        // houseAdapter.addItem(item);
-                        // }
-                        // });
-                        // }
+                    public void onSuccess(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
                         toggleSwipeRefreshLayout(false);
+
+                        houseAdapter.setItems(adsInfoResponseEnts);
                         loadingState = Constants.ListLoadingState.NONE;
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
+                    public void onFail(Throwable error) {
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;
 
