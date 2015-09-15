@@ -3,6 +3,7 @@ package com.synova.realestate.network;
 
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.OkHttpClient;
 import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.models.AdsDetailEnt;
 import com.synova.realestate.models.AdsInfoResponseEnt;
@@ -23,6 +24,7 @@ import java.util.List;
 import retrofit.Callback;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
+import retrofit.client.OkClient;
 import retrofit.client.Response;
 import retrofit.converter.GsonConverter;
 import retrofit.http.Body;
@@ -43,6 +45,7 @@ public class NetworkService {
             .setEndpoint(BASE_URL)
             .setConverter(new GsonConverter(RealEstateApplication.GSON))
             .setLogLevel(RestAdapter.LogLevel.FULL)
+            .setClient(new OkClient(new OkHttpClient()))
             .build().create(RestService.class);
 
     public static void getAdsInfo(AdsInfoEnt adsInfoEnt,

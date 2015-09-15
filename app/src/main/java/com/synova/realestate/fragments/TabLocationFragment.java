@@ -107,14 +107,19 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private int currentZoomLevel = 14;
 
+    /** Set true to set my location is in Paris (for testing purpose only) */
+    private boolean isMyLocationParis = true;
+
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_tab_location, container, false);
 
-        currentLocation = new Location("manual");
-        currentLocation.setLatitude(48.864716);
-        currentLocation.setLongitude(2.349014);
+        if (isMyLocationParis) {
+            currentLocation = new Location("manual");
+            currentLocation.setLatitude(48.864716);
+            currentLocation.setLongitude(2.349014);
+        }
 
         setupMap();
         setupGroupDetailBottom();
@@ -349,9 +354,12 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onLocationChanged(Location location) {
-        // if (currentLocation == null) {
-        // // moveCameraToLocation(location);
-        // }
+        if (!isMyLocationParis) {
+            if (currentLocation == null) {
+                currentLocation = location;
+                moveCameraToLocation(location);
+            }
+        }
         // currentLocation = location;
     }
 
@@ -508,14 +516,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        // if (currentLocation == null) {
-        // currentLocation = new Location("manual");
-        // currentLocation.setLatitude(cameraPosition.target.latitude);
-        // currentLocation.setLongitude(cameraPosition.target.longitude);
-        // return;
-        // }
-
-        if (!isTouchingMap
+        if (currentLocation != null
+                && !isTouchingMap
                 && !isForceMoveMap
                 && (checkDragDistanceValid(cameraPosition.target) || cameraPosition.zoom != currentZoomLevel)) {
             LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
