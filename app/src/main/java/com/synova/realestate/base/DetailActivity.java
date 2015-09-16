@@ -3,6 +3,7 @@ package com.synova.realestate.base;
 
 import android.app.ProgressDialog;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
@@ -27,7 +28,6 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
 import com.synova.realestate.adapters.DetailMapInfoWindowAdapter;
 import com.synova.realestate.adapters.DetailSlideShowAdapter;
@@ -87,13 +87,12 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
         adsView = (AdsImageView) findViewById(R.id.adsImageView);
         // adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
-        adsView.setImageResource(R.drawable.img_ads_banner);
-//        adsView.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                Snackbar.make(adsView, "You've clicked ads banner!", Snackbar.LENGTH_SHORT).show();
-//            }
-//        });
+        // adsView.setOnClickListener(new View.OnClickListener() {
+        // @Override
+        // public void onClick(View v) {
+        // Snackbar.make(adsView, "You've clicked ads banner!", Snackbar.LENGTH_SHORT).show();
+        // }
+        // });
 
         tvTitle = (TextView) findViewById(R.id.detail_tvTitle);
         tvAddress = (TextView) findViewById(R.id.detail_tvAddress);
@@ -208,7 +207,10 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
             ViewGroup groupPhone = (ViewGroup) view.findViewById(R.id.detail_seller_groupPhone);
             ViewGroup groupMail = (ViewGroup) view.findViewById(R.id.detail_seller_groupMail);
 
-            ImageLoader.getInstance().displayImage(publisher.logoUrl, ivThumbnail);
+            if (!Util.isNullOrEmpty(publisher.logoUrl)) {
+                ivThumbnail.setImageURI(Uri.parse(publisher.logoUrl));
+            }
+
             tvTitle.setText(publisher.name);
             tvPrice.setText(publisher.price);
             tvPhone.setText(publisher.tel);

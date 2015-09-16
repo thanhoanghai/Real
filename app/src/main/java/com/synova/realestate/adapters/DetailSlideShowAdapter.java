@@ -1,13 +1,14 @@
 
 package com.synova.realestate.adapters;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.synova.realestate.R;
+import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,20 +36,22 @@ public class DetailSlideShowAdapter extends RecyclingPagerAdapter {
                     R.layout.layout_detail_slideshow_item, container, false);
 
             holder = new SlideShowViewHolder();
-            holder.ivPhoto = (ImageView) view.findViewById(R.id.detail_slideShow_ivPhoto);
+            holder.ivPhoto = (SimpleDraweeView) view.findViewById(R.id.detail_slideShow_ivPhoto);
 
             view.setTag(holder);
         } else {
             holder = (SlideShowViewHolder) view.getTag();
         }
 
-        ImageLoader.getInstance().displayImage(photoUrl, holder.ivPhoto);
+        if (!Util.isNullOrEmpty(photoUrl)) {
+            holder.ivPhoto.setImageURI(Uri.parse(photoUrl));
+        }
 
         return view;
     }
 
     private class SlideShowViewHolder {
-        public ImageView ivPhoto;
+        public SimpleDraweeView ivPhoto;
     }
 
 }

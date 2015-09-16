@@ -1,31 +1,31 @@
 
 package com.synova.realestate.adapters;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.utils.Util;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 /**
  * Created by ducth on 6/13/15.
  */
-public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder>implements
+public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements
         View.OnClickListener {
 
     private List<AdsInfoResponseEnt> houses = new ArrayList<>();
@@ -106,7 +106,10 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 AdsInfoResponseEnt house = houses.get(position - 3);
                 HouseViewHolder holder = (HouseViewHolder) h;
 
-                ImageLoader.getInstance().displayImage(house.imageUrl, holder.ivPhoto);
+                if (!Util.isNullOrEmpty(house.imageUrl)) {
+                    holder.ivPhoto.setImageURI(Uri.parse(house.imageUrl));
+                }
+
                 int price = Util.convertMinMaxPriceToPrice(house.mminMaxPrice);
                 holder.tvPrice.setText(price <= Constants.HOUSE_PRICE_LIMIT ? Util
                         .formatPriceNumber(price) + "€" : "€");
@@ -149,7 +152,7 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     static class HouseViewHolder extends RecyclerView.ViewHolder {
 
         public ViewGroup containerView;
-        public ImageView ivPhoto;
+        public SimpleDraweeView ivPhoto;
         public TextView tvPrice;
         public TextView tvTitle;
         public TextView tvDescription;
@@ -157,7 +160,7 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         public HouseViewHolder(View itemView) {
             super(itemView);
             containerView = (ViewGroup) itemView.findViewById(R.id.grid_item_container);
-            ivPhoto = (ImageView) itemView.findViewById(R.id.grid_item_ivPhoto);
+            ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.grid_item_ivPhoto);
             tvPrice = (TextView) itemView.findViewById(R.id.grid_item_tvPrice);
             tvTitle = (TextView) itemView.findViewById(R.id.grid_item_tvTitle);
             tvDescription = (TextView) itemView.findViewById(R.id.grid_item_tvDescription);

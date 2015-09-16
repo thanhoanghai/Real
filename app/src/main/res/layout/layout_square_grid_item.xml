@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.synova.realestate.customviews.SquareRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:fresco="http://schemas.android.com/apk/res-auto"
     android:id="@+id/grid_item_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/selector_grid_item_bg"
     android:padding="4dp">
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/grid_item_ivPhoto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/img_default_grid" />
+        fresco:actualImageScaleType="centerCrop"
+        fresco:placeholderImage="@drawable/img_default_grid"
+        fresco:placeholderImageScaleType="centerCrop" />
 
     <TextView
         android:id="@+id/grid_item_tvPrice"

@@ -38,7 +38,7 @@ import rx.schedulers.Schedulers;
  */
 public class NetworkService {
 
-    public static final String BASE_URL = "http://115.78.234.253:8080/RealEstateWS/service";
+    public static final String BASE_URL = "http://37.187.43.23:8080/RealEstateWS/service";
 
     private static RestService restService = new RestAdapter.Builder()
             .setEndpoint(BASE_URL)

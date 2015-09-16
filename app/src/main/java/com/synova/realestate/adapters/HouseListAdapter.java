@@ -1,16 +1,16 @@
 
 package com.synova.realestate.adapters;
 
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
@@ -106,7 +106,9 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 AdsInfoResponseEnt house = houses.get(position - 1);
                 HouseListAdapter.HouseViewHolder holder = (HouseViewHolder) h;
 
-                ImageLoader.getInstance().displayImage(house.imageUrl, holder.ivPhoto);
+                if (!Util.isNullOrEmpty(house.imageUrl)) {
+                    holder.ivPhoto.setImageURI(Uri.parse(house.imageUrl));
+                }
 
                 if (!Util.isNullOrEmpty(house.mminMaxPrice)) {
                     int price = Integer.parseInt(house.mminMaxPrice.split("-")[0].replace(" ", ""));
@@ -148,7 +150,7 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
     static class HouseViewHolder extends RecyclerView.ViewHolder {
 
         public ViewGroup containerView;
-        public ImageView ivPhoto;
+        public SimpleDraweeView ivPhoto;
         public TextView tvPrice;
         public TextView tvTitle;
         public TextView tvDescription;
@@ -156,7 +158,7 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         public HouseViewHolder(View itemView) {
             super(itemView);
             containerView = (ViewGroup) itemView.findViewById(R.id.list_item_container);
-            ivPhoto = (ImageView) itemView.findViewById(R.id.list_item_ivPhoto);
+            ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.list_item_ivPhoto);
             tvPrice = (TextView) itemView.findViewById(R.id.list_item_tvPrice);
             tvTitle = (TextView) itemView.findViewById(R.id.list_item_tvTitle);
             tvDescription = (TextView) itemView.findViewById(R.id.list_item_tvDescription);

@@ -1,18 +1,19 @@
 
 package com.synova.realestate.adapters;
 
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.nostra13.universalimageloader.core.ImageLoader;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.synova.realestate.R;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.models.Publisher;
+import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,7 +92,10 @@ public class SellerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 Publisher publisher = publishers.get(position);
                 SellerItemViewHolder holder = (SellerItemViewHolder) h;
 
-                ImageLoader.getInstance().displayImage(publisher.logoUrl, holder.ivThumbnail);
+                if (!Util.isNullOrEmpty(publisher.logoUrl)){
+                    holder.ivThumbnail.setImageURI(Uri.parse(publisher.logoUrl));
+                }
+
                 holder.tvTitle.setText(publisher.name);
                 holder.tvAnnonces.setText(publisher.nbAds + " annonces");
                 // holder.tvWebsite.setText(publisher.website);
@@ -115,7 +119,7 @@ public class SellerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     static class SellerItemViewHolder extends RecyclerView.ViewHolder {
 
-        public ImageView ivThumbnail;
+        public SimpleDraweeView ivThumbnail;
         public TextView tvTitle;
         public TextView tvAnnonces;
         public TextView tvWebsite;
@@ -124,7 +128,7 @@ public class SellerListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         public SellerItemViewHolder(View itemView) {
             super(itemView);
-            ivThumbnail = (ImageView) itemView.findViewById(R.id.seller_item_ivThumbnail);
+            ivThumbnail = (SimpleDraweeView) itemView.findViewById(R.id.seller_item_ivThumbnail);
             tvTitle = (TextView) itemView.findViewById(R.id.seller_item_tvTitle);
             tvAnnonces = (TextView) itemView.findViewById(R.id.seller_item_tvAnnonces);
             tvWebsite = (TextView) itemView.findViewById(R.id.seller_item_tvWebsite);

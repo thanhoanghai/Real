@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -37,7 +38,6 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
 import com.synova.realestate.R;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
@@ -421,8 +421,11 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                             groupDetailBottom.setVisibility(View.VISIBLE);
 
                             PublisherDetailEnt detailEnt = detailEnts.get(0);
-                            ImageLoader.getInstance().displayImage(detailEnt.logoUrl,
-                                    ivThumbnail);
+
+                            if (!Util.isNullOrEmpty(detailEnt.logoUrl)){
+                                ivThumbnail.setImageURI(Uri.parse(detailEnt.logoUrl));
+                            }
+
                             tvTitle.setText(detailEnt.name);
                             tvPrice.setText(detailEnt.price);
                             tvDescription.setText(detailEnt.address);
