@@ -16,6 +16,7 @@ import com.synova.realestate.adapters.SellerListAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
+import com.synova.realestate.base.SubscriberImpl;
 import com.synova.realestate.customviews.DividerDecoration;
 import com.synova.realestate.models.Publisher;
 import com.synova.realestate.network.NetworkService;
@@ -23,7 +24,7 @@ import com.synova.realestate.network.model.PublisherRequestEnt;
 
 import java.util.List;
 
-import retrofit.RetrofitError;
+import rx.Subscription;
 
 /**
  * Created by ducth on 6/17/15.
@@ -38,6 +39,7 @@ public class TabSellerFragment extends BaseFragment implements
     private Constants.ListLoadingState loadingState = Constants.ListLoadingState.NONE;
 
     private PublisherRequestEnt publisherRequestEnt;
+    private Subscription subscription;
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -79,6 +81,15 @@ public class TabSellerFragment extends BaseFragment implements
     public void onResume() {
         super.onResume();
         toggleSwipeRefreshLayout(false);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
     }
 
     private void toggleSwipeRefreshLayout(final boolean isRefreshing) {
@@ -125,10 +136,10 @@ public class TabSellerFragment extends BaseFragment implements
         publisherRequestEnt.roomNumberS = "1239";
         publisherRequestEnt.keyWordS = "P";
 
-        NetworkService.getListPublisher(publisherRequestEnt,
-                new NetworkService.NetworkCallback<List<Publisher>>() {
+        subscription = NetworkService.getListPublisher(publisherRequestEnt).subscribe(
+                new SubscriberImpl<List<Publisher>>() {
                     @Override
-                    public void onSuccess(List<Publisher> publishers) {
+                    public void onNext(List<Publisher> publishers) {
                         sellersAdapter.setItems(publishers);
 
                         toggleSwipeRefreshLayout(false);
@@ -136,7 +147,7 @@ public class TabSellerFragment extends BaseFragment implements
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
+                    public void onError(Throwable e) {
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;
 

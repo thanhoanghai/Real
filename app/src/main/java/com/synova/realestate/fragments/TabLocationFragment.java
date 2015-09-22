@@ -43,6 +43,7 @@ import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.RealEstateApplication;
+import com.synova.realestate.base.SubscriberImpl;
 import com.synova.realestate.models.MapResponseEnt;
 import com.synova.realestate.models.eventbus.NavigationItemSelectedEvent;
 import com.synova.realestate.network.NetworkService;
@@ -57,8 +58,7 @@ import java.util.List;
 import java.util.Map;
 
 import de.greenrobot.event.EventBus;
-import retrofit.RetrofitError;
-import rx.functions.Action1;
+import rx.Subscription;
 
 /**
  * Created by ducth on 6/16/15.
@@ -90,7 +90,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private Constants.NetworkLoadingState loadingState = Constants.NetworkLoadingState.NONE;
 
-    private boolean isFirstTimeLoadData = true;
+    private boolean isFirstTimeLoadData = false;
 
     private Map<Constants.ElementType, List<Marker>> markers = new HashMap<>();
 
@@ -109,6 +109,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     /** Set true to set my location is in Paris (for testing purpose only) */
     private boolean isMyLocationParis = true;
+    private Subscription subscription;
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -178,6 +179,15 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
 
@@ -227,54 +237,56 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         mapRequestEnt.surfaceMinS = 0 + "";
         mapRequestEnt.surfaceMaxS = 2000 + "";
 
-        NetworkService.getMap(mapRequestEnt).subscribe(new Action1<List<MapResponseEnt>>() {
-            @Override
-            public void call(List<MapResponseEnt> mapResponseEnts) {
-                markers.clear();
-                map.clear();
+        subscription = NetworkService.getMap(mapRequestEnt)
+                .subscribe(new SubscriberImpl<List<MapResponseEnt>>() {
+                    @Override
+                    public void onNext(List<MapResponseEnt> mapResponseEnts) {
+                        markers.clear();
+                        map.clear();
 
-                if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
-                    List<LatLng> latLngs = new ArrayList<>();
-                    for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
-                        if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
-                                && mapResponseEnt.elementType != null) {
-                            Marker marker = createMarker(mapResponseEnt);
-                            latLngs.add(marker.getPosition());
+                        if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
+                            List<LatLng> latLngs = new ArrayList<>();
+                            for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
+                                if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
+                                        && mapResponseEnt.elementType != null) {
+                                    Marker marker = createMarker(mapResponseEnt);
+                                    latLngs.add(marker.getPosition());
 
-                            List<Marker> elementTypeMarkers = markers
-                                    .get(mapResponseEnt.elementType);
-                            if (elementTypeMarkers == null) {
-                                elementTypeMarkers = new ArrayList<>();
-                                markers.put(mapResponseEnt.elementType, elementTypeMarkers);
+                                    List<Marker> elementTypeMarkers = markers
+                                            .get(mapResponseEnt.elementType);
+                                    if (elementTypeMarkers == null) {
+                                        elementTypeMarkers = new ArrayList<>();
+                                        markers.put(mapResponseEnt.elementType, elementTypeMarkers);
+                                    }
+                                    elementTypeMarkers.add(marker);
+                                }
                             }
-                            elementTypeMarkers.add(marker);
+
+                            if (latLngs.size() > 0) {
+                                for (Constants.ElementType key : MainActivity.markersVisibility
+                                        .keySet()) {
+                                    if (!MainActivity.markersVisibility.get(key)) {
+                                        setMarkersVisible(key, false);
+                                    }
+                                }
+
+                                if (isFirstTimeLoadData) {
+                                    isFirstTimeLoadData = false;
+                                    moveCameraToBound(latLngs, true);
+                                }
+                            }
                         }
+
+                        loadingState = Constants.NetworkLoadingState.LOADED;
+                        progressBar.setVisibility(View.GONE);
                     }
 
-                    if (latLngs.size() > 0) {
-                        for (Constants.ElementType key : MainActivity.markersVisibility.keySet()) {
-                            if (!MainActivity.markersVisibility.get(key)) {
-                                setMarkersVisible(key, false);
-                            }
-                        }
-
-                        if (isFirstTimeLoadData) {
-                            isFirstTimeLoadData = false;
-                            moveCameraToBound(latLngs, true);
-                        }
+                    @Override
+                    public void onError(Throwable e) {
+                        loadingState = Constants.NetworkLoadingState.NONE;
+                        progressBar.setVisibility(View.GONE);
                     }
-                }
-
-                loadingState = Constants.NetworkLoadingState.LOADED;
-                progressBar.setVisibility(View.GONE);
-            }
-        }, new Action1<Throwable>() {
-            @Override
-            public void call(Throwable throwable) {
-                loadingState = Constants.NetworkLoadingState.NONE;
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+                });
     }
 
     private void calculateNewMinMaxPoints(LatLng center, LatLngBounds bounds) {
@@ -413,31 +425,28 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         AdEnt adEnt = new AdEnt();
         adEnt.adId = mapResponseEnt.id;
 
-        NetworkService.getPublisherDetails(adEnt,
-                new NetworkService.NetworkCallback<List<PublisherDetailEnt>>() {
+        subscription = NetworkService.getPublisherDetails(adEnt).subscribe(
+                new SubscriberImpl<List<PublisherDetailEnt>>() {
                     @Override
-                    public void onSuccess(List<PublisherDetailEnt> detailEnts) {
-                        if (detailEnts != null && detailEnts.size() > 0) {
-                            groupDetailBottom.setVisibility(View.VISIBLE);
+                    public void onNext(List<PublisherDetailEnt> publisherDetailEnts) {
+                        groupDetailBottom.setVisibility(View.VISIBLE);
 
-                            PublisherDetailEnt detailEnt = detailEnts.get(0);
+                        PublisherDetailEnt detailEnt = publisherDetailEnts.get(0);
 
-                            if (!Util.isNullOrEmpty(detailEnt.logoUrl)){
-                                ivThumbnail.setImageURI(Uri.parse(detailEnt.logoUrl));
-                            }
-
-                            tvTitle.setText(detailEnt.name);
-                            tvPrice.setText(detailEnt.price);
-                            tvDescription.setText(detailEnt.address);
+                        if (!Util.isNullOrEmpty(detailEnt.logoUrl)) {
+                            ivThumbnail.setImageURI(Uri.parse(detailEnt.logoUrl));
                         }
+
+                        tvTitle.setText(detailEnt.name);
+                        tvPrice.setText(detailEnt.price);
+                        tvDescription.setText(detailEnt.address);
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
+                    public void onError(Throwable e) {
 
                     }
                 });
-
         return true;
     }
 

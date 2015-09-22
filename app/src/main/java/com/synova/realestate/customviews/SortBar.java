@@ -113,34 +113,35 @@ public class SortBar extends FrameLayout implements View.OnClickListener,
                 changeUnselectedItemUI(segmentPrice);
                 changeUnselectedItemUI(segmentDate);
 
-                if (onSortBarItemSelectedListener != null) {
-                    onSortBarItemSelectedListener.onSortBarItemSelected(0, isChecked, checkedId);
-                }
+//                if (onSortBarItemSelectedListener != null) {
+//                    onSortBarItemSelectedListener.onSortBarItemSelected(0, isChecked, checkedId);
+//                }
                 break;
             case R.id.segment_price:
                 changeUnselectedItemUI(segmentDistance);
                 changeSelectedItemUI(segmentPrice, isChecked);
                 changeUnselectedItemUI(segmentDate);
 
-                if (onSortBarItemSelectedListener != null) {
-                    onSortBarItemSelectedListener.onSortBarItemSelected(1, isChecked, checkedId);
-                }
+//                if (onSortBarItemSelectedListener != null) {
+//                    onSortBarItemSelectedListener.onSortBarItemSelected(1, isChecked, checkedId);
+//                }
                 break;
             case R.id.segment_date:
                 changeUnselectedItemUI(segmentDistance);
                 changeUnselectedItemUI(segmentPrice);
                 changeSelectedItemUI(segmentDate, isChecked);
 
-                if (onSortBarItemSelectedListener != null) {
-                    onSortBarItemSelectedListener.onSortBarItemSelected(2, isChecked, checkedId);
-                }
+//                if (onSortBarItemSelectedListener != null) {
+//                    onSortBarItemSelectedListener.onSortBarItemSelected(2, isChecked, checkedId);
+//                }
                 break;
         }
     }
 
     private void changeSelectedItemUI(CompoundButton button, boolean isChecked) {
-        button.setCompoundDrawablesWithIntrinsicBounds(0, 0, isChecked ? R.drawable.ico_sort_up
-                : R.drawable.ico_sort_down, 0);
+//        button.setCompoundDrawablesWithIntrinsicBounds(0, 0, isChecked ? R.drawable.ico_sort_up
+//                : R.drawable.ico_sort_down, 0);
+        button.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ico_sort_up, 0);
         button.setTextColor(selectedTextColor);
     }
 

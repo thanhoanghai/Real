@@ -17,6 +17,7 @@ import com.synova.realestate.adapters.HouseListAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
+import com.synova.realestate.base.SubscriberImpl;
 import com.synova.realestate.customviews.SortBar;
 import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.eventbus.ChangeDialogFilterValuesEvent;
@@ -27,9 +28,7 @@ import com.synova.realestate.utils.Util;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
+import rx.Subscription;
 
 /**
  * Created by ducth on 6/12/15.
@@ -50,6 +49,7 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
     private static final int PAGE_LIMIT = 49;
 
     private ProgressBar progressBar;
+    private Subscription subscription;
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -78,7 +78,7 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
                 if (loadingState == Constants.ListLoadingState.NONE
                         && !recyclerView.canScrollVertically(1)) {
-                     loadMore();
+                    loadMore();
                 }
 
                 if (dy > 0) {
@@ -115,6 +115,15 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
         toggleSwipeRefreshLayout(false);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
+    }
+
     private void toggleSwipeRefreshLayout(final boolean isRefreshing) {
         swipeRefreshLayout.post(new Runnable() {
             @Override
@@ -129,23 +138,24 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
 
         AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
         adsInfoEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
-        NetworkService.getAdsInfo(adsInfoEnt, new Callback<List<AdsInfoResponseEnt>>() {
-            @Override
-            public void success(List<AdsInfoResponseEnt> adsInfoResponseEnts, Response response) {
-                houseAdapter.setItems(adsInfoResponseEnts);
+        subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
+                new SubscriberImpl<List<AdsInfoResponseEnt>>() {
+                    @Override
+                    public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
+                        houseAdapter.setItems(adsInfoResponseEnts);
 
-                toggleSwipeRefreshLayout(false);
-                loadingState = Constants.ListLoadingState.NONE;
-            }
+                        toggleSwipeRefreshLayout(false);
+                        loadingState = Constants.ListLoadingState.NONE;
+                    }
 
-            @Override
-            public void failure(RetrofitError error) {
-                toggleSwipeRefreshLayout(false);
-                loadingState = Constants.ListLoadingState.NONE;
+                    @Override
+                    public void onError(Throwable e) {
+                        toggleSwipeRefreshLayout(false);
+                        loadingState = Constants.ListLoadingState.NONE;
 
-                Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
-            }
-        });
+                        Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void loadMore() {
@@ -154,26 +164,27 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
 
         AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
         adsInfoEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
-        NetworkService.getAdsInfo(adsInfoEnt, new Callback<List<AdsInfoResponseEnt>>() {
-            @Override
-            public void success(List<AdsInfoResponseEnt> adsInfoResponseEnts, Response response) {
-                houseAdapter.getItems().addAll(adsInfoResponseEnts);
-                houseAdapter.notifyDataSetChanged();
+        subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
+                new SubscriberImpl<List<AdsInfoResponseEnt>>() {
+                    @Override
+                    public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
+                        houseAdapter.getItems().addAll(adsInfoResponseEnts);
+                        houseAdapter.notifyDataSetChanged();
 
-                toggleSwipeRefreshLayout(false);
-                loadingState = Constants.ListLoadingState.NONE;
-                progressBar.setVisibility(View.GONE);
-            }
+                        toggleSwipeRefreshLayout(false);
+                        loadingState = Constants.ListLoadingState.NONE;
+                        progressBar.setVisibility(View.GONE);
+                    }
 
-            @Override
-            public void failure(RetrofitError error) {
-                toggleSwipeRefreshLayout(false);
-                loadingState = Constants.ListLoadingState.NONE;
-                progressBar.setVisibility(View.GONE);
+                    @Override
+                    public void onError(Throwable e) {
+                        toggleSwipeRefreshLayout(false);
+                        loadingState = Constants.ListLoadingState.NONE;
+                        progressBar.setVisibility(View.GONE);
 
-                Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
-            }
-        });
+                        Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override

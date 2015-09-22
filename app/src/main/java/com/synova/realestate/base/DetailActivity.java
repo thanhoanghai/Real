@@ -48,7 +48,9 @@ import java.util.List;
 import java.util.Random;
 
 import cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager;
-import retrofit.RetrofitError;
+import rx.Observable;
+import rx.Subscription;
+import rx.functions.Func2;
 
 /**
  * Created by ducth on 6/17/15.
@@ -78,6 +80,8 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
     private AdsDetailEnt adsDetailEnt;
 
+    private Subscription subscription;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -104,6 +108,15 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         setupDataList();
 
         getDetail();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
     }
 
     private void setupActionBar() {
@@ -231,57 +244,60 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
         final AdEnt adEnt = new AdEnt();
         adEnt.adId = adId;
-        NetworkService.getPublisherDetails(adEnt,
-                new NetworkService.NetworkCallback<List<PublisherDetailEnt>>() {
+        subscription = Observable.zip(NetworkService.getPublisherDetails(adEnt),
+                NetworkService.getPropertyDetails(adEnt),
+                new Func2<List<PublisherDetailEnt>, AdsDetailEnt, Object[]>() {
                     @Override
-                    public void onSuccess(List<PublisherDetailEnt> publisherDetailEnts) {
-                        addSellerList(publisherDetailEnts);
-
-                        NetworkService.getPropertyDetails(adEnt,
-                                new NetworkService.NetworkCallback<AdsDetailEnt>() {
-                                    @Override
-                                    public void onSuccess(AdsDetailEnt adsDetailEnt) {
-                                        waitDialog.dismiss();
-
-                                        DetailActivity.this.adsDetailEnt = adsDetailEnt;
-
-                                        if (adsDetailEnt == null) {
-                                            return;
-                                        }
-
-                                        List<String> images = new ArrayList<>(adsDetailEnt.images
-                                                .size());
-                                        for (AdsDetailEnt.AdImage image : adsDetailEnt.images) {
-                                            images.add(image.imagesUrl);
-                                        }
-                                        slideShowAdapter.setData(images);
-                                        onPageSelected(0);
-
-                                        AdsDetailEnt.AdCharac adCharac = adsDetailEnt.characs
-                                                .get(0);
-                                        tvTitle.setText(adCharac.title);
-                                        tvPrice.setText(adCharac.minMaxPrice);
-                                        tvAddress.setText(adCharac.detailCharac);
-
-                                        LatLng latLng = Util
-                                                .convertPointGeomToLatLng(adCharac.localisation);
-                                        if (map != null) {
-                                            createMarker(latLng.latitude, latLng.longitude,
-                                                    adCharac.title);
-                                            moveCameraToLocation(latLng);
-                                        }
-
-                                    }
-
-                                    @Override
-                                    public void onFail(Throwable error) {
-                                        waitDialog.dismiss();
-                                        Toast.makeText(DetailActivity.this, "Fail to load details",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                    public Object[] call(List<PublisherDetailEnt> publisherDetailEnts,
+                            AdsDetailEnt adsDetailEnt) {
+                        Object[] objects = new Object[2];
+                        objects[0] = publisherDetailEnts;
+                        objects[1] = adsDetailEnt;
+                        return objects;
                     }
-                });
+                }).subscribe(new SubscriberImpl<Object[]>() {
+            @Override
+            public void onNext(Object[] objects) {
+                addSellerList((List<PublisherDetailEnt>) objects[0]);
+
+                waitDialog.dismiss();
+
+                DetailActivity.this.adsDetailEnt = (AdsDetailEnt) objects[1];
+
+                if (adsDetailEnt == null) {
+                    return;
+                }
+
+                List<String> images = new ArrayList<>(adsDetailEnt.images
+                        .size());
+                for (AdsDetailEnt.AdImage image : adsDetailEnt.images) {
+                    images.add(image.imagesUrl);
+                }
+                slideShowAdapter.setData(images);
+                onPageSelected(0);
+
+                AdsDetailEnt.AdCharac adCharac = adsDetailEnt.characs
+                        .get(0);
+                tvTitle.setText(adCharac.title);
+                tvPrice.setText(adCharac.minMaxPrice);
+                tvAddress.setText(adCharac.detailCharac);
+
+                LatLng latLng = Util
+                        .convertPointGeomToLatLng(adCharac.localisation);
+                if (map != null) {
+                    createMarker(latLng.latitude, latLng.longitude,
+                            adCharac.title);
+                    moveCameraToLocation(latLng);
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                waitDialog.dismiss();
+                Toast.makeText(DetailActivity.this, "Fail to load details",
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -357,26 +373,24 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                     final ProgressDialog waitDialog = DialogUtils.showWaitDialog(this, false);
 
                     if (adsDetailEnt.characs.get(0).isFavorite) {
-                        NetworkService.removeFavorite(RealEstateApplication.deviceId, "" + adId,
-                                new NetworkService.NetworkCallback<Boolean>() {
+                        subscription = NetworkService.removeFavorite("" + adId).subscribe(
+                                new SubscriberImpl<Boolean>() {
                                     @Override
-                                    public void onSuccess(Boolean isSuccess) {
+                                    public void onNext(Boolean isSuccess) {
                                         waitDialog.dismiss();
 
-                                        adsDetailEnt.characs.get(0).isFavorite = false;
-                                        invalidateOptionsMenu();
+                                        if (isSuccess) {
+                                            adsDetailEnt.characs.get(0).isFavorite = false;
+                                            invalidateOptionsMenu();
+                                        } else {
+                                            Toast.makeText(DetailActivity.this,
+                                                    "Remove favorite fail.",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
                                     }
 
                                     @Override
-                                    public void onFail(Throwable error) {
-                                        waitDialog.dismiss();
-                                        Toast.makeText(DetailActivity.this,
-                                                "Remove favorite fail.",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-
-                                    @Override
-                                    public void failure(RetrofitError error) {
+                                    public void onError(Throwable e) {
                                         waitDialog.dismiss();
                                         Toast.makeText(DetailActivity.this,
                                                 "Remove favorite fail.",
@@ -384,26 +398,24 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                                     }
                                 });
                     } else {
-                        NetworkService.addFavorite(RealEstateApplication.deviceId, "" + adId,
-                                new NetworkService.NetworkCallback<Boolean>() {
+                        subscription = NetworkService.addFavorite("" + adId).subscribe(
+                                new SubscriberImpl<Boolean>() {
                                     @Override
-                                    public void onSuccess(Boolean isSuccess) {
+                                    public void onNext(Boolean isSuccess) {
                                         waitDialog.dismiss();
 
-                                        adsDetailEnt.characs.get(0).isFavorite = true;
-                                        invalidateOptionsMenu();
+                                        if (isSuccess) {
+                                            adsDetailEnt.characs.get(0).isFavorite = true;
+                                            invalidateOptionsMenu();
+                                        } else {
+                                            Toast.makeText(DetailActivity.this,
+                                                    "Add to favorite fail.",
+                                                    Toast.LENGTH_SHORT).show();
+                                        }
                                     }
 
                                     @Override
-                                    public void onFail(Throwable error) {
-                                        waitDialog.dismiss();
-                                        Toast.makeText(DetailActivity.this,
-                                                "Add to favorite fail.",
-                                                Toast.LENGTH_SHORT).show();
-                                    }
-
-                                    @Override
-                                    public void failure(RetrofitError error) {
+                                    public void onError(Throwable e) {
                                         waitDialog.dismiss();
                                         Toast.makeText(DetailActivity.this,
                                                 "Add to favorite fail.",

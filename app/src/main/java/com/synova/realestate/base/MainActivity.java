@@ -78,7 +78,9 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnCheck
             @Override
             public void onPageSelected(int position) {
                 BaseFragment baseFragment = pagerAdapter.getPageAtIndex(position);
-                baseFragment.onPageSelected(position);
+                if (baseFragment != null){
+                    baseFragment.onPageSelected(position);
+                }
             }
 
             @Override

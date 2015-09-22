@@ -16,13 +16,15 @@ import com.synova.realestate.adapters.HouseListAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
-import com.synova.realestate.base.RealEstateApplication;
+import com.synova.realestate.base.SubscriberImpl;
 import com.synova.realestate.customviews.SortBar;
 import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.utils.Util;
 
 import java.util.List;
+
+import rx.Subscription;
 
 /**
  * Created by ducth on 6/12/15.
@@ -40,6 +42,7 @@ public class TabFavoriteFragment extends BaseFragment implements
     private HouseListAdapter houseAdapter;
 
     private Constants.ListLoadingState loadingState = Constants.ListLoadingState.NONE;
+    private Subscription subscription;
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -103,6 +106,15 @@ public class TabFavoriteFragment extends BaseFragment implements
         toggleSwipeRefreshLayout(false);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
+    }
+
     private void toggleSwipeRefreshLayout(final boolean isRefreshing) {
         swipeRefreshLayout.post(new Runnable() {
             @Override
@@ -115,24 +127,23 @@ public class TabFavoriteFragment extends BaseFragment implements
     private void loadNewData() {
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
-        NetworkService.getListFavorite(RealEstateApplication.deviceId,
-                new NetworkService.NetworkCallback<List<AdsInfoResponseEnt>>() {
-                    @Override
-                    public void onSuccess(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
-                        toggleSwipeRefreshLayout(false);
+        subscription = NetworkService.getListFavorite().subscribe(new SubscriberImpl<List<AdsInfoResponseEnt>>() {
+            @Override
+            public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
+                toggleSwipeRefreshLayout(false);
 
-                        houseAdapter.setItems(adsInfoResponseEnts);
-                        loadingState = Constants.ListLoadingState.NONE;
-                    }
+                houseAdapter.setItems(adsInfoResponseEnts);
+                loadingState = Constants.ListLoadingState.NONE;
+            }
 
-                    @Override
-                    public void onFail(Throwable error) {
-                        toggleSwipeRefreshLayout(false);
-                        loadingState = Constants.ListLoadingState.NONE;
+            @Override
+            public void onError(Throwable e) {
+                toggleSwipeRefreshLayout(false);
+                loadingState = Constants.ListLoadingState.NONE;
 
-                        Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override

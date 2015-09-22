@@ -18,6 +18,7 @@ import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.base.RealEstateApplication;
+import com.synova.realestate.base.SubscriberImpl;
 import com.synova.realestate.models.PublisherPropertyResponseEnt;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.PublisherPropertyEnt;
@@ -25,7 +26,7 @@ import com.synova.realestate.network.model.PublisherRequestEnt;
 
 import java.util.List;
 
-import retrofit.RetrofitError;
+import rx.Subscription;
 
 /**
  * Created by ducth on 7/7/15.
@@ -48,6 +49,8 @@ public class SellerPropertyFragment extends BaseFragment implements
     private static final int PAGE_LIMIT = 49;
 
     private ProgressBar progressBar;
+
+    private Subscription subscription;
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -92,6 +95,15 @@ public class SellerPropertyFragment extends BaseFragment implements
         toggleSwipeRefreshLayout(false);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (subscription != null && !subscription.isUnsubscribed()) {
+            subscription.unsubscribe();
+            subscription = null;
+        }
+    }
+
     public void setPublisherRequestEnt(PublisherRequestEnt publisherRequestEnt) {
         this.publisherRequestEnt = publisherRequestEnt;
     }
@@ -127,19 +139,19 @@ public class SellerPropertyFragment extends BaseFragment implements
         requestEnt.roomNumberS = publisherRequestEnt.roomNumberS;
         requestEnt.keyWordS = publisherRequestEnt.keyWordS;
 
-        NetworkService.getPublisherProperty(requestEnt,
-                new NetworkService.NetworkCallback<List<PublisherPropertyResponseEnt>>() {
+        subscription = NetworkService.getPublisherProperty(requestEnt).subscribe(
+                new SubscriberImpl<List<PublisherPropertyResponseEnt>>() {
                     @Override
-                    public void onSuccess(
-                            List<PublisherPropertyResponseEnt> publisherPropertyResponseEnt) {
-                        houseAdapter.setItems(publisherPropertyResponseEnt);
+                    public void onNext(
+                            List<PublisherPropertyResponseEnt> publisherPropertyResponseEnts) {
+                        houseAdapter.setItems(publisherPropertyResponseEnts);
 
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
+                    public void onError(Throwable e) {
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;
 
@@ -171,10 +183,10 @@ public class SellerPropertyFragment extends BaseFragment implements
         requestEnt.roomNumberS = publisherRequestEnt.roomNumberS;
         requestEnt.keyWordS = publisherRequestEnt.keyWordS;
 
-        NetworkService.getPublisherProperty(requestEnt,
-                new NetworkService.NetworkCallback<List<PublisherPropertyResponseEnt>>() {
+        subscription = NetworkService.getPublisherProperty(requestEnt).subscribe(
+                new SubscriberImpl<List<PublisherPropertyResponseEnt>>() {
                     @Override
-                    public void onSuccess(
+                    public void onNext(
                             List<PublisherPropertyResponseEnt> publisherPropertyResponseEnts) {
                         houseAdapter.getItems().addAll(publisherPropertyResponseEnts);
                         houseAdapter.notifyDataSetChanged();
@@ -185,7 +197,7 @@ public class SellerPropertyFragment extends BaseFragment implements
                     }
 
                     @Override
-                    public void failure(RetrofitError error) {
+                    public void onError(Throwable e) {
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;
                         progressBar.setVisibility(View.GONE);

@@ -3,6 +3,7 @@ package com.synova.realestate.network;
 
 import com.google.gson.JsonElement;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.okhttp.Cache;
 import com.squareup.okhttp.OkHttpClient;
 import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.models.AdsDetailEnt;
@@ -17,10 +18,14 @@ import com.synova.realestate.network.model.MapRequestEnt;
 import com.synova.realestate.network.model.PublisherDetailEnt;
 import com.synova.realestate.network.model.PublisherPropertyEnt;
 import com.synova.realestate.network.model.PublisherRequestEnt;
+import com.synova.realestate.utils.LogUtil;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Callback;
+import retrofit.ErrorHandler;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.OkClient;
@@ -31,6 +36,7 @@ import retrofit.http.POST;
 import retrofit.mime.TypedByteArray;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -38,251 +44,199 @@ import rx.schedulers.Schedulers;
  */
 public class NetworkService {
 
+    private static final String TAG = NetworkService.class.getSimpleName();
+
     public static final String BASE_URL = "http://37.187.43.23:8080/RealEstateWS/service";
 
-    private static RestService restService = new RestAdapter.Builder()
-            .setEndpoint(BASE_URL)
-            .setConverter(new GsonConverter(RealEstateApplication.GSON))
-            .setLogLevel(RestAdapter.LogLevel.FULL)
-            .setClient(new OkClient(new OkHttpClient()))
-            .build().create(RestService.class);
-
-    public static void getAdsInfo(AdsInfoEnt adsInfoEnt,
-            final Callback<List<AdsInfoResponseEnt>> callback) {
-        restService.getAdsInfo(adsInfoEnt, new Callback<JsonElement>() {
-
-            @Override
-            public void success(JsonElement jsonElement, Response response) {
-                List<AdsInfoResponseEnt> result = RealEstateApplication.GSON.fromJson(jsonElement,
-                        new TypeToken<List<AdsInfoResponseEnt>>() {
-                        }.getType());
-                if (callback != null) {
-                    callback.success(result, response);
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if (callback != null) {
-                    callback.failure(error);
-                }
-            }
-        });
-    }
-
-    public static Observable<List<MapResponseEnt>> getMap(final MapRequestEnt mapRequestEnt) {
-        return restService.getMap(mapRequestEnt).subscribeOn(Schedulers.newThread())
-                .observeOn(AndroidSchedulers.mainThread());
-    }
-
-    public static void getPropertyDetails(AdEnt adEnt, final NetworkCallback<AdsDetailEnt> callback) {
-        restService.getPropertyDetail(adEnt, new NetworkCallback<JsonElement>() {
-            @Override
-            public void onSuccess(JsonElement jsonElement) {
-                if (callback != null) {
-                    if (jsonElement != null) {
-                        AdsDetailEnt adsDetailEnt = RealEstateApplication.GSON.fromJson(
-                                jsonElement, AdsDetailEnt.class);
-                        callback.onSuccess(adsDetailEnt);
-                    } else {
-                        callback.onFail(new Exception("Fail to get Ads details."));
-                    }
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if (callback != null) {
-                    callback.failure(error);
-                }
-            }
-        });
-    }
-
-    public static void getListPublisher(PublisherRequestEnt publisherRequestEnt,
-            final NetworkCallback<List<Publisher>> callback) {
-        restService.getListPublisher(publisherRequestEnt, new NetworkCallback<JsonElement>() {
-            @Override
-            public void onSuccess(JsonElement jsonElement) {
-                List<Publisher> publishers = RealEstateApplication.GSON.fromJson(jsonElement,
-                        new TypeToken<List<Publisher>>() {
-                        }.getType());
-                if (callback != null) {
-                    callback.onSuccess(publishers);
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if (callback != null) {
-                    callback.failure(error);
-                }
-            }
-        });
-    }
-
-    public static void getPublisherProperty(PublisherPropertyEnt publisherPropertyEnt,
-            final NetworkCallback<List<PublisherPropertyResponseEnt>> callback) {
-        restService.getPublisherProperty(publisherPropertyEnt, new NetworkCallback<JsonElement>() {
-            @Override
-            public void onSuccess(JsonElement jsonElement) {
-                List<PublisherPropertyResponseEnt> publisherPropertyResponseEnts = RealEstateApplication.GSON
-                        .fromJson(jsonElement, new TypeToken<List<PublisherPropertyResponseEnt>>() {
-                        }.getType());
-                if (callback != null) {
-                    callback.onSuccess(publisherPropertyResponseEnts);
-                }
-
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if (callback != null) {
-                    callback.failure(error);
-                }
-            }
-        });
-    }
-
-    public static void getPublisherDetails(AdEnt adEnt,
-            final NetworkCallback<List<PublisherDetailEnt>> callback) {
-        restService.getPublisherDetails(adEnt, new NetworkCallback<JsonElement>() {
-            @Override
-            public void onSuccess(JsonElement jsonElement) {
-                List<PublisherDetailEnt> detailEnts = RealEstateApplication.GSON.fromJson(
-                        jsonElement,
-                        new TypeToken<List<PublisherDetailEnt>>() {
-                        }.getType());
-                if (callback != null) {
-                    callback.onSuccess(detailEnts);
-                }
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                if (callback != null) {
-                    callback.failure(error);
-                }
-            }
-        });
-    }
-
-    public static void addFavorite(String deviceId, String propertyId,
-            final NetworkCallback<Boolean> callback) {
-        restService.addFavorite(new FavoriteEnt(deviceId, propertyId),
-                new NetworkCallback<Response>() {
-                    @Override
-                    public void onSuccess(Response response) {
-                        if (callback != null) {
-                            String responseString = new String(
-                                    ((TypedByteArray) response.getBody()).getBytes());
-                            if (responseString.contains("success")) {
-                                callback.onSuccess(true);
-                            } else {
-                                callback.onFail(new Exception("Fail to add favorite."));
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        if (callback != null) {
-                            callback.failure(error);
-                        }
-                    }
-                });
-    }
-
-    public static void removeFavorite(String deviceId, String propertyId,
-            final NetworkCallback<Boolean> callback) {
-        restService.removeFavorite(new FavoriteEnt(deviceId, propertyId),
-                new NetworkCallback<Response>() {
-
-                    @Override
-                    public void onSuccess(Response response) {
-                        if (callback != null) {
-                            if (callback != null) {
-                                String responseString = new String(
-                                        ((TypedByteArray) response.getBody()).getBytes());
-                                if (responseString.contains("success")) {
-                                    callback.onSuccess(true);
-                                } else {
-                                    callback.onFail(new Exception("Fail to remove favorite."));
-                                }
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        if (callback != null) {
-                            callback.failure(error);
-                        }
-                    }
-                });
-    }
-
-    public static void getListFavorite(String deviceId,
-            final NetworkCallback<List<AdsInfoResponseEnt>> callback) {
-        restService.getListFavorite(new FavoriteEnt(deviceId, "-1"),
-                new NetworkCallback<JsonElement>() {
-
-                    @Override
-                    public void onSuccess(JsonElement jsonElement) {
-                        if (callback != null) {
-                            if (jsonElement != null) {
-                                List<AdsInfoResponseEnt> listFavorite = RealEstateApplication.GSON
-                                        .fromJson(jsonElement,
-                                                new TypeToken<List<AdsInfoResponseEnt>>() {
-                                                }.getType());
-
-                                callback.onSuccess(listFavorite);
-                            } else {
-                                callback.onFail(new Exception("Fail to get list favorite."));
-                            }
-                        }
-                    }
-
-                    @Override
-                    public void failure(RetrofitError error) {
-                        if (callback != null) {
-                            callback.onFail(error);
-                        }
-                    }
-                });
-    }
-
     private interface RestService {
-
         @POST("/property/getAdsInfo")
-        void getAdsInfo(@Body AdsInfoEnt adsInfoEnt, Callback<JsonElement> callback);
+        Observable<JsonElement> getAdsInfo(@Body AdsInfoEnt adsInfoEnt);
 
         @POST("/property/getDetails")
-        void getPropertyDetail(@Body AdEnt adEnt, NetworkCallback<JsonElement> callback);
+        Observable<JsonElement> getPropertyDetail(@Body AdEnt adEnt);
 
         @POST("/property/getMap")
         Observable<List<MapResponseEnt>> getMap(@Body MapRequestEnt mapRequestEnt);
 
         @POST("/publisher/getList")
-        void getListPublisher(@Body PublisherRequestEnt publisherRequestEnt,
-                NetworkCallback<JsonElement> callback);
+        Observable<JsonElement> getListPublisher(@Body PublisherRequestEnt publisherRequestEnt);
 
         @POST("/publisher/getDetails")
-        void getPublisherDetails(@Body AdEnt adEnt, NetworkCallback<JsonElement> callback);
+        Observable<JsonElement> getPublisherDetails(@Body AdEnt adEnt);
 
         @POST("/publisher/getProperty")
-        void getPublisherProperty(@Body PublisherPropertyEnt publisherPropertyEnt,
-                NetworkCallback<JsonElement> callback);
+        Observable<JsonElement> getPublisherProperty(@Body PublisherPropertyEnt publisherPropertyEnt);
 
         @POST("/favorite/addFavorite")
-        void addFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<Response> callback);
+        Observable<Response> addFavorite(@Body FavoriteEnt favoriteEnt);
 
         @POST("/favorite/removeFavorite")
-        void removeFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<Response> callback);
+        Observable<Response> removeFavorite(@Body FavoriteEnt favoriteEnt);
 
         @POST("/favorite/getList")
-        void getListFavorite(@Body FavoriteEnt favoriteEnt, NetworkCallback<JsonElement> callback);
+        Observable<JsonElement> getListFavorite(@Body FavoriteEnt favoriteEnt);
 
+    }
+
+    private static RestService restService = new RestAdapter.Builder()
+            .setEndpoint(BASE_URL)
+            .setConverter(new GsonConverter(RealEstateApplication.GSON))
+            .setLogLevel(RestAdapter.LogLevel.FULL)
+            .setClient(
+                    new OkClient(new OkHttpClient().setCache(new Cache(new File(System
+                            .getProperty("java.io.tmpdir"), "okhttp-cache"), 10L * 1024 * 1024))))
+            .setErrorHandler(new ErrorHandler() {
+                @Override
+                public Throwable handleError(RetrofitError cause) {
+                    LogUtil.e(TAG, cause);
+                    return null;
+                }
+            })
+            .build().create(RestService.class);
+
+    public static Observable<List<AdsInfoResponseEnt>> getAdsInfo(AdsInfoEnt adsInfoEnt) {
+        return request(restService.getAdsInfo(adsInfoEnt)).flatMap(
+                new Func1<JsonElement, Observable<List<AdsInfoResponseEnt>>>() {
+                    @Override
+                    public Observable<List<AdsInfoResponseEnt>> call(JsonElement jsonElement) {
+                        List<AdsInfoResponseEnt> result = RealEstateApplication.GSON.fromJson(
+                                jsonElement,
+                                new TypeToken<List<AdsInfoResponseEnt>>() {
+                                }.getType());
+                        if (result == null) {
+                            result = new ArrayList<>();
+                        }
+                        return Observable.just(result);
+                    }
+                });
+    }
+
+    public static Observable<List<MapResponseEnt>> getMap(final MapRequestEnt mapRequestEnt) {
+        return request(restService.getMap(mapRequestEnt));
+    }
+
+    public static Observable<AdsDetailEnt> getPropertyDetails(AdEnt adEnt) {
+        return request(restService.getPropertyDetail(adEnt)).flatMap(
+                new Func1<JsonElement, Observable<AdsDetailEnt>>() {
+                    @Override
+                    public Observable<AdsDetailEnt> call(JsonElement jsonElement) {
+                        AdsDetailEnt adsDetailEnt = RealEstateApplication.GSON.fromJson(
+                                jsonElement, AdsDetailEnt.class);
+                        if (adsDetailEnt == null) {
+                            adsDetailEnt = new AdsDetailEnt();
+                        }
+                        return Observable.just(adsDetailEnt);
+                    }
+                });
+    }
+
+    public static Observable<List<Publisher>> getListPublisher(
+            PublisherRequestEnt publisherRequestEnt) {
+        return request(restService.getListPublisher(publisherRequestEnt)).flatMap(
+                new Func1<JsonElement, Observable<List<Publisher>>>() {
+                    @Override
+                    public Observable<List<Publisher>> call(JsonElement jsonElement) {
+                        List<Publisher> publishers = RealEstateApplication.GSON.fromJson(
+                                jsonElement,
+                                new TypeToken<List<Publisher>>() {
+                                }.getType());
+                        if (publishers == null) {
+                            publishers = new ArrayList<>();
+                        }
+                        return Observable.just(publishers);
+                    }
+                });
+    }
+
+    public static Observable<List<PublisherPropertyResponseEnt>> getPublisherProperty(
+            PublisherPropertyEnt publisherPropertyEnt) {
+        return request(restService.getPublisherProperty(publisherPropertyEnt)).flatMap(
+                new Func1<JsonElement, Observable<List<PublisherPropertyResponseEnt>>>() {
+                    @Override
+                    public Observable<List<PublisherPropertyResponseEnt>> call(
+                            JsonElement jsonElement) {
+                        List<PublisherPropertyResponseEnt> publisherPropertyResponseEnts = RealEstateApplication.GSON
+                                .fromJson(jsonElement,
+                                        new TypeToken<List<PublisherPropertyResponseEnt>>() {
+                                        }.getType());
+                        if (publisherPropertyResponseEnts == null) {
+                            publisherPropertyResponseEnts = new ArrayList<>();
+                        }
+                        return Observable.just(publisherPropertyResponseEnts);
+                    }
+                });
+    }
+
+    public static Observable<List<PublisherDetailEnt>> getPublisherDetails(AdEnt adEnt) {
+        return request(restService.getPublisherDetails(adEnt)).flatMap(
+                new Func1<JsonElement, Observable<List<PublisherDetailEnt>>>() {
+                    @Override
+                    public Observable<List<PublisherDetailEnt>> call(JsonElement jsonElement) {
+                        List<PublisherDetailEnt> detailEnts = RealEstateApplication.GSON.fromJson(
+                                jsonElement,
+                                new TypeToken<List<PublisherDetailEnt>>() {
+                                }.getType());
+                        if (detailEnts == null) {
+                            detailEnts = new ArrayList<>();
+                        }
+                        return Observable.just(detailEnts);
+                    }
+                });
+    }
+
+    public static Observable<Boolean> addFavorite(String propertyId) {
+        return request(
+                restService
+                        .addFavorite(new FavoriteEnt(RealEstateApplication.deviceId, propertyId)))
+                .flatMap(
+                        new Func1<Response, Observable<Boolean>>() {
+                            @Override
+                            public Observable<Boolean> call(Response response) {
+                                String responseString = new String(
+                                        ((TypedByteArray) response.getBody()).getBytes());
+
+                                return Observable.just(responseString.contains("success"));
+                            }
+                        });
+    }
+
+    public static Observable<Boolean> removeFavorite(String propertyId) {
+        return request(
+                restService.removeFavorite(new FavoriteEnt(RealEstateApplication.deviceId,
+                        propertyId))).flatMap(
+                new Func1<Response, Observable<Boolean>>() {
+                    @Override
+                    public Observable<Boolean> call(Response response) {
+                        String responseString = new String(
+                                ((TypedByteArray) response.getBody()).getBytes());
+
+                        return Observable.just(responseString.contains("success"));
+                    }
+                });
+    }
+
+    public static Observable<List<AdsInfoResponseEnt>> getListFavorite() {
+        return request(
+                restService.getListFavorite(new FavoriteEnt(RealEstateApplication.deviceId, "-1")))
+                .flatMap(
+                        new Func1<JsonElement, Observable<List<AdsInfoResponseEnt>>>() {
+                            @Override
+                            public Observable<List<AdsInfoResponseEnt>> call(JsonElement jsonElement) {
+                                List<AdsInfoResponseEnt> listFavorite = RealEstateApplication.GSON
+                                        .fromJson(jsonElement,
+                                                new TypeToken<List<AdsInfoResponseEnt>>() {
+                                                }.getType());
+                                if (listFavorite == null) {
+                                    listFavorite = new ArrayList<>();
+                                }
+                                return Observable.just(listFavorite);
+                            }
+                        });
+    }
+
+    private static <T> Observable<T> request(Observable<T> observable) {
+        return observable.subscribeOn(Schedulers.newThread()).observeOn(
+                AndroidSchedulers.mainThread());
     }
 
     public static abstract class NetworkCallback<T> implements Callback<T> {
