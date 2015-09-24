@@ -16,6 +16,8 @@ import java.util.List;
  */
 public class PrefUtil {
 
+    private static final String TAG = PrefUtil.class.getSimpleName();
+
     private static final String PREFERENCE_NAME = "RealEstate-Prefs";
     private static final String KEY_ACHAT_LOCATION = "1";
     private static final String KEY_MOTS_CLES = "2";
@@ -58,16 +60,18 @@ public class PrefUtil {
     }
 
     public static List<Constants.PropertyType> getTypeDeBiens() {
-        String json = pref.getString(KEY_TYPE_DE_BIENS, "");
-        if (json.length() == 0) {
-            List<Constants.PropertyType> types = new ArrayList<>();
-            types.add(Constants.PropertyType.ALL);
-            return types;
+        String json = pref.getString(KEY_TYPE_DE_BIENS, "[\"ALL\"]");
+        List<Constants.PropertyType> types;
+        try {
+            types = RealEstateApplication.GSON.fromJson(json,
+                    new TypeToken<List<Constants.PropertyType>>() {
+                    }.getType());
+        } catch (Exception e) {
+            types = new ArrayList<>();
+            LogUtil.e(TAG, e);
         }
 
-        return RealEstateApplication.GSON.fromJson(json,
-                new TypeToken<List<Constants.PropertyType>>() {
-                }.getType());
+        return types;
     }
 
     public static void setDistance(String distance) {
