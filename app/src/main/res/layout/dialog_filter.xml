@@ -161,6 +161,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:orientation="horizontal">
 
                     <TextView
@@ -184,6 +185,7 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:visibility="gone"
                     android:layout_marginTop="5dp"
                     android:orientation="horizontal">
 
@@ -209,6 +211,7 @@
                     android:layout_height="wrap_content"
                     android:max="20"
                     android:maxHeight="8dp"
+                    android:visibility="gone"
                     android:minHeight="8dp"
                     android:progressDrawable="@drawable/selector_seekbar_progress"
                     android:thumb="@drawable/ico_seekbar_thumb" />
@@ -293,7 +296,7 @@
                         android:layout_weight="1"
                         android:gravity="right"
                         android:paddingTop="10dp"
-                        android:text="10 à > 300 m2"
+                        android:text="10 à 300 m2"
                         android:textColor="@color/black"
                         android:textStyle="bold" />
                 </LinearLayout>
@@ -308,7 +311,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="10"
+                        android:text="&lt; 10"
                         android:textColor="@color/text_gray" />
 
                     <TextView
@@ -316,7 +319,7 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:gravity="right"
-                        android:text="300"
+                        android:text="&gt; 300"
                         android:textColor="@color/text_gray" />
                 </LinearLayout>
 

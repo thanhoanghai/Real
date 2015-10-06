@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
@@ -30,6 +31,11 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     private List<AdsInfoResponseEnt> houses = new ArrayList<>();
     private Set<Integer> selectedItems = new HashSet<>();
+    private View.OnClickListener onBtnFavoriteClickListener;
+
+    public void setOnBtnFavoriteClickListener(View.OnClickListener onBtnFavoriteClickListener) {
+        this.onBtnFavoriteClickListener = onBtnFavoriteClickListener;
+    }
 
     private OnRecyclerViewItemClickedListener onItemClickedListener;
 
@@ -84,7 +90,9 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(
                         R.layout.layout_tab_list_item, viewGroup, false);
                 view.setOnClickListener(this);
-                return new HouseViewHolder(view);
+                HouseViewHolder holder = new HouseViewHolder(view);
+                holder.btnFavorite.setOnClickListener(onBtnFavoriteClickListener);
+                return holder;
             case FOOTER:
                 view = LayoutInflater.from(viewGroup.getContext()).inflate(
                         R.layout.layout_footer_load_more, viewGroup, false);
@@ -127,6 +135,9 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
                 holder.containerView.setBackgroundResource(selectedItems.contains(house.id)
                         ? R.drawable.shape_grid_item_pressed_bg : R.drawable.selector_grid_item_bg);
+
+                holder.btnFavorite.setImageResource(house.isFavorite ? R.drawable.ico_star_full
+                        : R.drawable.ico_star_empty);
                 break;
             case FOOTER:
                 break;
@@ -155,6 +166,8 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         public TextView tvTitle;
         public TextView tvDescription;
 
+        public ImageButton btnFavorite;
+
         public HouseViewHolder(View itemView) {
             super(itemView);
             containerView = (ViewGroup) itemView.findViewById(R.id.list_item_container);
@@ -162,6 +175,8 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             tvPrice = (TextView) itemView.findViewById(R.id.list_item_tvPrice);
             tvTitle = (TextView) itemView.findViewById(R.id.list_item_tvTitle);
             tvDescription = (TextView) itemView.findViewById(R.id.list_item_tvDescription);
+
+            btnFavorite = (ImageButton) itemView.findViewById(R.id.list_item_btnFavorite);
         }
     }
 }

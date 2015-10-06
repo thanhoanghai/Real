@@ -15,6 +15,17 @@
         fresco:placeholderImage="@drawable/img_default_grid"
         fresco:placeholderImageScaleType="centerCrop" />
 
+    <ImageButton
+        android:id="@+id/grid_item_btnFavorite"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@color/cyan"
+        android:paddingBottom="5dp"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:paddingTop="5dp"
+        android:src="@drawable/ico_star_empty" />
+
     <TextView
         android:id="@+id/grid_item_tvPrice"
         android:layout_width="wrap_content"

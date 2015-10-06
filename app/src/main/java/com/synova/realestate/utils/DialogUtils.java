@@ -13,7 +13,6 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.RadioGroup;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.facebook.rebound.SimpleSpringListener;
@@ -153,6 +152,8 @@ public class DialogUtils {
         final TextView tvMinPrix = (TextView) dialog.findViewById(R.id.dialog_filter_tvMinPrix);
         final TextView tvMaxPrix = (TextView) dialog.findViewById(R.id.dialog_filter_tvMaxPrix);
 
+        final RangeBar surfaceBar = (RangeBar) dialog.findViewById(R.id.dialog_filter_surfaceBar);
+
         final RadioGroup groupAchatLocation = (RadioGroup) dialog
                 .findViewById(R.id.dialog_filter_groupAchatLocation);
         groupAchatLocation.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -226,31 +227,43 @@ public class DialogUtils {
 
         recyclerView.setMinimumHeight(Util.dpToPx(context, 120));
 
-        final int distanceStep = 100;
-        final TextView tvDistance = (TextView) dialog.findViewById(R.id.dialog_filter_tvDistance);
-        final SeekBar distanceBar = (SeekBar) dialog.findViewById(R.id.dialog_filter_distanceBar);
-        distanceBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                tvDistance.setText((progress * distanceStep) + "m");
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
-        });
-        distanceBar.setProgress(Integer.parseInt(PrefUtil.getDistance()) / distanceStep);
+        // final int distanceStep = 100;
+        // final TextView tvDistance = (TextView)
+        // dialog.findViewById(R.id.dialog_filter_tvDistance);
+        // final SeekBar distanceBar = (SeekBar)
+        // dialog.findViewById(R.id.dialog_filter_distanceBar);
+        // distanceBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+        // @Override
+        // public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        // tvDistance.setText((progress * distanceStep) + "m");
+        // }
+        //
+        // @Override
+        // public void onStartTrackingTouch(SeekBar seekBar) {
+        //
+        // }
+        //
+        // @Override
+        // public void onStopTrackingTouch(SeekBar seekBar) {
+        //
+        // }
+        // });
+        // distanceBar.setProgress(Integer.parseInt(PrefUtil.getDistance()) / distanceStep);
 
         String[] minMaxPrix = PrefUtil.getPrixMinMax().split("-");
-        int minPrixIndex = (Integer.parseInt(minMaxPrix[0]) - prixData.minPrixValue)
+        int divider = PrefUtil.getAchatLocation() == Constants.AchatLocation.ACHAT ? 1000 : 1;
+
+        if (minMaxPrix[0].trim().length() == 0) {
+            minMaxPrix[0] = "" + (prixData.minPrixValue * divider);
+        }
+
+        if (minMaxPrix[1].trim().length() == 0) {
+            minMaxPrix[1] = "" + (prixData.maxPrixValue * divider);
+        }
+
+        int minPrixIndex = (Integer.parseInt(minMaxPrix[0]) / divider - prixData.minPrixValue)
                 / prixData.prixStep;
-        final int maxPrixIndex = (Integer.parseInt(minMaxPrix[1]) - prixData.minPrixValue)
+        final int maxPrixIndex = (Integer.parseInt(minMaxPrix[1]) / divider - prixData.minPrixValue)
                 / prixData.prixStep;
 
         final TextView tvPrice = (TextView) dialog.findViewById(R.id.dialog_filter_tvPrice);
@@ -274,16 +287,25 @@ public class DialogUtils {
         priceBar.setThumbIndices(minPrixIndex, maxPrixIndex);
 
         final int minSurfaceValue = 10;
+        final int maxSurfaceValue = 300;
         final int stepSurfaceValue = 10;
 
         String[] minMaxSurface = PrefUtil.getSurfaceMinMax().split("-");
+
+        if (minMaxSurface[0].trim().length() == 0) {
+            minMaxSurface[0] = "" + minSurfaceValue;
+        }
+
+        if (minMaxSurface[1].trim().length() == 0) {
+            minMaxSurface[1] = "" + maxSurfaceValue;
+        }
+
         final int minSurfaceIndex = (Integer.parseInt(minMaxSurface[0]) - minSurfaceValue)
                 / stepSurfaceValue;
         int maxSurfaceIndex = (Integer.parseInt(minMaxSurface[1]) - minSurfaceValue)
                 / stepSurfaceValue;
 
         final TextView tvSurface = (TextView) dialog.findViewById(R.id.dialog_filter_tvSurface);
-        final RangeBar surfaceBar = (RangeBar) dialog.findViewById(R.id.dialog_filter_surfaceBar);
         surfaceBar.setOnRangeBarChangeListener(new RangeBar.OnRangeBarChangeListener() {
             @Override
             public void onIndexChangeListener(RangeBar rangeBar, int leftThumbIndex,
@@ -336,12 +358,12 @@ public class DialogUtils {
                 List<Constants.PropertyType> cachedTypes = PrefUtil.getTypeDeBiens();
                 if (temp.size() > cachedTypes.size()) {
                     temp.removeAll(cachedTypes);
-                    if(temp.size() > 0){
+                    if (temp.size() > 0) {
                         isChanged = true;
                     }
                 } else {
                     cachedTypes.removeAll(temp);
-                    if(cachedTypes.size() > 0){
+                    if (cachedTypes.size() > 0) {
                         isChanged = true;
                     }
                 }
@@ -350,23 +372,46 @@ public class DialogUtils {
                     PrefUtil.setTypeDeBiens(selectedTypes);
                 }
 
-                String selectedDistance = "" + (distanceBar.getProgress() * distanceStep);
-                if (!selectedDistance.equals(PrefUtil.getDistance())) {
-                    isChanged = true;
-                }
-                PrefUtil.setDistance(selectedDistance);
+                // String selectedDistance = "" + (distanceBar.getProgress() * distanceStep);
+                // if (!selectedDistance.equals(PrefUtil.getDistance())) {
+                // isChanged = true;
+                // }
+                // PrefUtil.setDistance(selectedDistance);
 
-                String selectedPrixMinMax = (prixData.minPrixValue
-                        + priceBar.getLeftIndex() * prixData.prixStep) + "-"
-                        + (prixData.minPrixValue + priceBar.getRightIndex() * prixData.prixStep);
+                int multiply = selectedAchatLocation == Constants.AchatLocation.ACHAT ? 1000 : 1;
+                String selectedMinPrice = " ", selectedMaxPrice = " ";
+
+                if (priceBar.getLeftIndex() != 0) {
+                    selectedMinPrice = ""
+                            + (prixData.minPrixValue + priceBar.getLeftIndex() * prixData.prixStep)
+                            * multiply;
+                }
+
+                if (priceBar.getRightIndex() != priceBar.getTickCount() - 1) {
+                    selectedMaxPrice = ""
+                            + (prixData.minPrixValue + priceBar.getRightIndex() * prixData.prixStep)
+                            * multiply;
+                }
+
+                String selectedPrixMinMax = selectedMinPrice + "-" + selectedMaxPrice;
                 if (!selectedPrixMinMax.equals(PrefUtil.getPrixMinMax())) {
                     isChanged = true;
                 }
                 PrefUtil.setPrixMinMax(selectedPrixMinMax);
 
-                String selectedSurfaceMinMax = (minSurfaceValue
-                        + surfaceBar.getLeftIndex() * stepSurfaceValue) + "-"
-                        + (minSurfaceValue + surfaceBar.getRightIndex() * stepSurfaceValue);
+                String selectedSurfaceMin = " ", selectedSurfaceMax = " ";
+
+                if (surfaceBar.getLeftIndex() != 0) {
+                    selectedSurfaceMin = ""
+                            + (minSurfaceValue + surfaceBar.getLeftIndex() * stepSurfaceValue);
+                }
+
+                if (surfaceBar.getRightIndex() != surfaceBar.getTickCount() - 1) {
+                    selectedSurfaceMax = ""
+                            + (minSurfaceValue + surfaceBar.getRightIndex() * stepSurfaceValue);
+                }
+
+                String selectedSurfaceMinMax = selectedSurfaceMin + "-" + selectedSurfaceMax;
                 if (!selectedSurfaceMinMax.equals(PrefUtil.getSurfaceMinMax())) {
                     isChanged = true;
                 }

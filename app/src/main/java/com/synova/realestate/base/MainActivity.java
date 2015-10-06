@@ -1,7 +1,6 @@
 
 package com.synova.realestate.base;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -21,10 +20,14 @@ import com.synova.realestate.R;
 import com.synova.realestate.adapters.TabsPagerAdapter;
 import com.synova.realestate.customviews.AdsImageView;
 import com.synova.realestate.customviews.CustomTabPageIndicator;
+import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.eventbus.NavigationItemSelectedEvent;
 import com.synova.realestate.utils.DialogUtils;
+import com.synova.realestate.utils.Util;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -97,6 +100,17 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnCheck
                 // Snackbar.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private List<AdsInfoResponseEnt> listAdsInfoResponse = new ArrayList<>();
+
+    public List<AdsInfoResponseEnt> getListAdsInfoResponse() {
+        return listAdsInfoResponse;
+    }
+
+    public void setListAdsInfoResponse(List<AdsInfoResponseEnt> listAdsInfoResponse) {
+        this.listAdsInfoResponse.clear();
+        this.listAdsInfoResponse.addAll(listAdsInfoResponse);
     }
 
     @Override
@@ -188,10 +202,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnCheck
                         public boolean onMenuItemClick(MenuItem item) {
                             switch (item.getItemId()) {
                                 case R.id.action_share_fb:
-                                    Intent intent = new Intent(Intent.ACTION_SEND);
-                                    intent.setType("text/plain");
-                                    intent.putExtra(Intent.EXTRA_TEXT, "http://www.google.com/");
-                                    startActivity(Intent.createChooser(intent, "Share via"));
+                                    Util.shareViaIntent(MainActivity.this);
                                     break;
                             }
                             return true;

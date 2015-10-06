@@ -92,6 +92,10 @@ public class RangeBar extends View {
         rangeBarInit(context, attrs);
     }
 
+    public int getTickCount(){
+        return mTickCount;
+    }
+
     // View Methods ////////////////////////////////////////////////////////////
 
     @Override

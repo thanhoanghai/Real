@@ -5,14 +5,16 @@ import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.utils.PrefUtil;
 
+import java.util.List;
+
 /**
  * Created by ducth on 6/23/15.
  */
 public class AdsInfoEnt {
 
     public String cellPhoneId = RealEstateApplication.deviceId;
-    public double xLocalisation = 48.8184681922801;
-    public double yLocalisation = 2.4196212907603;
+    public double xLocalisation = 2.4196212907603;
+    public double yLocalisation = 48.8184681922801;
     public String polygon;
     public int adminId;
     public int offsetS;
@@ -20,27 +22,27 @@ public class AdsInfoEnt {
     // public String isSale = PrefUtil.getAchatLocation().getParamName();
     public String rentSaleS = PrefUtil.getAchatLocation().getParamName();
     public String businessTypeS;
-    public String surfaceMinS = PrefUtil.getSurfaceMinMax().split("-")[0];
-    public String surfaceMaxS = PrefUtil.getSurfaceMinMax().split("-")[1];
-    public String priceMinS = PrefUtil.getPrixMinMax().split("-")[0];
-    public String priceMaxS = PrefUtil.getPrixMinMax().split("-")[1];
+    public String surfaceMinS = PrefUtil.getSurfaceMinMax().split("-")[0].trim();
+    public String surfaceMaxS = PrefUtil.getSurfaceMinMax().split("-")[1].trim();
+    public String priceMinS = PrefUtil.getPrixMinMax().split("-")[0].trim();
+    public String priceMaxS = PrefUtil.getPrixMinMax().split("-")[1].trim();
     public String codePostalS;
     public String roomNumberS;
     public String keyWordS = PrefUtil.getMotsCles();
     public Constants.FilterOrderType orderByS = Constants.FilterOrderType.DISTANCE;
 
     public AdsInfoEnt() {
-//        List<Constants.PropertyType> types = PrefUtil.getTypeDeBiens();
-//        if (types.contains(Constants.PropertyType.ALL)) {
-//            for (int i = 2; i < Constants.PropertyType.values().length; i++) {
-//                propertyTypeS += Constants.PropertyType.values()[i].getName() + ",";
-//            }
-//        } else {
-//            for (Constants.PropertyType type : types) {
-//                propertyTypeS += type.getName() + ",";
-//            }
-//        }
-//        propertyTypeS = propertyTypeS.length() > 0 ? propertyTypeS.substring(0,
-//                propertyTypeS.length() - 1) : "";
+        List<Constants.PropertyType> types = PrefUtil.getTypeDeBiens();
+        if (types.contains(Constants.PropertyType.ALL)) {
+            for (int i = 2; i < Constants.PropertyType.values().length; i++) {
+                propertyTypeS += Constants.PropertyType.values()[i].getName() + ",";
+            }
+        } else {
+            for (Constants.PropertyType type : types) {
+                propertyTypeS += type.getName() + ",";
+            }
+        }
+        propertyTypeS = propertyTypeS.length() > 0 ? propertyTypeS.substring(0,
+                propertyTypeS.length() - 1) : "";
     }
 }

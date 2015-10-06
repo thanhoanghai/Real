@@ -31,6 +31,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.synova.realestate.R;
@@ -46,6 +47,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -392,33 +394,31 @@ public class Util {
         return accounts.length > 0;
     }
 
-    // public static void sendEmail(Activity activity, String[] recipients, String subject,
-    // String content) {
-    // Intent intent = new Intent(Intent.ACTION_SEND);
-    // if (subject != null && subject.length() > 0) {
-    // intent.putExtra(Intent.EXTRA_SUBJECT, subject);
-    // }
-    // if (content != null && content.length() > 0) {
-    // ArrayList<String> contents = new ArrayList<>();
-    // contents.add(content);
-    // intent.putExtra(Intent.EXTRA_TEXT, contents);
-    // }
-    // if (recipients != null && recipients.length > 0) {
-    // intent.putExtra(Intent.EXTRA_EMAIL, recipients);
-    // }
-    //
-    // intent.setType("message/rfc822");
-    // try {
-    // activity.startActivity(Intent.createChooser(intent, activity
-    // .getResources().getString(R.string.choose_email_client)));
-    //
-    // } catch (android.content.ActivityNotFoundException ex) {
-    // Toast.makeText(
-    // activity,
-    // activity.getResources().getString(R.string.no_email_client),
-    // Toast.LENGTH_SHORT).show();
-    // }
-    // }
+    public static void sendEmail(Activity activity, String[] recipients, String subject,
+            String content) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        if (subject != null && subject.length() > 0) {
+            intent.putExtra(Intent.EXTRA_SUBJECT, subject);
+        }
+        if (content != null && content.length() > 0) {
+            ArrayList<String> contents = new ArrayList<>();
+            contents.add(content);
+            intent.putExtra(Intent.EXTRA_TEXT, contents);
+        }
+        if (recipients != null && recipients.length > 0) {
+            intent.putExtra(Intent.EXTRA_EMAIL, recipients);
+        }
+
+        intent.setType("message/rfc822");
+        try {
+            activity.startActivity(Intent.createChooser(intent, "Choose app to send email"));
+
+        } catch (android.content.ActivityNotFoundException ex) {
+            Toast.makeText(
+                    activity, "No email client is installed on your device",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
 
     public static boolean checkAppInstalledByStoreUrl(Context context, String storeUrl) {
         String appPackageName = getAppPackageNameFromStoreUrl(storeUrl);
@@ -636,8 +636,6 @@ public class Util {
 
     public static LatLng convertPointGeomToLatLng(String pointGeom) {
         String[] point = pointGeom.substring(6, pointGeom.length() - 1).split(" ");
-        // LatLng latLng = new LatLng(Double.parseDouble(point[0]), Double.parseDouble(point[1]));
-        // TODO temp switch to fix server wrong response info
         LatLng latLng = new LatLng(Double.parseDouble(point[1]), Double.parseDouble(point[0]));
         return latLng;
     }
@@ -647,9 +645,6 @@ public class Util {
         LatLng[] latLngs = new LatLng[points.length];
         for (int i = 0; i < points.length; i++) {
             String[] point = points[i].split(" ");
-            // LatLng latLng = new LatLng(Double.parseDouble(point[0]),
-            // Double.parseDouble(point[1]));
-            // TODO temp switch to fix server wrong response info
             LatLng latLng = new LatLng(Double.parseDouble(point[1]), Double.parseDouble(point[0]));
             latLngs[i] = latLng;
         }
@@ -698,6 +693,29 @@ public class Util {
                 return 0;
             }
         });
+    }
+
+    public static void shareViaIntent(Context context) {
+        Intent intent = new Intent(Intent.ACTION_SEND);
+        intent.setType("text/plain");
+        intent.putExtra(Intent.EXTRA_TEXT, "http://www.google.com/");
+        context.startActivity(Intent.createChooser(intent, "Share via"));
+    }
+
+    public static void callPhone(Context context, String phoneNumber) {
+        Intent intent = new Intent(Intent.ACTION_DIAL, Uri.fromParts("tel", phoneNumber, null));
+        context.startActivity(intent);
+    }
+
+    public static View findView(View childView, int targetId) {
+        if (childView != null) {
+            View parent = (View) childView.getParent();
+            if (parent != null && parent.getId() == targetId) {
+                return parent;
+            }
+            return findView(parent, targetId);
+        }
+        return null;
     }
 
     private static class ClickableText extends ClickableSpan {

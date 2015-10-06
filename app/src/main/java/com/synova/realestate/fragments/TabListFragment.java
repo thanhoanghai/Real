@@ -16,6 +16,7 @@ import com.synova.realestate.R;
 import com.synova.realestate.adapters.HouseListAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.base.SubscriberImpl;
 import com.synova.realestate.customviews.SortBar;
@@ -46,10 +47,38 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
 
     private Constants.ListLoadingState loadingState = Constants.ListLoadingState.NONE;
 
-    private static final int PAGE_LIMIT = 49;
+    private static final int PAGE_LIMIT = 30;
 
     private ProgressBar progressBar;
     private Subscription subscription;
+
+    private View.OnClickListener onBtnFavoriteClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            View view = Util.findView(v, R.id.list_item_container);
+            int position = rvItems.getChildAdapterPosition(view) - 1;
+            final AdsInfoResponseEnt house = houseAdapter.getItems().get(position);
+
+            if (house.isFavorite) {
+                NetworkService.removeFavorite("" + house.id).subscribe(
+                        new SubscriberImpl<Boolean>() {
+                            @Override
+                            public void onNext(Boolean aBoolean) {
+                                house.isFavorite = false;
+                                houseAdapter.notifyDataSetChanged();
+                            }
+                        });
+            } else {
+                NetworkService.addFavorite("" + house.id).subscribe(new SubscriberImpl<Boolean>() {
+                    @Override
+                    public void onNext(Boolean aBoolean) {
+                        house.isFavorite = true;
+                        houseAdapter.notifyDataSetChanged();
+                    }
+                });
+            }
+        }
+    };
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -99,20 +128,22 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
             }
         });
         houseAdapter = new HouseListAdapter();
+        houseAdapter.setItems(((MainActivity)activity).getListAdsInfoResponse());
         houseAdapter.setOnItemClickedListener(this);
+        houseAdapter.setOnBtnFavoriteClickListener(onBtnFavoriteClickListener);
         rvItems.setAdapter(houseAdapter);
 
-        loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
-        toggleSwipeRefreshLayout(true);
-        loadNewData();
+        loadingState = Constants.ListLoadingState.NONE;
+//        toggleSwipeRefreshLayout(true);
+//        loadNewData();
 
         return rootView;
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    protected void onPageSelected(int position) {
         toggleSwipeRefreshLayout(false);
+        houseAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -137,12 +168,15 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
         AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
-        adsInfoEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
+        adsInfoEnt.offsetS = houseAdapter.getItems().size() > 0 ? houseAdapter.getItemCount() + 1
+                : 0;
         subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
                 new SubscriberImpl<List<AdsInfoResponseEnt>>() {
                     @Override
                     public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
-                        houseAdapter.setItems(adsInfoResponseEnts);
+                        ((MainActivity)activity).setListAdsInfoResponse(adsInfoResponseEnts);
+                        houseAdapter.notifyDataSetChanged();
+//                        houseAdapter.setItems(adsInfoResponseEnts);
 
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;
@@ -163,12 +197,14 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
         progressBar.setVisibility(View.VISIBLE);
 
         AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
-        adsInfoEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
+        adsInfoEnt.offsetS = houseAdapter.getItems().size() > 0 ? houseAdapter.getItemCount() + 1
+                : 0;
         subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
                 new SubscriberImpl<List<AdsInfoResponseEnt>>() {
                     @Override
                     public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
-                        houseAdapter.getItems().addAll(adsInfoResponseEnts);
+//                        houseAdapter.getItems().addAll(adsInfoResponseEnts);
+                        ((MainActivity)activity).getListAdsInfoResponse().addAll(adsInfoResponseEnts);
                         houseAdapter.notifyDataSetChanged();
 
                         toggleSwipeRefreshLayout(false);

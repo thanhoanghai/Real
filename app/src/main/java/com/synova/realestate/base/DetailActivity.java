@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -425,6 +424,9 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                     }
                 }
                 return true;
+            case R.id.action_share:
+                Util.shareViaIntent(this);
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -445,11 +447,11 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 break;
             case R.id.detail_seller_groupPhone:
                 PublisherDetailEnt publisher = (PublisherDetailEnt) v.getTag();
-                Snackbar.make(v, "Call " + publisher.tel, Snackbar.LENGTH_SHORT).show();
+                Util.callPhone(this, publisher.tel);
                 break;
             case R.id.detail_seller_groupMail:
                 publisher = (PublisherDetailEnt) v.getTag();
-                Snackbar.make(v, "Send mail to " + publisher.mail, Snackbar.LENGTH_SHORT).show();
+                Util.sendEmail(this, new String[]{publisher.mail}, null, null);
                 break;
         }
     }
