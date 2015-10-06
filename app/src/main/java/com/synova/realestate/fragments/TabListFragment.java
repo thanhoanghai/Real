@@ -128,14 +128,14 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
             }
         });
         houseAdapter = new HouseListAdapter();
-        houseAdapter.setItems(((MainActivity)activity).getListAdsInfoResponse());
+        houseAdapter.setItems(((MainActivity) activity).getListAdsInfoResponse());
         houseAdapter.setOnItemClickedListener(this);
         houseAdapter.setOnBtnFavoriteClickListener(onBtnFavoriteClickListener);
         rvItems.setAdapter(houseAdapter);
 
         loadingState = Constants.ListLoadingState.NONE;
-//        toggleSwipeRefreshLayout(true);
-//        loadNewData();
+        // toggleSwipeRefreshLayout(true);
+        // loadNewData();
 
         return rootView;
     }
@@ -168,15 +168,13 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
         AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
-        adsInfoEnt.offsetS = houseAdapter.getItems().size() > 0 ? houseAdapter.getItemCount() + 1
-                : 0;
+        adsInfoEnt.offsetS = 0;
         subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
                 new SubscriberImpl<List<AdsInfoResponseEnt>>() {
                     @Override
                     public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
-                        ((MainActivity)activity).setListAdsInfoResponse(adsInfoResponseEnts);
+                        ((MainActivity) activity).setListAdsInfoResponse(adsInfoResponseEnts);
                         houseAdapter.notifyDataSetChanged();
-//                        houseAdapter.setItems(adsInfoResponseEnts);
 
                         toggleSwipeRefreshLayout(false);
                         loadingState = Constants.ListLoadingState.NONE;
@@ -197,14 +195,14 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
         progressBar.setVisibility(View.VISIBLE);
 
         AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
-        adsInfoEnt.offsetS = houseAdapter.getItems().size() > 0 ? houseAdapter.getItemCount() + 1
+        adsInfoEnt.offsetS = houseAdapter.getItems().size() > 0 ? houseAdapter.getItems().size() + 1
                 : 0;
         subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
                 new SubscriberImpl<List<AdsInfoResponseEnt>>() {
                     @Override
                     public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
-//                        houseAdapter.getItems().addAll(adsInfoResponseEnts);
-                        ((MainActivity)activity).getListAdsInfoResponse().addAll(adsInfoResponseEnts);
+                        ((MainActivity) activity).getListAdsInfoResponse().addAll(
+                                adsInfoResponseEnts);
                         houseAdapter.notifyDataSetChanged();
 
                         toggleSwipeRefreshLayout(false);

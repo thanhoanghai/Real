@@ -65,7 +65,7 @@ public class HouseGridAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
     @Override
     public int getItemCount() {
-        return houses.size() + 2;
+        return houses.size() + 3;
     }
 
     @Override

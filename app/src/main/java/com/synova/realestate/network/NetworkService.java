@@ -46,7 +46,8 @@ public class NetworkService {
 
     private static final String TAG = NetworkService.class.getSimpleName();
 
-    public static final String BASE_URL = "http://37.187.43.23:8080/RealEstateWS/service";
+//    public static final String BASE_URL = "http://37.187.43.23:8080/RealEstateWS/service";
+    public static final String BASE_URL = "http://115.78.234.253:8080/RealEstateWS/service";
 
     private interface RestService {
         @POST("/property/getAdsInfo")

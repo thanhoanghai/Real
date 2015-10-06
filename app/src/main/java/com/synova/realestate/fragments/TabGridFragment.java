@@ -171,14 +171,12 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
         AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
-        adsInfoEnt.offsetS = houseAdapter.getItems().size() > 0 ? houseAdapter.getItemCount() + 1
-                : 0;
+        adsInfoEnt.offsetS = 0;
         subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
                 new SubscriberImpl<List<AdsInfoResponseEnt>>() {
                     @Override
                     public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
                         ((MainActivity) activity).setListAdsInfoResponse(adsInfoResponseEnts);
-                        // houseAdapter.setItems(adsInfoResponseEnts);
                         houseAdapter.notifyDataSetChanged();
 
                         toggleSwipeRefreshLayout(false);
@@ -200,7 +198,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
         progressBar.setVisibility(View.VISIBLE);
 
         AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
-        adsInfoEnt.offsetS = houseAdapter.getItems().size() > 0 ? houseAdapter.getItemCount() + 1
+        adsInfoEnt.offsetS = houseAdapter.getItems().size() > 0 ? houseAdapter.getItems().size() + 1
                 : 0;
         subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
                 new SubscriberImpl<List<AdsInfoResponseEnt>>() {
@@ -208,7 +206,6 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
                     public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
                         ((MainActivity) activity).getListAdsInfoResponse().addAll(
                                 adsInfoResponseEnts);
-                        // houseAdapter.getItems().addAll(adsInfoResponseEnts);
                         houseAdapter.notifyDataSetChanged();
 
                         toggleSwipeRefreshLayout(false);
