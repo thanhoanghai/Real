@@ -60,7 +60,7 @@ public class PrefUtil {
     }
 
     public static List<Constants.PropertyType> getTypeDeBiens() {
-        String json = pref.getString(KEY_TYPE_DE_BIENS, "[\"ALL\"]");
+        String json = pref.getString(KEY_TYPE_DE_BIENS, "[\"Appartement\"]");
         List<Constants.PropertyType> types;
         try {
             types = RealEstateApplication.GSON.fromJson(json,
