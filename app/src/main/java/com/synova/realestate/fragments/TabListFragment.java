@@ -21,6 +21,7 @@ import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.base.SubscriberImpl;
 import com.synova.realestate.customviews.SortBar;
 import com.synova.realestate.models.AdsInfoResponseEnt;
+import com.synova.realestate.models.eventbus.AddRemoveFavoriteEvent;
 import com.synova.realestate.models.eventbus.ChangeDialogFilterValuesEvent;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.AdsInfoEnt;
@@ -63,17 +64,31 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
                 NetworkService.removeFavorite("" + house.id).subscribe(
                         new SubscriberImpl<Boolean>() {
                             @Override
-                            public void onNext(Boolean aBoolean) {
-                                house.isFavorite = false;
-                                houseAdapter.notifyDataSetChanged();
+                            public void onNext(Boolean isSuccess) {
+                                if (isSuccess) {
+                                    house.isFavorite = false;
+                                    houseAdapter.notifyDataSetChanged();
+
+                                    EventBus.getDefault().postSticky(new AddRemoveFavoriteEvent());
+                                } else {
+                                    Toast.makeText(activity, "Remove favorite fail.",
+                                            Toast.LENGTH_SHORT).show();
+                                }
                             }
                         });
             } else {
                 NetworkService.addFavorite("" + house.id).subscribe(new SubscriberImpl<Boolean>() {
                     @Override
-                    public void onNext(Boolean aBoolean) {
-                        house.isFavorite = true;
-                        houseAdapter.notifyDataSetChanged();
+                    public void onNext(Boolean isSuccess) {
+                        if (isSuccess) {
+                            house.isFavorite = true;
+                            houseAdapter.notifyDataSetChanged();
+
+                            EventBus.getDefault().postSticky(new AddRemoveFavoriteEvent());
+                        } else {
+                            Toast.makeText(activity, "Add favorite fail.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
                     }
                 });
             }

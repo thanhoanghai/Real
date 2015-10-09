@@ -36,6 +36,7 @@ import com.synova.realestate.customviews.TouchableWrapperView;
 import com.synova.realestate.fragments.RetainMapFragment;
 import com.synova.realestate.models.AdsDetailEnt;
 import com.synova.realestate.models.DetailData;
+import com.synova.realestate.models.eventbus.AddRemoveFavoriteEvent;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.AdEnt;
 import com.synova.realestate.network.model.PublisherDetailEnt;
@@ -47,6 +48,7 @@ import java.util.List;
 import java.util.Random;
 
 import cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager;
+import de.greenrobot.event.EventBus;
 import rx.Observable;
 import rx.Subscription;
 import rx.functions.Func2;
@@ -381,6 +383,8 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                                         if (isSuccess) {
                                             adsDetailEnt.characs.get(0).isFavorite = false;
                                             invalidateOptionsMenu();
+
+                                            EventBus.getDefault().postSticky(new AddRemoveFavoriteEvent());
                                         } else {
                                             Toast.makeText(DetailActivity.this,
                                                     "Remove favorite fail.",
@@ -406,6 +410,8 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                                         if (isSuccess) {
                                             adsDetailEnt.characs.get(0).isFavorite = true;
                                             invalidateOptionsMenu();
+
+                                            EventBus.getDefault().postSticky(new AddRemoveFavoriteEvent());
                                         } else {
                                             Toast.makeText(DetailActivity.this,
                                                     "Add to favorite fail.",

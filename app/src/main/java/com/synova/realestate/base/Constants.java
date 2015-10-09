@@ -20,8 +20,10 @@ public class Constants {
     public static final int HOUSE_PRICE_LIMIT = 10000;
 
     public enum TabBar {
-        GRID(R.drawable.ico_tabbar_grid), LIST(R.drawable.ico_tabbar_list),
-        LOCATION(R.drawable.ico_tabbar_location), ALERT(R.drawable.ico_tabbar_sellers_list),
+        GRID(R.drawable.ico_tabbar_grid),
+        LIST(R.drawable.ico_tabbar_list),
+        LOCATION(R.drawable.ico_tabbar_location),
+        ALERT(R.drawable.ico_tabbar_sellers_list),
         FAVORITE(R.drawable.ico_star_empty);
 
         private int resId;
@@ -63,7 +65,8 @@ public class Constants {
     }
 
     public enum AchatLocation {
-        ACHAT("true"), LOCATION("false");
+        ACHAT("true"),
+        LOCATION("false");
 
         private String paramName;
 
@@ -92,7 +95,19 @@ public class Constants {
         @SerializedName("Terrain")
         TERRAIN("Terrain"),
         @SerializedName("Commerce")
-        COMMERCE("Commerce");
+        COMMERCE("Commerce"),
+        @SerializedName("Loft")
+        LOFT("Loft"),
+        @SerializedName("Immeuble")
+        IMMEUBLE("Immeuble"),
+        @SerializedName("Château")
+        CHATEAU("Château"),
+        @SerializedName("Bâtiment")
+        BATIMENT("Bâtiment"),
+        @SerializedName("Hôtel particulier")
+        HOTEL_PARTICULIER("Hôtel particulier"),
+        @SerializedName("Autre")
+        AUTRE("Autre");
 
         private String name;
 
@@ -119,14 +134,22 @@ public class Constants {
     }
 
     public enum ListLoadingState {
-        NONE, SWIPE_REFRESH, LOAD_MORE
+        NONE,
+        SWIPE_REFRESH,
+        LOAD_MORE
     }
 
     public enum NetworkLoadingState {
-        NONE, LOADING, LOADED, LOAD_MORE, FAIL
+        NONE,
+        LOADING,
+        LOADED,
+        LOAD_MORE,
+        FAIL
     }
 
     public enum RecyclerViewType {
-        HEADER, ITEM, FOOTER
+        HEADER,
+        ITEM,
+        FOOTER
     }
 }

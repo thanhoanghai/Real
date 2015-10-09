@@ -90,7 +90,7 @@ public class NetworkService {
                 @Override
                 public Throwable handleError(RetrofitError cause) {
                     LogUtil.e(TAG, cause);
-                    return null;
+                    return cause;
                 }
             })
             .build().create(RestService.class);

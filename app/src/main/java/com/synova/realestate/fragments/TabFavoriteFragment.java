@@ -19,11 +19,13 @@ import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
 import com.synova.realestate.base.SubscriberImpl;
 import com.synova.realestate.customviews.SortBar;
 import com.synova.realestate.models.AdsInfoResponseEnt;
+import com.synova.realestate.models.eventbus.AddRemoveFavoriteEvent;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.utils.Util;
 
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
 import rx.Subscription;
 
 /**
@@ -43,6 +45,34 @@ public class TabFavoriteFragment extends BaseFragment implements
 
     private Constants.ListLoadingState loadingState = Constants.ListLoadingState.NONE;
     private Subscription subscription;
+    private View.OnClickListener onBtnFavoriteClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            View view = Util.findView(v, R.id.list_item_container);
+            int position = rvItems.getChildAdapterPosition(view) - 1;
+            final AdsInfoResponseEnt house = houseAdapter.getItems().get(position);
+
+            NetworkService.removeFavorite("" + house.id).subscribe(
+                    new SubscriberImpl<Boolean>() {
+                        @Override
+                        public void onNext(Boolean isSuccess) {
+                            if (isSuccess) {
+                                houseAdapter.getItems().remove(house);
+                                houseAdapter.notifyDataSetChanged();
+                            } else {
+                                Toast.makeText(activity, "Remove favorite fail.",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+                            Toast.makeText(activity, "Remove favorite fail.",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        }
+    };
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -91,6 +121,7 @@ public class TabFavoriteFragment extends BaseFragment implements
         });
         houseAdapter = new HouseListAdapter();
         houseAdapter.setOnItemClickedListener(this);
+        houseAdapter.setOnBtnFavoriteClickListener(onBtnFavoriteClickListener);
         rvItems.setAdapter(houseAdapter);
 
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
@@ -127,23 +158,24 @@ public class TabFavoriteFragment extends BaseFragment implements
     private void loadNewData() {
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
-        subscription = NetworkService.getListFavorite().subscribe(new SubscriberImpl<List<AdsInfoResponseEnt>>() {
-            @Override
-            public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
-                toggleSwipeRefreshLayout(false);
+        subscription = NetworkService.getListFavorite().subscribe(
+                new SubscriberImpl<List<AdsInfoResponseEnt>>() {
+                    @Override
+                    public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
+                        toggleSwipeRefreshLayout(false);
 
-                houseAdapter.setItems(adsInfoResponseEnts);
-                loadingState = Constants.ListLoadingState.NONE;
-            }
+                        houseAdapter.setItems(adsInfoResponseEnts);
+                        loadingState = Constants.ListLoadingState.NONE;
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-                toggleSwipeRefreshLayout(false);
-                loadingState = Constants.ListLoadingState.NONE;
+                    @Override
+                    public void onError(Throwable e) {
+                        toggleSwipeRefreshLayout(false);
+                        loadingState = Constants.ListLoadingState.NONE;
 
-                Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
-            }
-        });
+                        Toast.makeText(activity, "Failed to get data!", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     @Override
@@ -172,5 +204,29 @@ public class TabFavoriteFragment extends BaseFragment implements
             case R.id.segment_date:
                 break;
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().registerSticky(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
+    }
+
+    public void onEventMainThread(AddRemoveFavoriteEvent event) {
+        EventBus.getDefault().removeStickyEvent(event);
+
+        swipeRefreshLayout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                toggleSwipeRefreshLayout(true);
+                loadNewData();
+            }
+        }, 300);
     }
 }
