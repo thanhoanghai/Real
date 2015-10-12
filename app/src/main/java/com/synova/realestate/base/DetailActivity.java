@@ -23,6 +23,7 @@ import android.widget.Toast;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
@@ -33,7 +34,6 @@ import com.synova.realestate.adapters.DetailSlideShowAdapter;
 import com.synova.realestate.customviews.AdsImageView;
 import com.synova.realestate.customviews.CustomCirclePageIndicator;
 import com.synova.realestate.customviews.TouchableWrapperView;
-import com.synova.realestate.fragments.RetainMapFragment;
 import com.synova.realestate.models.AdsDetailEnt;
 import com.synova.realestate.models.DetailData;
 import com.synova.realestate.models.eventbus.AddRemoveFavoriteEvent;
@@ -156,7 +156,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         TouchableWrapperView mapTouchableWrapperView = (TouchableWrapperView) findViewById(R.id.detail_mapTouchableWrapperView);
         mapTouchableWrapperView.setScrollableView(scrollView);
 
-        RetainMapFragment mapFragment = (RetainMapFragment) getSupportFragmentManager()
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(
                         R.id.detail_mapFragment);
         mapFragment.getMapAsync(this);
@@ -281,7 +281,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                         .get(0);
                 tvTitle.setText(adCharac.title);
                 tvPrice.setText(adCharac.minMaxPrice);
-                tvAddress.setText(adCharac.detailCharac);
+                tvAddress.setText(adCharac.description);
 
                 LatLng latLng = Util
                         .convertPointGeomToLatLng(adCharac.localisation);

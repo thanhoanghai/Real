@@ -14,8 +14,8 @@ public class PublisherPropertyEnt {
 
     public String cellPhoneIdI = RealEstateApplication.deviceId;
     public int publisherIdI;
-    public double xLocalisation;
-    public double yLocalisation;
+    public double xLocalisation = RealEstateApplication.currentLocation.getLongitude();
+    public double yLocalisation = RealEstateApplication.currentLocation.getLatitude();
     public String polygon;
     public int adminId;
     public int offsetS;

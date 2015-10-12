@@ -20,14 +20,10 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.Circle;
@@ -64,18 +60,12 @@ import rx.Subscription;
  * Created by ducth on 6/16/15.
  */
 public class TabLocationFragment extends BaseFragment implements OnMapReadyCallback,
-        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
-        LocationListener, GoogleMap.OnMarkerClickListener, GoogleMap.OnMapClickListener,
-        View.OnClickListener, GoogleMap.OnCameraChangeListener {
+        View.OnClickListener, GoogleMap.OnMapClickListener, GoogleMap.OnMarkerClickListener,
+        GoogleMap.OnCameraChangeListener {
 
     private static final int BOUNDS_PADDING = 100;
-    private RetainMapFragment mapFragment;
+    private SupportMapFragment mapFragment;
     private GoogleMap map;
-    private GoogleApiClient googleApiClient;
-    private LocationRequest locationRequest;
-
-    private Location lastKnownLocation;
-    private Location currentLocation;
 
     private Circle selectedMarkerCircle;
     private Polygon selectedMarkerPolygon;
@@ -97,8 +87,8 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     /**
      * Latitude = Y-axis, Longitude = X-axis.
      */
-    private LatLng currentMin = new LatLng(48.9306, 2.1475);
-    private LatLng currentMax = new LatLng(48.7924, 2.4963);
+    // private LatLng currentMin = new LatLng(48.9306, 2.1475);
+    // private LatLng currentMax = new LatLng(48.7924, 2.4963);
     private boolean isTouchingMap;
 
     private boolean isForceMoveMap;
@@ -108,19 +98,13 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     private int currentZoomLevel = 14;
 
     /** Set true to set my location is in Paris (for testing purpose only) */
-    private boolean isMyLocationParis = true;
+    // private boolean isMyLocationParis = true;
     private Subscription subscription;
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
             @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.fragment_tab_location, container, false);
-
-        if (isMyLocationParis) {
-            currentLocation = new Location("manual");
-            currentLocation.setLatitude(48.864716);
-            currentLocation.setLongitude(2.349014);
-        }
 
         setupMap();
         setupGroupDetailBottom();
@@ -139,18 +123,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     private void setupMap() {
-        locationRequest = new LocationRequest();
-        locationRequest.setInterval(Constants.INTERVAL);
-        locationRequest.setFastestInterval(Constants.FASTEST_INTERVAL);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-
-        googleApiClient = new GoogleApiClient.Builder(activity)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .addApi(LocationServices.API)
-                .build();
-
-        mapFragment = (RetainMapFragment) getChildFragmentManager().findFragmentById(
+        mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(
                 R.id.tab_location_mapFragment);
         mapFragment.getMapAsync(this);
     }
@@ -168,22 +141,19 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
-        googleApiClient.connect();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
-        googleApiClient.disconnect();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (subscription != null && !subscription.isUnsubscribed()) {
+        if (subscription != null) {
             subscription.unsubscribe();
-            subscription = null;
         }
     }
 
@@ -204,21 +174,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                     .setNegativeButton("Close", null)
                     .show();
         }
-        if (googleApiClient.isConnected()) {
-            startRequestLocationUpdate();
-        }
 
         if (map != null && markers.size() == 0
                 && loadingState == Constants.NetworkLoadingState.NONE) {
             getMap();
-        }
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (googleApiClient.isConnected()) {
-            stopRequestLocationUpdate();
         }
     }
 
@@ -229,10 +188,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
         final MapRequestEnt mapRequestEnt = new MapRequestEnt();
         mapRequestEnt.deviceId = RealEstateApplication.deviceId;
-        mapRequestEnt.xMin = currentMin.longitude;
-        mapRequestEnt.yMin = currentMin.latitude;
-        mapRequestEnt.xMax = currentMax.longitude;
-        mapRequestEnt.yMax = currentMax.latitude;
+        mapRequestEnt.xMin = RealEstateApplication.currentMin.longitude;
+        mapRequestEnt.yMin = RealEstateApplication.currentMin.latitude;
+        mapRequestEnt.xMax = RealEstateApplication.currentMax.longitude;
+        mapRequestEnt.yMax = RealEstateApplication.currentMax.latitude;
         mapRequestEnt.adsOffset = 100;
         mapRequestEnt.surfaceMinS = 0 + "";
         mapRequestEnt.surfaceMaxS = 2000 + "";
@@ -291,12 +250,13 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private void calculateNewMinMaxPoints(LatLng center, LatLngBounds bounds) {
         double xMin = bounds.northeast.longitude;
-        double yMin = bounds.northeast.latitude;
-        currentMin = new LatLng(yMin, xMin);
+        double yMin = bounds.southwest.latitude;
 
         double xMax = bounds.southwest.longitude;
-        double yMax = bounds.southwest.latitude;
-        currentMax = new LatLng(yMax, xMax);
+        double yMax = bounds.northeast.latitude;
+
+        RealEstateApplication.currentMin = new LatLng(yMin, xMin);
+        RealEstateApplication.currentMax = new LatLng(yMax, xMax);
     }
 
     @Override
@@ -310,7 +270,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         map.setOnMarkerClickListener(this);
         map.setOnCameraChangeListener(this);
 
-        // getMap();
+        moveCameraToLocation(RealEstateApplication.currentLocation);
     }
 
     private void moveCameraToLocation(Location location) {
@@ -354,44 +314,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLngs.get(0), currentZoomLevel));
             isForceMoveMap = false;
         }
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-        startRequestLocationUpdate();
-
-        lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(
-                googleApiClient);
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        if (!isMyLocationParis) {
-            if (currentLocation == null) {
-                currentLocation = location;
-                moveCameraToLocation(location);
-            }
-        }
-        // currentLocation = location;
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
-    }
-
-    private void startRequestLocationUpdate() {
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest,
-                this);
-    }
-
-    private void stopRequestLocationUpdate() {
-        LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
     }
 
     @Override
@@ -528,15 +450,13 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onCameraChange(CameraPosition cameraPosition) {
-        if (currentLocation != null
-                && !isTouchingMap
+        if (!isTouchingMap
                 && !isForceMoveMap
                 && (checkDragDistanceValid(cameraPosition.target) || cameraPosition.zoom != currentZoomLevel)) {
             LatLngBounds bounds = map.getProjection().getVisibleRegion().latLngBounds;
 
-            currentLocation = new Location("manual");
-            currentLocation.setLatitude(cameraPosition.target.latitude);
-            currentLocation.setLongitude(cameraPosition.target.longitude);
+            RealEstateApplication.currentLocation.setLatitude(cameraPosition.target.latitude);
+            RealEstateApplication.currentLocation.setLongitude(cameraPosition.target.longitude);
             calculateNewMinMaxPoints(cameraPosition.target, bounds);
 
             float[] distanceX = new float[1];
@@ -559,8 +479,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         newLocation.setLatitude(center.latitude);
         newLocation.setLongitude(center.longitude);
 
-        // return currentLocation.distanceTo(newLocation) > 1500;
-        float distance = currentLocation.distanceTo(newLocation);
+        float distance = RealEstateApplication.currentLocation.distanceTo(newLocation);
         return distance > limitX || distance > limitY;
     }
 

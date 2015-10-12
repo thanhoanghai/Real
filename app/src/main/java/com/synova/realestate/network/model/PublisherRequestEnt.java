@@ -2,6 +2,7 @@
 package com.synova.realestate.network.model;
 
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.utils.PrefUtil;
 
 import java.util.List;
@@ -12,8 +13,8 @@ import java.util.List;
 public class PublisherRequestEnt {
 
     public int publisherId;
-    public double xLocalisation;
-    public double yLocalisation;
+    public double xLocalisation = RealEstateApplication.currentLocation.getLongitude();
+    public double yLocalisation = RealEstateApplication.currentLocation.getLatitude();
     public String polygon;
     public int adminId;
     public int offsetS;

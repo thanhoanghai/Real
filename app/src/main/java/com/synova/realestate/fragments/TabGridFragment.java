@@ -23,6 +23,7 @@ import com.synova.realestate.customviews.SortBar;
 import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.eventbus.AddRemoveFavoriteEvent;
 import com.synova.realestate.models.eventbus.ChangeDialogFilterValuesEvent;
+import com.synova.realestate.models.eventbus.ReceivedCurrentLocationEvent;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.AdsInfoEnt;
 import com.synova.realestate.utils.Util;
@@ -153,7 +154,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
 
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
         toggleSwipeRefreshLayout(true);
-        loadNewData();
+        // loadNewData();
 
         return rootView;
     }
@@ -277,6 +278,10 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
     public void onStop() {
         super.onStop();
         EventBus.getDefault().unregister(this);
+    }
+
+    public void onEventMainThread(ReceivedCurrentLocationEvent event) {
+        loadNewData();
     }
 
     private ChangeDialogFilterValuesEvent lastChangeDialogFilterValuesEvent;

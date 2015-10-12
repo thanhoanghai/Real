@@ -13,8 +13,8 @@ import java.util.List;
 public class AdsInfoEnt {
 
     public String cellPhoneId = RealEstateApplication.deviceId;
-    public double xLocalisation = 2.4196212907603;
-    public double yLocalisation = 48.8184681922801;
+    public double xLocalisation = RealEstateApplication.currentLocation.getLongitude();
+    public double yLocalisation = RealEstateApplication.currentLocation.getLatitude();
     public String polygon;
     public int adminId;
     public int offsetS;
