@@ -276,11 +276,12 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
 
     @Override
     public void onStop() {
-        super.onStop();
         EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 
     public void onEventMainThread(ReceivedCurrentLocationEvent event) {
+        EventBus.getDefault().removeStickyEvent(event);
         loadNewData();
     }
 
