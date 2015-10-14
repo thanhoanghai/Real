@@ -81,7 +81,6 @@ public class TabFavoriteFragment extends BaseFragment implements
 
         sortBar = (SortBar) rootView.findViewById(R.id.tab_favorite_sortBar);
         sortBar.setOnSortBarItemSelectedListener(this);
-        sortBar.selectItem(0);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView
                 .findViewById(R.id.tab_favorite_swipeRefreshLayout);
@@ -218,8 +217,15 @@ public class TabFavoriteFragment extends BaseFragment implements
         super.onStop();
     }
 
+    private AddRemoveFavoriteEvent lastAddRemoveFavoriteEvent;
+
     public void onEventMainThread(AddRemoveFavoriteEvent event) {
-        EventBus.getDefault().removeStickyEvent(event);
+        if (lastAddRemoveFavoriteEvent != null
+                && lastAddRemoveFavoriteEvent.timestamp == event.timestamp) {
+            return;
+        }
+
+        lastAddRemoveFavoriteEvent = event;
 
         swipeRefreshLayout.postDelayed(new Runnable() {
             @Override

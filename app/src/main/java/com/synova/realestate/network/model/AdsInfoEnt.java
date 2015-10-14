@@ -29,7 +29,7 @@ public class AdsInfoEnt {
     public String codePostalS;
     public String roomNumberS;
     public String keyWordS = PrefUtil.getMotsCles();
-    public Constants.FilterOrderType orderByS = Constants.FilterOrderType.DISTANCE;
+    public Constants.FilterOrderType orderByS = PrefUtil.getOrderBy();
 
     public AdsInfoEnt() {
         List<Constants.PropertyType> types = PrefUtil.getTypeDeBiens();

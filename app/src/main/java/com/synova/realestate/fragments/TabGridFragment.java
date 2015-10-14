@@ -1,6 +1,10 @@
 
 package com.synova.realestate.fragments;
 
+import java.util.List;
+
+import rx.Subscription;
+
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -28,10 +32,7 @@ import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.AdsInfoEnt;
 import com.synova.realestate.utils.Util;
 
-import java.util.List;
-
 import de.greenrobot.event.EventBus;
-import rx.Subscription;
 
 /**
  * Created by ducth on 6/12/15.
@@ -108,7 +109,6 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
 
         sortBar = (SortBar) rootView.findViewById(R.id.tab_grid_sortBar);
         sortBar.setOnSortBarItemSelectedListener(this);
-        sortBar.selectItem(0);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView
                 .findViewById(R.id.tab_grid_swipeRefreshLayout);
@@ -253,19 +253,21 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
 
     @Override
     public void onSortBarItemSelected(int position, final boolean isSortAsc, int segmentId) {
-        List<AdsInfoResponseEnt> ads = houseAdapter.getItems();
-        switch (segmentId) {
-            case R.id.segment_distance:
-                Util.sortAdsByDistance(ads, isSortAsc);
-                houseAdapter.notifyDataSetChanged();
-                break;
-            case R.id.segment_price:
-                Util.sortAdsByPrice(ads, isSortAsc);
-                houseAdapter.notifyDataSetChanged();
-                break;
-            case R.id.segment_date:
-                break;
-        }
+        // List<AdsInfoResponseEnt> ads = houseAdapter.getItems();
+        // switch (segmentId) {
+        // case R.id.segment_distance:
+        // Util.sortAdsByDistance(ads, isSortAsc);
+        // houseAdapter.notifyDataSetChanged();
+        // break;
+        // case R.id.segment_price:
+        // Util.sortAdsByPrice(ads, isSortAsc);
+        // houseAdapter.notifyDataSetChanged();
+        // break;
+        // case R.id.segment_date:
+        // break;
+        // }
+        toggleSwipeRefreshLayout(true);
+        loadNewData();
     }
 
     @Override
@@ -285,15 +287,17 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
         loadNewData();
     }
 
-    private ChangeDialogFilterValuesEvent lastChangeDialogFilterValuesEvent;
-
     public void onEventMainThread(ChangeDialogFilterValuesEvent event) {
-        if (lastChangeDialogFilterValuesEvent != null
-                && lastChangeDialogFilterValuesEvent.timestamp == event.timestamp) {
-            return;
-        }
+        EventBus.getDefault().removeStickyEvent(event);
 
-        lastChangeDialogFilterValuesEvent = event;
+        toggleSwipeRefreshLayout(true);
+        loadNewData();
+    }
+
+    private AddRemoveFavoriteEvent lastAddRemoveFavoriteEvent;
+
+    public void onEventMainThread(AddRemoveFavoriteEvent event) {
+        EventBus.getDefault().removeStickyEvent(event);
 
         toggleSwipeRefreshLayout(true);
         loadNewData();

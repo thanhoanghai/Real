@@ -25,6 +25,7 @@ public class PrefUtil {
     private static final String KEY_DISTANCE = "4";
     private static final String KEY_PRIX_MIN_MAX = "5";
     private static final String KEY_SURFACE_MIN_MAX = "6";
+    private static final String KEY_ORDER_BY = "7";
 
     private static SharedPreferences pref = null;
 
@@ -91,7 +92,7 @@ public class PrefUtil {
     }
 
     public static String getPrixMinMax() {
-        return pref.getString(KEY_PRIX_MIN_MAX, "200-600");
+        return pref.getString(KEY_PRIX_MIN_MAX, " - ");
     }
 
     public static void setSurfaceMinMax(String surfaceMinMax) {
@@ -101,6 +102,18 @@ public class PrefUtil {
     }
 
     public static String getSurfaceMinMax() {
-        return pref.getString(KEY_SURFACE_MIN_MAX, "10-300");
+        return pref.getString(KEY_SURFACE_MIN_MAX, " - ");
+    }
+
+    public static void setOrderBy(Constants.FilterOrderType orderBy) {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(KEY_ORDER_BY, RealEstateApplication.GSON.toJson(orderBy));
+        editor.commit();
+    }
+
+    public static Constants.FilterOrderType getOrderBy() {
+        String orderBy = pref.getString(KEY_ORDER_BY,
+                RealEstateApplication.GSON.toJson(Constants.FilterOrderType.DISTANCE_ASC));
+        return RealEstateApplication.GSON.fromJson(orderBy, Constants.FilterOrderType.class);
     }
 }

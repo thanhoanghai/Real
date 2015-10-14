@@ -114,7 +114,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (subscription != null && !subscription.isUnsubscribed()) {
+        if (subscription != null) {
             subscription.unsubscribe();
             subscription = null;
         }
@@ -431,7 +431,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 }
                 return true;
             case R.id.action_share:
-                Util.shareViaIntent(this);
+                Util.shareViaFacebook(this);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

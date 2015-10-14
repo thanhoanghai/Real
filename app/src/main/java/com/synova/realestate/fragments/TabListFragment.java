@@ -104,7 +104,6 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
 
         sortBar = (SortBar) rootView.findViewById(R.id.tab_list_sortBar);
         sortBar.setOnSortBarItemSelectedListener(this);
-        sortBar.selectItem(0);
 
         swipeRefreshLayout = (SwipeRefreshLayout) rootView
                 .findViewById(R.id.tab_list_swipeRefreshLayout);
@@ -276,15 +275,15 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
         EventBus.getDefault().unregister(this);
     }
 
-    private ChangeDialogFilterValuesEvent lastChangeDialogFilterValuesEvent;
-
     public void onEventMainThread(ChangeDialogFilterValuesEvent event) {
-        if (lastChangeDialogFilterValuesEvent != null
-                && lastChangeDialogFilterValuesEvent.timestamp == event.timestamp) {
-            return;
-        }
+        EventBus.getDefault().removeStickyEvent(event);
 
-        lastChangeDialogFilterValuesEvent = event;
+        toggleSwipeRefreshLayout(true);
+        loadNewData();
+    }
+
+    public void onEventMainThread(AddRemoveFavoriteEvent event) {
+        EventBus.getDefault().removeStickyEvent(event);
 
         toggleSwipeRefreshLayout(true);
         loadNewData();

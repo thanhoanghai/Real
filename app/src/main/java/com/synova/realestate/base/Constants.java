@@ -126,11 +126,17 @@ public class Constants {
 
     public enum FilterOrderType {
         @SerializedName("distance")
-        DISTANCE,
-        @SerializedName("amount")
-        PRICE,
+        DISTANCE_ASC,
+        @SerializedName("distance desc")
+        DISTANCE_DESC,
+        @SerializedName("price")
+        PRICE_ASC,
+        @SerializedName("price desc")
+        PRICE_DESC,
         @SerializedName("extract_time")
-        DATE
+        DATE_ASC,
+        @SerializedName("extract_time desc")
+        DATE_DESC,
     }
 
     public enum ListLoadingState {

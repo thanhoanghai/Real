@@ -138,6 +138,7 @@ public class SellerPropertyFragment extends BaseFragment implements
         requestEnt.codePostalS = publisherRequestEnt.codePostalS;
         requestEnt.roomNumberS = publisherRequestEnt.roomNumberS;
         requestEnt.keyWordS = publisherRequestEnt.keyWordS;
+        requestEnt.orderByS = publisherRequestEnt.orderByS;
 
         subscription = NetworkService.getPublisherProperty(requestEnt).subscribe(
                 new SubscriberImpl<List<PublisherPropertyResponseEnt>>() {
@@ -182,6 +183,7 @@ public class SellerPropertyFragment extends BaseFragment implements
         requestEnt.codePostalS = publisherRequestEnt.codePostalS;
         requestEnt.roomNumberS = publisherRequestEnt.roomNumberS;
         requestEnt.keyWordS = publisherRequestEnt.keyWordS;
+        requestEnt.orderByS = publisherRequestEnt.orderByS;
 
         subscription = NetworkService.getPublisherProperty(requestEnt).subscribe(
                 new SubscriberImpl<List<PublisherPropertyResponseEnt>>() {

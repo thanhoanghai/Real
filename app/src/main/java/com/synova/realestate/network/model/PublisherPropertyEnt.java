@@ -19,7 +19,7 @@ public class PublisherPropertyEnt {
     public String polygon;
     public int adminId;
     public int offsetS;
-    public String propertyTypeS;
+    public String propertyTypeS = "";
     // public String isSale = PrefUtil.getAchatLocation().getParamName();
     public String rentSaleS = PrefUtil.getAchatLocation().getParamName();
     public String businessTypeS;
@@ -30,6 +30,7 @@ public class PublisherPropertyEnt {
     public String codePostalS;
     public String roomNumberS;
     public String keyWordS = PrefUtil.getMotsCles();
+    public Constants.FilterOrderType orderByS = PrefUtil.getOrderBy();
 
     public PublisherPropertyEnt() {
         List<Constants.PropertyType> types = PrefUtil.getTypeDeBiens();

@@ -11,6 +11,8 @@ import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 
 import com.synova.realestate.R;
+import com.synova.realestate.base.Constants;
+import com.synova.realestate.utils.PrefUtil;
 
 /**
  * Created by ducth on 6/13/15.
@@ -68,7 +70,21 @@ public class SortBar extends FrameLayout implements View.OnClickListener,
         segmentPrice.setOnCheckedChangeListener(this);
         segmentDate.setOnCheckedChangeListener(this);
 
-        selectItem(0);
+        Constants.FilterOrderType type = PrefUtil.getOrderBy();
+        switch (type) {
+            case DISTANCE_ASC:
+            case DISTANCE_DESC:
+                selectItem(0);
+                break;
+            case PRICE_ASC:
+            case PRICE_DESC:
+                selectItem(1);
+                break;
+            case DATE_ASC:
+            case DATE_DESC:
+                selectItem(2);
+                break;
+        }
     }
 
     public void setOnSortBarItemSelectedListener(OnSortBarItemSelectedListener listener) {
@@ -113,35 +129,52 @@ public class SortBar extends FrameLayout implements View.OnClickListener,
                 changeUnselectedItemUI(segmentPrice);
                 changeUnselectedItemUI(segmentDate);
 
-//                if (onSortBarItemSelectedListener != null) {
-//                    onSortBarItemSelectedListener.onSortBarItemSelected(0, isChecked, checkedId);
-//                }
+                if (isChecked) {
+                    PrefUtil.setOrderBy(Constants.FilterOrderType.DISTANCE_ASC);
+                } else {
+                    PrefUtil.setOrderBy(Constants.FilterOrderType.DISTANCE_DESC);
+                }
+
+                if (onSortBarItemSelectedListener != null) {
+                    onSortBarItemSelectedListener.onSortBarItemSelected(0, isChecked, checkedId);
+                }
                 break;
             case R.id.segment_price:
                 changeUnselectedItemUI(segmentDistance);
                 changeSelectedItemUI(segmentPrice, isChecked);
                 changeUnselectedItemUI(segmentDate);
 
-//                if (onSortBarItemSelectedListener != null) {
-//                    onSortBarItemSelectedListener.onSortBarItemSelected(1, isChecked, checkedId);
-//                }
+                if (isChecked) {
+                    PrefUtil.setOrderBy(Constants.FilterOrderType.PRICE_ASC);
+                } else {
+                    PrefUtil.setOrderBy(Constants.FilterOrderType.PRICE_DESC);
+                }
+
+                if (onSortBarItemSelectedListener != null) {
+                    onSortBarItemSelectedListener.onSortBarItemSelected(1, isChecked, checkedId);
+                }
                 break;
             case R.id.segment_date:
                 changeUnselectedItemUI(segmentDistance);
                 changeUnselectedItemUI(segmentPrice);
                 changeSelectedItemUI(segmentDate, isChecked);
 
-//                if (onSortBarItemSelectedListener != null) {
-//                    onSortBarItemSelectedListener.onSortBarItemSelected(2, isChecked, checkedId);
-//                }
+                if (isChecked) {
+                    PrefUtil.setOrderBy(Constants.FilterOrderType.DATE_ASC);
+                } else {
+                    PrefUtil.setOrderBy(Constants.FilterOrderType.DATE_DESC);
+                }
+
+                if (onSortBarItemSelectedListener != null) {
+                    onSortBarItemSelectedListener.onSortBarItemSelected(2, isChecked, checkedId);
+                }
                 break;
         }
     }
 
     private void changeSelectedItemUI(CompoundButton button, boolean isChecked) {
-//        button.setCompoundDrawablesWithIntrinsicBounds(0, 0, isChecked ? R.drawable.ico_sort_up
-//                : R.drawable.ico_sort_down, 0);
-        button.setCompoundDrawablesWithIntrinsicBounds(0,0,R.drawable.ico_sort_up, 0);
+        button.setCompoundDrawablesWithIntrinsicBounds(0, 0, isChecked ? R.drawable.ico_sort_up
+                : R.drawable.ico_sort_down, 0);
         button.setTextColor(selectedTextColor);
     }
 
@@ -158,6 +191,6 @@ public class SortBar extends FrameLayout implements View.OnClickListener,
     }
 
     public interface OnSortBarItemSelectedListener {
-        public void onSortBarItemSelected(int position, boolean isSortAsc, int segmentId);
+        void onSortBarItemSelected(int position, boolean isSortAsc, int segmentId);
     }
 }
