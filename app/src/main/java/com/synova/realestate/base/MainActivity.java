@@ -102,6 +102,10 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnCheck
         });
     }
 
+    public int getCurrentPage(){
+        return viewPager.getCurrentItem();
+    }
+
     private List<AdsInfoResponseEnt> listAdsInfoResponse = new ArrayList<>();
 
     public List<AdsInfoResponseEnt> getListAdsInfoResponse() {

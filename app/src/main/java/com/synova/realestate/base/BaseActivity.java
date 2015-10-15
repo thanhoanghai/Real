@@ -83,7 +83,7 @@ public class BaseActivity extends AppCompatActivity {
         return transitionType;
     }
 
-    private BaseFragment getCurrentFragment() {
+    public BaseFragment getCurrentFragment() {
         return fragmentStacks.size() > 0 ? fragmentStacks.peek() : null;
     }
 

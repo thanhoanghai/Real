@@ -275,8 +275,13 @@ public class TabListFragment extends BaseFragment implements SwipeRefreshLayout.
         EventBus.getDefault().unregister(this);
     }
 
-    public void onEventMainThread(ChangeDialogFilterValuesEvent event) {
+    public void onEvent(ChangeDialogFilterValuesEvent event) {
+        if (((MainActivity) activity).getCurrentPage() != Constants.TabBar.LIST.ordinal()) {
+            return;
+        }
+
         EventBus.getDefault().removeStickyEvent(event);
+        EventBus.getDefault().cancelEventDelivery(event);
 
         toggleSwipeRefreshLayout(true);
         loadNewData();
