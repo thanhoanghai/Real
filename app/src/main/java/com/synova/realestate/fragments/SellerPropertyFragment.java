@@ -125,9 +125,9 @@ public class SellerPropertyFragment extends BaseFragment implements
         requestEnt.publisherIdI = publisherRequestEnt.publisherId;
         requestEnt.xLocalisation = publisherRequestEnt.xLocalisation;
         requestEnt.yLocalisation = publisherRequestEnt.yLocalisation;
-//        requestEnt.polygon = publisherRequestEnt.polygon;
+        // requestEnt.polygon = publisherRequestEnt.polygon;
         requestEnt.adminId = publisherRequestEnt.adminId;
-        requestEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
+        requestEnt.offsetS = 0;
         requestEnt.propertyTypeS = publisherRequestEnt.propertyTypeS;
         requestEnt.rentSaleS = publisherRequestEnt.rentSaleS;
         requestEnt.businessTypeS = publisherRequestEnt.businessTypeS;
@@ -170,9 +170,10 @@ public class SellerPropertyFragment extends BaseFragment implements
         requestEnt.publisherIdI = publisherRequestEnt.publisherId;
         requestEnt.xLocalisation = publisherRequestEnt.xLocalisation;
         requestEnt.yLocalisation = publisherRequestEnt.yLocalisation;
-//        requestEnt.polygon = publisherRequestEnt.polygon;
+        // requestEnt.polygon = publisherRequestEnt.polygon;
         requestEnt.adminId = publisherRequestEnt.adminId;
-        requestEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
+        requestEnt.offsetS = houseAdapter.getItems().size() > 0 ? houseAdapter.getItems().size() + 1
+                : 0;
         requestEnt.propertyTypeS = publisherRequestEnt.propertyTypeS;
         requestEnt.rentSaleS = publisherRequestEnt.rentSaleS;
         requestEnt.businessTypeS = publisherRequestEnt.businessTypeS;
