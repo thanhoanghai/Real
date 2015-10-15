@@ -16,7 +16,7 @@ public class PublisherPropertyEnt {
     public int publisherIdI;
     public double xLocalisation = RealEstateApplication.currentLocation.getLongitude();
     public double yLocalisation = RealEstateApplication.currentLocation.getLatitude();
-    public String polygon;
+    public String polygon = "NULL";
     public int adminId;
     public int offsetS;
     public String propertyTypeS = "";

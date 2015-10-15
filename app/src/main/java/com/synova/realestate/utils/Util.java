@@ -696,18 +696,17 @@ public class Util {
         });
     }
 
-    public static void shareViaIntent(Context context) {
+    public static void shareViaIntent(Context context, String link) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, "http://www.google.com/");
+        intent.putExtra(Intent.EXTRA_TEXT, link);
         context.startActivity(Intent.createChooser(intent, "Share via"));
     }
 
-    public static void shareViaFacebook(Context context) {
-        String urlToShare = "http://www.google.com/";
+    public static void shareViaFacebook(Context context, String link) {
         Intent intent = new Intent(Intent.ACTION_SEND);
         intent.setType("text/plain");
-        intent.putExtra(Intent.EXTRA_TEXT, urlToShare);
+        intent.putExtra(Intent.EXTRA_TEXT, link);
 
         // See if official Facebook app is found
         boolean facebookAppFound = false;
@@ -722,7 +721,7 @@ public class Util {
 
         // As fallback, launch sharer.php in a browser
         if (!facebookAppFound) {
-            String sharerUrl = "https://www.facebook.com/sharer/sharer.php?u=" + urlToShare;
+            String sharerUrl = "https://www.facebook.com/sharer/sharer.php?u=" + link;
             intent = new Intent(Intent.ACTION_VIEW, Uri.parse(sharerUrl));
         }
 

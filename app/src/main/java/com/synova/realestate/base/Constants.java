@@ -55,13 +55,29 @@ public class Constants {
 
     public enum ElementType {
         @SerializedName("bien")
-        BIEN,
+        BIEN(R.drawable.ico_marker_bien, R.color.bien_type),
         @SerializedName("agence")
-        AGENCE,
+        AGENCE(R.drawable.ico_marker_agence, R.color.agence_type),
         @SerializedName("particulier")
-        PARTICULIER,
+        PARTICULIER(R.drawable.ico_marker_particulier, R.color.particulier_type),
         @SerializedName("notaire")
-        NOTAIRE
+        NOTAIRE(R.drawable.ico_marker_notaire, R.color.notaire_type);
+
+        private int iconResId;
+        private int color;
+
+        ElementType(int iconResId, int color) {
+            this.iconResId = iconResId;
+            this.color = color;
+        }
+
+        public int getIconResId() {
+            return iconResId;
+        }
+
+        public int getColor() {
+            return color;
+        }
     }
 
     public enum AchatLocation {

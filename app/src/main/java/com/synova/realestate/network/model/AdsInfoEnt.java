@@ -15,7 +15,6 @@ public class AdsInfoEnt {
     public String cellPhoneId = RealEstateApplication.deviceId;
     public double xLocalisation = RealEstateApplication.currentLocation.getLongitude();
     public double yLocalisation = RealEstateApplication.currentLocation.getLatitude();
-    public String polygon;
     public int adminId;
     public int offsetS;
     public String propertyTypeS = "";
@@ -29,7 +28,7 @@ public class AdsInfoEnt {
     public String codePostalS;
     public String roomNumberS;
     public String keyWordS = PrefUtil.getMotsCles();
-    public Constants.FilterOrderType orderByS = PrefUtil.getOrderBy();
+    public Constants.FilterOrderType orderByS = Constants.FilterOrderType.DISTANCE_ASC;
 
     public AdsInfoEnt() {
         List<Constants.PropertyType> types = PrefUtil.getTypeDeBiens();

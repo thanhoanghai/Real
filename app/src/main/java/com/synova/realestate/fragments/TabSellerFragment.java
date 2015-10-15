@@ -16,7 +16,6 @@ import com.synova.realestate.adapters.SellerListAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.OnRecyclerViewItemClickedListener;
-import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.base.SubscriberImpl;
 import com.synova.realestate.customviews.DividerDecoration;
 import com.synova.realestate.models.Publisher;
@@ -140,16 +139,16 @@ public class TabSellerFragment extends BaseFragment implements
 
         publisherRequestEnt = new PublisherRequestEnt();
 
-        double minLat = RealEstateApplication.currentMin.latitude;
-        double minLong = RealEstateApplication.currentMin.longitude;
+//        double minLat = RealEstateApplication.currentMin.latitude;
+//        double minLong = RealEstateApplication.currentMin.longitude;
+//
+//        double maxLat = RealEstateApplication.currentMax.latitude;
+//        double maxLong = RealEstateApplication.currentMax.longitude;
 
-        double maxLat = RealEstateApplication.currentMax.latitude;
-        double maxLong = RealEstateApplication.currentMax.longitude;
+//        String polygonPattern = "POLYGON((%1$s %2$s,%3$s %4$s,%5$s %6$s,%7$s %8$s))";
 
-        String polygonPattern = "POLYGON((%1$s %2$s,%3$s %4$s,%5$s %6$s,%7$s %8$s))";
-
-        publisherRequestEnt.polygon = String.format(polygonPattern, minLat, minLong, maxLat,
-                minLong, maxLat, maxLong, minLat, maxLong);
+//        publisherRequestEnt.polygon = String.format(polygonPattern, minLat, minLong, maxLat,
+//                minLong, maxLat, maxLong, minLat, maxLong);
         publisherRequestEnt.businessTypeS = "b";
         publisherRequestEnt.codePostalS = "111";
         publisherRequestEnt.roomNumberS = "1239";

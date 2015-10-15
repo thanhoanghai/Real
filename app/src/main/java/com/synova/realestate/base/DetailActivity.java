@@ -2,7 +2,6 @@
 package com.synova.realestate.base;
 
 import android.app.ProgressDialog;
-import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
@@ -35,7 +34,6 @@ import com.synova.realestate.customviews.AdsImageView;
 import com.synova.realestate.customviews.CustomCirclePageIndicator;
 import com.synova.realestate.customviews.TouchableWrapperView;
 import com.synova.realestate.models.AdsDetailEnt;
-import com.synova.realestate.models.DetailData;
 import com.synova.realestate.models.eventbus.AddRemoveFavoriteEvent;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.AdEnt;
@@ -45,7 +43,6 @@ import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import cn.trinea.android.view.autoscrollviewpager.AutoScrollViewPager;
 import de.greenrobot.event.EventBus;
@@ -79,6 +76,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
     private int adId;
 
+    private PublisherDetailEnt publisherDetailEnt;
     private AdsDetailEnt adsDetailEnt;
 
     private Subscription subscription;
@@ -106,7 +104,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         setupMap();
         setupActionBar();
         setupSlideShow();
-        setupDataList();
+        // setupDataList();
 
         getDetail();
     }
@@ -163,32 +161,12 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
     }
 
     private void setupDataList() {
-        List<DetailData> data = new ArrayList<>();
-
-        DetailData detailData = new DetailData();
-        detailData.title = "Capacité d'hébergement";
-        detailData.quantity = 6;
-        data.add(detailData);
-
-        detailData = new DetailData();
-        detailData.title = "Chambre à Coucher";
-        detailData.quantity = 3;
-        data.add(detailData);
-
-        detailData = new DetailData();
-        detailData.title = "Lits";
-        detailData.quantity = 3;
-        data.add(detailData);
-
-        detailData = new DetailData();
-        detailData.title = "Salle de Bain";
-        detailData.quantity = 3;
-        data.add(detailData);
+        String[] detailCharacs = adsDetailEnt.characs.get(0).detailCharac.split("\\|");
 
         groupData = (LinearLayout) findViewById(R.id.detail_groupData);
 
         LayoutInflater inflater = LayoutInflater.from(this);
-        for (int i = 0; i < data.size(); i++) {
+        for (int i = 0; i < detailCharacs.length; i++) {
             if (i > 0) {
                 View divider = new View(this);
                 divider.setBackgroundResource(R.drawable.shape_cyan_divider);
@@ -196,10 +174,10 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
             }
             View item = inflater.inflate(R.layout.layout_detail_data_list_item, groupData, false);
             TextView tvTitle = (TextView) item.findViewById(R.id.detail_data_item_tvTitle);
-            TextView tvQuantity = (TextView) item.findViewById(R.id.detail_data_item_tvQuantity);
+            // TextView tvQuantity = (TextView) item.findViewById(R.id.detail_data_item_tvQuantity);
 
-            tvTitle.setText(data.get(i).title);
-            tvQuantity.setText(data.get(i).quantity + "");
+            tvTitle.setText(detailCharacs[i]);
+            // tvQuantity.setText(data.get(i).quantity + "");
 
             groupData.addView(item);
         }
@@ -236,6 +214,9 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
             groupMail.setTag(publisher);
             groupMail.setOnClickListener(this);
 
+            groupPhone.setBackgroundColor(getResources().getColor(publisher.type.getColor()));
+            groupMail.setBackgroundColor(getResources().getColor(publisher.type.getColor()));
+
             groupSellers.addView(view);
         }
     }
@@ -259,7 +240,9 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 }).subscribe(new SubscriberImpl<Object[]>() {
             @Override
             public void onNext(Object[] objects) {
-                addSellerList((List<PublisherDetailEnt>) objects[0]);
+                List<PublisherDetailEnt> publisherDetailEntList = (List<PublisherDetailEnt>) objects[0];
+                publisherDetailEnt = publisherDetailEntList.get(0);
+                addSellerList(publisherDetailEntList);
 
                 waitDialog.dismiss();
 
@@ -268,6 +251,8 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 if (adsDetailEnt == null) {
                     return;
                 }
+
+                setupDataList();
 
                 List<String> images = new ArrayList<>(adsDetailEnt.images
                         .size());
@@ -286,10 +271,12 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 LatLng latLng = Util
                         .convertPointGeomToLatLng(adCharac.localisation);
                 if (map != null) {
-                    createMarker(latLng.latitude, latLng.longitude,
-                            adCharac.title);
+                    createMarker(latLng.latitude, latLng.longitude, adCharac.title,
+                            publisherDetailEnt.type.getIconResId());
                     moveCameraToLocation(latLng);
                 }
+
+                invalidateOptionsMenu();
             }
 
             @Override
@@ -309,9 +296,9 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         map.setOnMarkerClickListener(this);
     }
 
-    private Marker createMarker(double lat, double lng, String title) {
+    private Marker createMarker(double lat, double lng, String title, int iconResId) {
         return map.addMarker(new MarkerOptions()
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ico_marker_bien))
+                .icon(BitmapDescriptorFactory.fromResource(iconResId))
                 .position(new LatLng(lat, lng))
                 .anchor(0.1f, 0.9f)
                 .title(title));
@@ -319,23 +306,6 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
     private void moveCameraToLocation(LatLng latLng) {
         map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-    }
-
-    private void createMapMockData(Location loc) {
-        int min = 10;
-        int max = 100;
-
-        Random r = new Random();
-        for (int i = 0; i < 5; i++) {
-            int number = r.nextInt(max - min + 1) + min;
-            if (i % 2 == 0) {
-                number = -number;
-            }
-            double lat = loc.getLatitude() + number / 10E4;
-            double lng = loc.getLongitude() + number / 10E4;
-
-            createMarker(lat, lng, "House " + i);
-        }
     }
 
     @Override
@@ -356,7 +326,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
 
             boolean isFavorite = adsDetailEnt.characs.get(0).isFavorite;
             menu.findItem(R.id.action_favorite).setIcon(
-                    isFavorite ? R.drawable.ico_star_full : R.drawable.ico_star_empty);
+                    isFavorite ? R.drawable.ico_star_full_yellow : R.drawable.ico_star_empty);
         }
         return super.onPrepareOptionsMenu(menu);
     }
@@ -384,7 +354,8 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                                             adsDetailEnt.characs.get(0).isFavorite = false;
                                             invalidateOptionsMenu();
 
-                                            EventBus.getDefault().postSticky(new AddRemoveFavoriteEvent());
+                                            EventBus.getDefault().postSticky(
+                                                    new AddRemoveFavoriteEvent());
                                         } else {
                                             Toast.makeText(DetailActivity.this,
                                                     "Remove favorite fail.",
@@ -411,7 +382,8 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                                             adsDetailEnt.characs.get(0).isFavorite = true;
                                             invalidateOptionsMenu();
 
-                                            EventBus.getDefault().postSticky(new AddRemoveFavoriteEvent());
+                                            EventBus.getDefault().postSticky(
+                                                    new AddRemoveFavoriteEvent());
                                         } else {
                                             Toast.makeText(DetailActivity.this,
                                                     "Add to favorite fail.",
@@ -431,7 +403,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 }
                 return true;
             case R.id.action_share:
-                Util.shareViaFacebook(this);
+                Util.shareViaFacebook(this, publisherDetailEnt.adUrl);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -457,7 +429,9 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
                 break;
             case R.id.detail_seller_groupMail:
                 publisher = (PublisherDetailEnt) v.getTag();
-                Util.sendEmail(this, new String[]{publisher.mail}, null, null);
+                Util.sendEmail(this, new String[] {
+                        publisher.mail
+                }, null, null);
                 break;
         }
     }

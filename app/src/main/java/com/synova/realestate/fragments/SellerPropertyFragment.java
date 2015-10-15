@@ -125,7 +125,7 @@ public class SellerPropertyFragment extends BaseFragment implements
         requestEnt.publisherIdI = publisherRequestEnt.publisherId;
         requestEnt.xLocalisation = publisherRequestEnt.xLocalisation;
         requestEnt.yLocalisation = publisherRequestEnt.yLocalisation;
-        requestEnt.polygon = publisherRequestEnt.polygon;
+//        requestEnt.polygon = publisherRequestEnt.polygon;
         requestEnt.adminId = publisherRequestEnt.adminId;
         requestEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
         requestEnt.propertyTypeS = publisherRequestEnt.propertyTypeS;
@@ -170,7 +170,7 @@ public class SellerPropertyFragment extends BaseFragment implements
         requestEnt.publisherIdI = publisherRequestEnt.publisherId;
         requestEnt.xLocalisation = publisherRequestEnt.xLocalisation;
         requestEnt.yLocalisation = publisherRequestEnt.yLocalisation;
-        requestEnt.polygon = publisherRequestEnt.polygon;
+//        requestEnt.polygon = publisherRequestEnt.polygon;
         requestEnt.adminId = publisherRequestEnt.adminId;
         requestEnt.offsetS = houseAdapter.getItems().size() + PAGE_LIMIT;
         requestEnt.propertyTypeS = publisherRequestEnt.propertyTypeS;

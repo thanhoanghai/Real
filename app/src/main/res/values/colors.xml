@@ -19,4 +19,9 @@
     <color name="divider_gray">#b3b3b3</color>
     <color name="badge_color">#f22511</color>
 
+    <color name="bien_type">#3cd7d0</color>
+    <color name="agence_type">#506bcc</color>
+    <color name="particulier_type">#25a500</color>
+    <color name="notaire_type">#223992</color>
+
 </resources>

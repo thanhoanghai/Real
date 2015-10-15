@@ -202,7 +202,7 @@ public class MainActivity extends BaseActivity implements CompoundButton.OnCheck
                         public boolean onMenuItemClick(MenuItem item) {
                             switch (item.getItemId()) {
                                 case R.id.action_share_fb:
-                                    Util.shareViaFacebook(MainActivity.this);
+                                    Util.shareViaFacebook(MainActivity.this, null);
                                     break;
                             }
                             return true;
