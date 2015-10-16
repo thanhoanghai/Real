@@ -40,7 +40,7 @@ public class LocationService {
         return locationService;
     }
 
-    public void checkLocationSettings(final Activity activity) {
+    public void checkLocationSettings(final Activity activity, final boolean notifyAfterUserConfirm) {
         final LocationRequest request = LocationRequest.create()
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setNumUpdates(5)
@@ -64,7 +64,8 @@ public class LocationService {
                             } catch (IntentSender.SendIntentException th) {
                                 LogUtil.e(TAG, th);
                             }
-                        } else if (status.getStatusCode() == LocationSettingsStatusCodes.SUCCESS) {
+                        } else if (status.getStatusCode() == LocationSettingsStatusCodes.SUCCESS
+                                && notifyAfterUserConfirm) {
                             EventBus.getDefault().postSticky(
                                     new LocationSettingsAllowanceEvent(true));
                         }

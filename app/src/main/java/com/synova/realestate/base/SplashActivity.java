@@ -33,7 +33,7 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        LocationService.getInstance().checkLocationSettings(this);
+        LocationService.getInstance().checkLocationSettings(this, true);
 
         final SimpleDraweeView splashView = (SimpleDraweeView) findViewById(R.id.splashView);
         Uri uri = new Uri.Builder()

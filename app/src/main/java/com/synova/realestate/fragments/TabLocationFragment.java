@@ -1,9 +1,7 @@
 
 package com.synova.realestate.fragments;
 
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
@@ -37,15 +35,18 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.synova.realestate.R;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.LocationService;
 import com.synova.realestate.base.MainActivity;
 import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.base.SubscriberImpl;
+import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.MapResponseEnt;
+import com.synova.realestate.models.PublisherPropertyResponseEnt;
 import com.synova.realestate.models.eventbus.NavigationItemSelectedEvent;
 import com.synova.realestate.network.NetworkService;
-import com.synova.realestate.network.model.AdEnt;
+import com.synova.realestate.network.model.AdsInfoEnt;
 import com.synova.realestate.network.model.MapRequestEnt;
-import com.synova.realestate.network.model.PublisherDetailEnt;
+import com.synova.realestate.network.model.PublisherPropertyEnt;
 import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
@@ -161,24 +162,16 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     public void onResume() {
         super.onResume();
 
-        if (!Util.isLocationEnabled(activity)) {
-            new AlertDialog.Builder(activity)
-                    .setTitle("Notice")
-                    .setMessage("Location service not enabled! Do you want to enable?")
-                    .setPositiveButton("Enable", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Util.openLocationSetting(activity);
-                        }
-                    })
-                    .setNegativeButton("Close", null)
-                    .show();
-        }
-
         if (map != null && markers.size() == 0
                 && loadingState == Constants.NetworkLoadingState.NONE) {
             getMap();
         }
+    }
+
+    @Override
+    protected void onPageSelected(int position) {
+        super.onPageSelected(position);
+        LocationService.getInstance().checkLocationSettings(activity, false);
     }
 
     private void getMap() {
@@ -192,9 +185,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         mapRequestEnt.yMin = RealEstateApplication.currentMin.latitude;
         mapRequestEnt.xMax = RealEstateApplication.currentMax.longitude;
         mapRequestEnt.yMax = RealEstateApplication.currentMax.latitude;
-        mapRequestEnt.adsOffset = 100;
-        mapRequestEnt.surfaceMinS = 0 + "";
-        mapRequestEnt.surfaceMaxS = 2000 + "";
 
         subscription = NetworkService.getMap(mapRequestEnt)
                 .subscribe(new SubscriberImpl<List<MapResponseEnt>>() {
@@ -249,10 +239,10 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     }
 
     private void calculateNewMinMaxPoints(LatLng center, LatLngBounds bounds) {
-        double xMin = bounds.northeast.longitude;
+        double xMin = bounds.southwest.longitude;
         double yMin = bounds.southwest.latitude;
 
-        double xMax = bounds.southwest.longitude;
+        double xMax = bounds.northeast.longitude;
         double yMax = bounds.northeast.latitude;
 
         RealEstateApplication.currentMin = new LatLng(yMin, xMin);
@@ -338,37 +328,85 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
             addSelectedMarkerPolygon(polygon);
         }
 
-        // addSelectedMarkerCircle(marker.getPosition().latitude, marker.getPosition().longitude,
-        // 500);
+        switch (mapResponseEnt.elementType) {
+            case BIEN:
+                AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
+                adsInfoEnt.adminId = mapResponseEnt.id;
 
-        // groupDetailBottom.setVisibility(View.VISIBLE);
-        groupDetailBottom.setTag(mapResponseEnt.id);
+                subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
+                        new SubscriberImpl<List<AdsInfoResponseEnt>>() {
+                            @Override
+                            public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
+                                if (adsInfoResponseEnts.size() == 0) {
+                                    return;
+                                }
 
-        AdEnt adEnt = new AdEnt();
-        adEnt.adId = mapResponseEnt.id;
+                                AdsInfoResponseEnt adsInfoResponseEnt = adsInfoResponseEnts
+                                        .get(0);
 
-        subscription = NetworkService.getPublisherDetails(adEnt).subscribe(
-                new SubscriberImpl<List<PublisherDetailEnt>>() {
-                    @Override
-                    public void onNext(List<PublisherDetailEnt> publisherDetailEnts) {
-                        groupDetailBottom.setVisibility(View.VISIBLE);
+                                if (!Util.isNullOrEmpty(adsInfoResponseEnt.imageUrl)) {
+                                    ivThumbnail.setImageURI(Uri
+                                            .parse(adsInfoResponseEnt.imageUrl));
+                                }
 
-                        PublisherDetailEnt detailEnt = publisherDetailEnts.get(0);
+                                tvTitle.setText(adsInfoResponseEnt.title);
+                                tvPrice.setText(adsInfoResponseEnt.mminMaxPrice);
 
-                        if (!Util.isNullOrEmpty(detailEnt.logoUrl)) {
-                            ivThumbnail.setImageURI(Uri.parse(detailEnt.logoUrl));
-                        }
+                                String description = String.format(activity
+                                        .getString(R.string.list_item_description_template),
+                                        adsInfoResponseEnt.roomNumber,
+                                        adsInfoResponseEnt.surface, adsInfoResponseEnt.distance);
 
-                        tvTitle.setText(detailEnt.name);
-                        tvPrice.setText(detailEnt.price);
-                        tvDescription.setText(detailEnt.address);
-                    }
+                                tvDescription.setText(description);
 
-                    @Override
-                    public void onError(Throwable e) {
+                                groupDetailBottom.setVisibility(View.VISIBLE);
+                                groupDetailBottom.setTag(adsInfoResponseEnt.id);
+                            }
+                        });
+                break;
+            case AGENCE:
+            case PARTICULIER:
+            case NOTAIRE:
+                PublisherPropertyEnt publisherPropertyEnt = new PublisherPropertyEnt();
+                publisherPropertyEnt.publisherIdI = mapResponseEnt.id;
 
-                    }
-                });
+                subscription = NetworkService.getPublisherProperty(publisherPropertyEnt).subscribe(
+                        new SubscriberImpl<List<PublisherPropertyResponseEnt>>() {
+                            @Override
+                            public void onNext(
+                                    List<PublisherPropertyResponseEnt> publisherPropertyResponseEnts) {
+                                if (publisherPropertyResponseEnts.size() == 0) {
+                                    return;
+                                }
+
+                                PublisherPropertyResponseEnt publisherPropertyResponseEnt = publisherPropertyResponseEnts
+                                        .get(0);
+
+                                if (!Util.isNullOrEmpty(publisherPropertyResponseEnt.imageUrl)) {
+                                    ivThumbnail.setImageURI(Uri
+                                            .parse(publisherPropertyResponseEnt.imageUrl));
+                                }
+
+                                tvTitle.setText(publisherPropertyResponseEnt.title);
+                                tvPrice.setText(Util
+                                        .formatPriceNumber(publisherPropertyResponseEnt.price)
+                                        + "€");
+
+                                String description = String.format(activity
+                                        .getString(R.string.list_item_description_template),
+                                        publisherPropertyResponseEnt.roomNumber,
+                                        publisherPropertyResponseEnt.surface,
+                                        publisherPropertyResponseEnt.distance);
+
+                                tvDescription.setText(description);
+
+                                groupDetailBottom.setVisibility(View.VISIBLE);
+                                groupDetailBottom.setTag(publisherPropertyResponseEnt.adId);
+                            }
+                        });
+                break;
+        }
+
         return true;
     }
 
@@ -419,7 +457,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 break;
             case R.id.tab_location_groupDetailBottom:
                 int adId = (int) groupDetailBottom.getTag();
-                // activity.showDetailActivity(adId);
+                activity.showDetailActivity(adId);
                 break;
         }
     }
