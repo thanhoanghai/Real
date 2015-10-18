@@ -26,6 +26,7 @@ public class PrefUtil {
     private static final String KEY_PRIX_MIN_MAX = "5";
     private static final String KEY_SURFACE_MIN_MAX = "6";
     private static final String KEY_ORDER_BY = "7";
+    private static final String KEY_ROOM_NUMBERS = "8";
 
     private static SharedPreferences pref = null;
 
@@ -115,5 +116,15 @@ public class PrefUtil {
         String orderBy = pref.getString(KEY_ORDER_BY,
                 RealEstateApplication.GSON.toJson(Constants.FilterOrderType.DISTANCE_ASC));
         return RealEstateApplication.GSON.fromJson(orderBy, Constants.FilterOrderType.class);
+    }
+
+    public static void setRoomNumbers(int roomNumbers) {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putInt(KEY_ROOM_NUMBERS, roomNumbers);
+        editor.commit();
+    }
+
+    public static int getRoomNumbers() {
+        return pref.getInt(KEY_ROOM_NUMBERS, 1);
     }
 }

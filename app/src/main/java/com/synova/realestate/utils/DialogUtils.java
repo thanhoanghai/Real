@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.RadioGroup;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.facebook.rebound.SimpleSpringListener;
@@ -26,6 +27,7 @@ import com.synova.realestate.base.Constants;
 import com.synova.realestate.customviews.rangebar.RangeBar;
 import com.synova.realestate.models.DialogFilterPrixDataHolder;
 import com.synova.realestate.models.eventbus.ChangeDialogFilterValuesEvent;
+import com.synova.realestate.models.eventbus.ChangeDialogFilterValuesInTabLocationEvent;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -250,6 +252,29 @@ public class DialogUtils {
         // });
         // distanceBar.setProgress(Integer.parseInt(PrefUtil.getDistance()) / distanceStep);
 
+        final TextView tvRoomNumbers = (TextView)
+                dialog.findViewById(R.id.dialog_filter_tvRoomNumbers);
+        final SeekBar roomNumbersBar = (SeekBar) dialog
+                .findViewById(R.id.dialog_filter_roomNumbersBar);
+        roomNumbersBar.setProgress(PrefUtil.getRoomNumbers() - 1);
+        tvRoomNumbers.setText("" + PrefUtil.getRoomNumbers());
+        roomNumbersBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                tvRoomNumbers.setText("" + (progress + 1));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         String[] minMaxPrix = PrefUtil.getPrixMinMax().split("-");
         int divider = PrefUtil.getAchatLocation() == Constants.AchatLocation.ACHAT ? 1000 : 1;
 
@@ -378,6 +403,12 @@ public class DialogUtils {
                 // }
                 // PrefUtil.setDistance(selectedDistance);
 
+                int selectedRoomNumbers = Integer.parseInt(tvRoomNumbers.getText().toString());
+                if (selectedRoomNumbers != PrefUtil.getRoomNumbers()) {
+                    isChanged = true;
+                }
+                PrefUtil.setRoomNumbers(selectedRoomNumbers);
+
                 int multiply = selectedAchatLocation == Constants.AchatLocation.ACHAT ? 1000 : 1;
                 String selectedMinPrice = " ", selectedMaxPrice = " ";
 
@@ -420,6 +451,9 @@ public class DialogUtils {
                 if (isChanged) {
                     EventBus.getDefault().postSticky(
                             new ChangeDialogFilterValuesEvent(System.currentTimeMillis()));
+
+                    EventBus.getDefault().postSticky(
+                            new ChangeDialogFilterValuesInTabLocationEvent());
                 }
 
                 dialog.dismiss();

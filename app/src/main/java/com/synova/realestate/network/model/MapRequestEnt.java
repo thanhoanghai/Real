@@ -1,5 +1,7 @@
 package com.synova.realestate.network.model;
 
+import com.synova.realestate.base.Constants;
+import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.utils.PrefUtil;
 
 /**
@@ -13,15 +15,14 @@ public class MapRequestEnt {
     public double yMax;
     public String surfaceMinS = PrefUtil.getSurfaceMinMax().split("-")[0].trim();
     public String surfaceMaxS = PrefUtil.getSurfaceMinMax().split("-")[1].trim();
-    public String deviceId;
-//    public int adsOffset = 100;
-    public String propertyTypeS = "";
+    public String deviceId = RealEstateApplication.deviceId;
+    public String propertyTypeS = Constants.PropertyType.APPARTEMENT.getName();
     public String rentSaleS = PrefUtil.getAchatLocation().getParamName();
     public String businessTypeS = "";
     public String priceMinS = PrefUtil.getPrixMinMax().split("-")[0].trim();
     public String priceMaxS = PrefUtil.getPrixMinMax().split("-")[1].trim();
     public String codePostalS = "";
-    public String roomNumberS = "";
+    public String roomNumberS = "" + PrefUtil.getRoomNumbers();
     public String keyWordS = PrefUtil.getMotsCles();
 
 }

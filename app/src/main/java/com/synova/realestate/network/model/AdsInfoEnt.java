@@ -26,7 +26,7 @@ public class AdsInfoEnt {
     public String priceMinS = PrefUtil.getPrixMinMax().split("-")[0].trim();
     public String priceMaxS = PrefUtil.getPrixMinMax().split("-")[1].trim();
     public String codePostalS;
-    public String roomNumberS;
+    public String roomNumberS = "" + PrefUtil.getRoomNumbers();
     public String keyWordS = PrefUtil.getMotsCles();
     public Constants.FilterOrderType orderByS = Constants.FilterOrderType.DISTANCE_ASC;
 

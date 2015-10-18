@@ -41,12 +41,13 @@ import com.synova.realestate.base.RealEstateApplication;
 import com.synova.realestate.base.SubscriberImpl;
 import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.MapResponseEnt;
-import com.synova.realestate.models.PublisherPropertyResponseEnt;
+import com.synova.realestate.models.Publisher;
+import com.synova.realestate.models.eventbus.ChangeDialogFilterValuesInTabLocationEvent;
 import com.synova.realestate.models.eventbus.NavigationItemSelectedEvent;
 import com.synova.realestate.network.NetworkService;
 import com.synova.realestate.network.model.AdsInfoEnt;
 import com.synova.realestate.network.model.MapRequestEnt;
-import com.synova.realestate.network.model.PublisherPropertyEnt;
+import com.synova.realestate.network.model.PublisherRequestEnt;
 import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
@@ -141,7 +142,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
     @Override
     public void onStart() {
         super.onStart();
-        EventBus.getDefault().register(this);
+        EventBus.getDefault().registerSticky(this);
     }
 
     @Override
@@ -180,7 +181,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         progressBar.setVisibility(View.VISIBLE);
 
         final MapRequestEnt mapRequestEnt = new MapRequestEnt();
-        mapRequestEnt.deviceId = RealEstateApplication.deviceId;
         mapRequestEnt.xMin = RealEstateApplication.currentMin.longitude;
         mapRequestEnt.yMin = RealEstateApplication.currentMin.latitude;
         mapRequestEnt.xMax = RealEstateApplication.currentMax.longitude;
@@ -331,7 +331,9 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         switch (mapResponseEnt.elementType) {
             case BIEN:
                 AdsInfoEnt adsInfoEnt = new AdsInfoEnt();
-                adsInfoEnt.adminId = mapResponseEnt.id;
+                adsInfoEnt.propertyTypeS = Constants.PropertyType.APPARTEMENT.getName();
+                adsInfoEnt.xLocalisation = marker.getPosition().longitude;
+                adsInfoEnt.yLocalisation = marker.getPosition().latitude;
 
                 subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
                         new SubscriberImpl<List<AdsInfoResponseEnt>>() {
@@ -367,41 +369,33 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
             case AGENCE:
             case PARTICULIER:
             case NOTAIRE:
-                PublisherPropertyEnt publisherPropertyEnt = new PublisherPropertyEnt();
-                publisherPropertyEnt.publisherIdI = mapResponseEnt.id;
+                PublisherRequestEnt publisherRequestEnt = new PublisherRequestEnt();
+                publisherRequestEnt.publisherId = mapResponseEnt.id;
+                publisherRequestEnt.propertyTypeS = Constants.PropertyType.APPARTEMENT.getName();
+                publisherRequestEnt.xLocalisation = marker.getPosition().longitude;
+                publisherRequestEnt.yLocalisation = marker.getPosition().latitude;
 
-                subscription = NetworkService.getPublisherProperty(publisherPropertyEnt).subscribe(
-                        new SubscriberImpl<List<PublisherPropertyResponseEnt>>() {
+                subscription = NetworkService.getListPublisher(publisherRequestEnt).subscribe(
+                        new SubscriberImpl<List<Publisher>>() {
                             @Override
-                            public void onNext(
-                                    List<PublisherPropertyResponseEnt> publisherPropertyResponseEnts) {
-                                if (publisherPropertyResponseEnts.size() == 0) {
+                            public void onNext(List<Publisher> publishers) {
+                                if (publishers.size() == 0) {
                                     return;
                                 }
 
-                                PublisherPropertyResponseEnt publisherPropertyResponseEnt = publisherPropertyResponseEnts
-                                        .get(0);
+                                Publisher publisher = publishers.get(0);
 
-                                if (!Util.isNullOrEmpty(publisherPropertyResponseEnt.imageUrl)) {
-                                    ivThumbnail.setImageURI(Uri
-                                            .parse(publisherPropertyResponseEnt.imageUrl));
+                                if (!Util.isNullOrEmpty(publisher.logoUrl)) {
+                                    ivThumbnail.setImageURI(Uri.parse(publisher.logoUrl));
                                 }
 
-                                tvTitle.setText(publisherPropertyResponseEnt.title);
-                                tvPrice.setText(Util
-                                        .formatPriceNumber(publisherPropertyResponseEnt.price)
-                                        + "€");
+                                tvTitle.setText(publisher.name);
+                                tvPrice.setText(Util.formatPriceNumber(publisher.amount) + "€");
 
-                                String description = String.format(activity
-                                        .getString(R.string.list_item_description_template),
-                                        publisherPropertyResponseEnt.roomNumber,
-                                        publisherPropertyResponseEnt.surface,
-                                        publisherPropertyResponseEnt.distance);
-
-                                tvDescription.setText(description);
+                                tvDescription.setText(publisher.address);
 
                                 groupDetailBottom.setVisibility(View.VISIBLE);
-                                groupDetailBottom.setTag(publisherPropertyResponseEnt.adId);
+                                groupDetailBottom.setTag(publisher.nbAds);
                             }
                         });
                 break;
@@ -480,10 +474,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         }
     }
 
-    public void onEventMainThread(NavigationItemSelectedEvent event) {
-        setMarkersVisible(event.type, event.isChecked);
-    }
-
     float limitX, limitY;
 
     @Override
@@ -519,6 +509,15 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
         float distance = RealEstateApplication.currentLocation.distanceTo(newLocation);
         return distance > limitX || distance > limitY;
+    }
+
+    public void onEventMainThread(NavigationItemSelectedEvent event) {
+        setMarkersVisible(event.type, event.isChecked);
+    }
+
+    public void onEventMainThread(ChangeDialogFilterValuesInTabLocationEvent event) {
+        EventBus.getDefault().removeStickyEvent(event);
+        getMap();
     }
 
     private class TouchableWrapper extends FrameLayout {

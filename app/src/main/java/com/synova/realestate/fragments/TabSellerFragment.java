@@ -118,40 +118,7 @@ public class TabSellerFragment extends BaseFragment implements
     private void loadNewData() {
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
-        // publisherRequestEnt = new PublisherRequestEnt();
-        // publisherRequestEnt.publisherId = 16547;
-        // publisherRequestEnt.xLocalisation = 2.1475;
-        // publisherRequestEnt.yLocalisation = 48.9306;
-        // publisherRequestEnt.polygon =
-        // "POLYGON((2.1475 48.9306,2.4963 48.7924,2.4963 48.9306,2.1475 48.9306))";
-        // publisherRequestEnt.adminId = 1656;
-        // publisherRequestEnt.offsetS = 100;
-        // publisherRequestEnt.propertyTypeS = "p1";
-        // publisherRequestEnt.rentSaleS = "1";
-        // publisherRequestEnt.businessTypeS = "b";
-        // publisherRequestEnt.surfaceMinS = "20";
-        // publisherRequestEnt.surfaceMaxS = "70";
-        // publisherRequestEnt.priceMinS = "1";
-        // publisherRequestEnt.priceMaxS = "9";
-        // publisherRequestEnt.codePostalS = "111";
-        // publisherRequestEnt.roomNumberS = "1239";
-        // publisherRequestEnt.keyWordS = "P";
-
         publisherRequestEnt = new PublisherRequestEnt();
-
-//        double minLat = RealEstateApplication.currentMin.latitude;
-//        double minLong = RealEstateApplication.currentMin.longitude;
-//
-//        double maxLat = RealEstateApplication.currentMax.latitude;
-//        double maxLong = RealEstateApplication.currentMax.longitude;
-
-//        String polygonPattern = "POLYGON((%1$s %2$s,%3$s %4$s,%5$s %6$s,%7$s %8$s))";
-
-//        publisherRequestEnt.polygon = String.format(polygonPattern, minLat, minLong, maxLat,
-//                minLong, maxLat, maxLong, minLat, maxLong);
-        publisherRequestEnt.businessTypeS = "b";
-        publisherRequestEnt.codePostalS = "111";
-        publisherRequestEnt.roomNumberS = "1239";
 
         subscription = NetworkService.getListPublisher(publisherRequestEnt).subscribe(
                 new SubscriberImpl<List<Publisher>>() {

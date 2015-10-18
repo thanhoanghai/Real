@@ -19,7 +19,6 @@ public class PublisherRequestEnt {
     public int adminId;
     public int offsetS;
     public String propertyTypeS = "";
-    // public String isSale = PrefUtil.getAchatLocation().getParamName();
     public String rentSaleS = PrefUtil.getAchatLocation().getParamName();
     public String businessTypeS = "";
     public String surfaceMinS = PrefUtil.getSurfaceMinMax().split("-")[0].trim();
@@ -27,7 +26,7 @@ public class PublisherRequestEnt {
     public String priceMinS = PrefUtil.getPrixMinMax().split("-")[0].trim();
     public String priceMaxS = PrefUtil.getPrixMinMax().split("-")[1].trim();
     public String codePostalS = "";
-    public String roomNumberS = "";
+    public String roomNumberS = "" + PrefUtil.getRoomNumbers();
     public String keyWordS = PrefUtil.getMotsCles();
     public Constants.FilterOrderType orderByS = PrefUtil.getOrderBy();
 
