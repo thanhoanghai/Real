@@ -74,7 +74,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
     private ViewGroup groupData;
     private ViewGroup groupSellers;
 
-    private int adId;
+    private long adId;
 
     private PublisherDetailEnt publisherDetailEnt;
     private AdsDetailEnt adsDetailEnt;
@@ -86,7 +86,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
 
-        adId = getIntent().getExtras().getInt("adId");
+        adId = getIntent().getExtras().getLong("adId");
 
         adsView = (AdsImageView) findViewById(R.id.adsImageView);
         // adsView.setAdsUrl("http://www.webbanner24.com/blog/wp-content/uploads/2014/09/Top-5-Reasons-Why-You-Need-Banner-Ads.jpg");
@@ -225,7 +225,7 @@ public class DetailActivity extends BaseActivity implements OnMapReadyCallback,
         final ProgressDialog waitDialog = DialogUtils.showWaitDialog(this, true);
 
         final AdEnt adEnt = new AdEnt();
-        adEnt.adId = adId;
+        adEnt.adId = (int) adId;
         subscription = Observable.zip(NetworkService.getPublisherDetails(adEnt),
                 NetworkService.getPropertyDetails(adEnt),
                 new Func2<List<PublisherDetailEnt>, AdsDetailEnt, Object[]>() {

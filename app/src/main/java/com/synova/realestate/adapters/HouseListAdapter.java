@@ -19,9 +19,7 @@ import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.utils.Util;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by ducth on 6/13/15.
@@ -30,7 +28,6 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         View.OnClickListener {
 
     private List<AdsInfoResponseEnt> houses = new ArrayList<>();
-    private Set<Integer> selectedItems = new HashSet<>();
     private View.OnClickListener onBtnFavoriteClickListener;
 
     public void setOnBtnFavoriteClickListener(View.OnClickListener onBtnFavoriteClickListener) {
@@ -133,7 +130,7 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                         house.surface, house.distance);
                 holder.tvDescription.setText(Html.fromHtml(description));
 
-                holder.containerView.setBackgroundResource(selectedItems.contains(house.id)
+                holder.containerView.setBackgroundResource(AdsInfoResponseEnt.isRead(house.getId())
                         ? R.drawable.shape_grid_item_pressed_bg : R.drawable.selector_grid_item_bg);
 
                 // holder.btnFavorite.setImageResource(house.isFavorite ? R.drawable.ico_star_full
@@ -152,7 +149,7 @@ public class HouseListAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
             int position = parent.getChildAdapterPosition(v) - 1;
 
             AdsInfoResponseEnt adsInfoResponseEnt = houses.get(position);
-            selectedItems.add(adsInfoResponseEnt.id);
+            adsInfoResponseEnt.save();
             notifyDataSetChanged();
 
             onItemClickedListener.onItemClicked(parent, v, position, v.getId(), adsInfoResponseEnt);

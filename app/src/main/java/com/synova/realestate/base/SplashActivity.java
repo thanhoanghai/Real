@@ -12,6 +12,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.synova.realestate.R;
+import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.eventbus.LocationSettingsAllowanceEvent;
 import com.synova.realestate.models.eventbus.ReceivedCurrentLocationEvent;
 
@@ -53,6 +54,8 @@ public class SplashActivity extends Activity {
                 checkToNavigateToNextScreen();
             }
         }, 5000);
+
+        AdsInfoResponseEnt.deleteOldReadAds();
     }
 
     private void getLocation() {

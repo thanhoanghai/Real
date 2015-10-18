@@ -59,6 +59,19 @@
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="846dbbc88a0b05585573e6676922a11d9d28358e" />
+
+        <meta-data
+            android:name="DATABASE"
+            android:value="roof.db" />
+        <meta-data
+            android:name="VERSION"
+            android:value="1" />
+        <meta-data
+            android:name="QUERY_LOG"
+            android:value="false" />
+        <meta-data
+            android:name="DOMAIN_PACKAGE_NAME"
+            android:value="com.synova.realestate.model" />
     </application>
 
 </manifest>

@@ -65,7 +65,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
             final AdsInfoResponseEnt house = houseAdapter.getItems().get(position);
 
             if (house.isFavorite) {
-                NetworkService.removeFavorite("" + house.id).subscribe(
+                NetworkService.removeFavorite("" + house.getId()).subscribe(
                         new SubscriberImpl<Boolean>() {
                             @Override
                             public void onNext(Boolean isSuccess) {
@@ -81,7 +81,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
                             }
                         });
             } else {
-                NetworkService.addFavorite("" + house.id).subscribe(new SubscriberImpl<Boolean>() {
+                NetworkService.addFavorite("" + house.getId()).subscribe(new SubscriberImpl<Boolean>() {
                     @Override
                     public void onNext(Boolean isSuccess) {
                         if (isSuccess) {
@@ -247,7 +247,7 @@ public class TabGridFragment extends BaseFragment implements SwipeRefreshLayout.
     @Override
     public void onItemClicked(RecyclerView recyclerView, View view, int position, long id,
             AdsInfoResponseEnt adEnt) {
-        activity.showDetailActivity(adEnt.id);
+        activity.showDetailActivity(adEnt.getId());
     }
 
     @Override

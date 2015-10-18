@@ -99,7 +99,7 @@ public class BaseActivity extends AppCompatActivity {
         }
     }
 
-    public void showDetailActivity(int adId) {
+    public void showDetailActivity(long adId) {
         Intent intent = new Intent(this, DetailActivity.class);
         intent.putExtra("adId", adId);
         startActivity(intent);
