@@ -8,6 +8,7 @@
         <item name="vpiCirclePageIndicatorStyle">@style/CustomCirclePageIndicator</item>
         <item name="vpiTabPageIndicatorStyle">@style/CustomTabPageIndicator</item>
         <item name="android:textAllCaps">false</item>
+        <item name="android:windowActionBarOverlay">true</item>
     </style>
 
     <style name="CustomCirclePageIndicator">

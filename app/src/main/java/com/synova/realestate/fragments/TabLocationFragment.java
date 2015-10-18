@@ -4,7 +4,6 @@ package com.synova.realestate.fragments;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
@@ -13,8 +12,10 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -32,7 +33,9 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.synova.realestate.R;
+import com.synova.realestate.adapters.PublisherAdapter;
 import com.synova.realestate.base.BaseFragment;
 import com.synova.realestate.base.Constants;
 import com.synova.realestate.base.LocationService;
@@ -74,12 +77,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     private ImageView btnMenu;
 
-    private ViewGroup groupDetailBottom;
-    private ImageView ivThumbnail;
-    private TextView tvTitle;
-    private TextView tvDescription;
-    private TextView tvPrice;
-
     private Constants.NetworkLoadingState loadingState = Constants.NetworkLoadingState.NONE;
 
     private boolean isFirstTimeLoadData = false;
@@ -109,7 +106,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         rootView = inflater.inflate(R.layout.fragment_tab_location, container, false);
 
         setupMap();
-        setupGroupDetailBottom();
+        setupBottomPanel();
 
         btnMenu = (ImageView) rootView.findViewById(R.id.tab_location_btnMenu);
         btnMenu.setOnClickListener(this);
@@ -124,19 +121,64 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         return rootView;
     }
 
+    private SlidingUpPanelLayout slidingLayout;
+    private TextView tvScrollUpToViewMore;
+    private ListView lvBottom;
+    private PublisherAdapter publisherAdapter;
+
+    private void setupBottomPanel() {
+        slidingLayout = (SlidingUpPanelLayout) rootView.findViewById(R.id.slidingUpPanel);
+        slidingLayout.setPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
+            @Override
+            public void onPanelSlide(View panel, float slideOffset) {
+                mapFragment.getView().setVisibility(View.VISIBLE);
+            }
+
+            @Override
+            public void onPanelCollapsed(View panel) {
+
+            }
+
+            @Override
+            public void onPanelExpanded(View panel) {
+                mapFragment.getView().setVisibility(View.INVISIBLE);
+            }
+
+            @Override
+            public void onPanelAnchored(View panel) {
+
+            }
+
+            @Override
+            public void onPanelHidden(View panel) {
+
+            }
+        });
+
+        tvScrollUpToViewMore = (TextView) rootView.findViewById(R.id.location_tvScrollUpToViewMore);
+        tvScrollUpToViewMore.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                slidingLayout.setVisibility(View.GONE);
+            }
+        });
+
+        lvBottom = (ListView) rootView.findViewById(R.id.location_lvListBottom);
+        publisherAdapter = new PublisherAdapter();
+        lvBottom.setAdapter(publisherAdapter);
+        lvBottom.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Publisher publisher = publisherAdapter.getItem(position);
+                activity.showDetailActivity(publisher.nbAds);
+            }
+        });
+    }
+
     private void setupMap() {
         mapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentById(
                 R.id.tab_location_mapFragment);
         mapFragment.getMapAsync(this);
-    }
-
-    private void setupGroupDetailBottom() {
-        groupDetailBottom = (ViewGroup) rootView.findViewById(R.id.tab_location_groupDetailBottom);
-        groupDetailBottom.setOnClickListener(this);
-        ivThumbnail = (ImageView) rootView.findViewById(R.id.tab_location_bottom_ivThumbnail);
-        tvTitle = (TextView) rootView.findViewById(R.id.tab_location_bottom_tvTitle);
-        tvDescription = (TextView) rootView.findViewById(R.id.tab_location_bottom_tvDescription);
-        tvPrice = (TextView) rootView.findViewById(R.id.tab_location_bottom_tvPrice);
     }
 
     @Override
@@ -193,36 +235,31 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                         markers.clear();
                         map.clear();
 
-                        if (mapResponseEnts != null && mapResponseEnts.size() > 0) {
-                            List<LatLng> latLngs = new ArrayList<>();
-                            for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
-                                if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
-                                        && mapResponseEnt.elementType != null) {
-                                    Marker marker = createMarker(mapResponseEnt);
-                                    latLngs.add(marker.getPosition());
+                        List<LatLng> latLngs = new ArrayList<>();
+                        for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
+                            Marker marker = createMarker(mapResponseEnt);
+                            latLngs.add(marker.getPosition());
 
-                                    List<Marker> elementTypeMarkers = markers
-                                            .get(mapResponseEnt.elementType);
-                                    if (elementTypeMarkers == null) {
-                                        elementTypeMarkers = new ArrayList<>();
-                                        markers.put(mapResponseEnt.elementType, elementTypeMarkers);
-                                    }
-                                    elementTypeMarkers.add(marker);
+                            List<Marker> elementTypeMarkers = markers
+                                    .get(mapResponseEnt.elementType);
+                            if (elementTypeMarkers == null) {
+                                elementTypeMarkers = new ArrayList<>();
+                                markers.put(mapResponseEnt.elementType, elementTypeMarkers);
+                            }
+                            elementTypeMarkers.add(marker);
+                        }
+
+                        if (latLngs.size() > 0) {
+                            for (Constants.ElementType key : MainActivity.markersVisibility
+                                    .keySet()) {
+                                if (!MainActivity.markersVisibility.get(key)) {
+                                    setMarkersVisible(key, false);
                                 }
                             }
 
-                            if (latLngs.size() > 0) {
-                                for (Constants.ElementType key : MainActivity.markersVisibility
-                                        .keySet()) {
-                                    if (!MainActivity.markersVisibility.get(key)) {
-                                        setMarkersVisible(key, false);
-                                    }
-                                }
-
-                                if (isFirstTimeLoadData) {
-                                    isFirstTimeLoadData = false;
-                                    moveCameraToBound(latLngs, true);
-                                }
+                            if (isFirstTimeLoadData) {
+                                isFirstTimeLoadData = false;
+                                moveCameraToBound(latLngs, true);
                             }
                         }
 
@@ -308,7 +345,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
 
     @Override
     public void onMapClick(LatLng latLng) {
-        groupDetailBottom.setVisibility(View.INVISIBLE);
+        slidingLayout.setVisibility(View.GONE);
     }
 
     @Override
@@ -339,30 +376,30 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                         new SubscriberImpl<List<AdsInfoResponseEnt>>() {
                             @Override
                             public void onNext(List<AdsInfoResponseEnt> adsInfoResponseEnts) {
-                                if (adsInfoResponseEnts.size() == 0) {
-                                    return;
+                                if (adsInfoResponseEnts.size() > 0) {
+                                    List<Publisher> publishers = new ArrayList<>();
+                                    for (AdsInfoResponseEnt ads : adsInfoResponseEnts) {
+                                        Publisher publisher = new Publisher();
+                                        publisher.logoUrl = ads.imageUrl;
+                                        publisher.name = ads.title;
+                                        publisher.amount = Util
+                                                .convertMinMaxPriceToPrice(ads.mminMaxPrice);
+
+                                        publishers.add(publisher);
+                                    }
+
+                                    int padding = publishers.size() > 1 ? (int) activity
+                                            .getResources()
+                                            .getDimension(R.dimen.scroll_up_to_view_more_padding)
+                                            : 0;
+                                    tvScrollUpToViewMore.setPadding(0, 0, 0, padding);
+                                    slidingLayout.setVisibility(View.VISIBLE);
+
+                                    publisherAdapter.setItems(publishers);
+                                    publisherAdapter.notifyDataSetChanged();
+                                } else {
+                                    slidingLayout.setVisibility(View.GONE);
                                 }
-
-                                AdsInfoResponseEnt adsInfoResponseEnt = adsInfoResponseEnts
-                                        .get(0);
-
-                                if (!Util.isNullOrEmpty(adsInfoResponseEnt.imageUrl)) {
-                                    ivThumbnail.setImageURI(Uri
-                                            .parse(adsInfoResponseEnt.imageUrl));
-                                }
-
-                                tvTitle.setText(adsInfoResponseEnt.title);
-                                tvPrice.setText(adsInfoResponseEnt.mminMaxPrice);
-
-                                String description = String.format(activity
-                                        .getString(R.string.list_item_description_template),
-                                        adsInfoResponseEnt.roomNumber,
-                                        adsInfoResponseEnt.surface, adsInfoResponseEnt.distance);
-
-                                tvDescription.setText(description);
-
-                                groupDetailBottom.setVisibility(View.VISIBLE);
-                                groupDetailBottom.setTag(adsInfoResponseEnt.id);
                             }
                         });
                 break;
@@ -379,23 +416,19 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                         new SubscriberImpl<List<Publisher>>() {
                             @Override
                             public void onNext(List<Publisher> publishers) {
-                                if (publishers.size() == 0) {
-                                    return;
+                                if (publishers.size() > 0) {
+                                    int padding = publishers.size() > 1 ? (int) activity
+                                            .getResources()
+                                            .getDimension(R.dimen.scroll_up_to_view_more_padding)
+                                            : 0;
+                                    tvScrollUpToViewMore.setPadding(0, 0, 0, padding);
+                                    slidingLayout.setVisibility(View.VISIBLE);
+
+                                    publisherAdapter.setItems(publishers);
+                                    publisherAdapter.notifyDataSetChanged();
+                                } else {
+                                    slidingLayout.setVisibility(View.GONE);
                                 }
-
-                                Publisher publisher = publishers.get(0);
-
-                                if (!Util.isNullOrEmpty(publisher.logoUrl)) {
-                                    ivThumbnail.setImageURI(Uri.parse(publisher.logoUrl));
-                                }
-
-                                tvTitle.setText(publisher.name);
-                                tvPrice.setText(Util.formatPriceNumber(publisher.amount) + "€");
-
-                                tvDescription.setText(publisher.address);
-
-                                groupDetailBottom.setVisibility(View.VISIBLE);
-                                groupDetailBottom.setTag(publisher.nbAds);
                             }
                         });
                 break;
@@ -448,10 +481,6 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
         switch (v.getId()) {
             case R.id.tab_location_btnMenu:
                 ((MainActivity) activity).openDrawer();
-                break;
-            case R.id.tab_location_groupDetailBottom:
-                int adId = (int) groupDetailBottom.getTag();
-                activity.showDetailActivity(adId);
                 break;
         }
     }

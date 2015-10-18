@@ -46,7 +46,7 @@ public class NetworkService {
 
     private static final String TAG = NetworkService.class.getSimpleName();
 
-//    public static final String BASE_URL = "http://37.187.43.23:8080/RealEstateWS/service";
+    // public static final String BASE_URL = "http://37.187.43.23:8080/RealEstateWS/service";
     public static final String BASE_URL = "http://115.78.234.253:8080/RealEstateWS/service";
 
     private interface RestService {
@@ -113,7 +113,21 @@ public class NetworkService {
     }
 
     public static Observable<List<MapResponseEnt>> getMap(final MapRequestEnt mapRequestEnt) {
-        return request(restService.getMap(mapRequestEnt));
+        return request(restService.getMap(mapRequestEnt).flatMap(
+                new Func1<List<MapResponseEnt>, Observable<List<MapResponseEnt>>>() {
+                    @Override
+                    public Observable<List<MapResponseEnt>> call(
+                            List<MapResponseEnt> mapResponseEnts) {
+                        List<MapResponseEnt> temp = new ArrayList<>();
+                        for (MapResponseEnt mapResponseEnt : mapResponseEnts) {
+                            if (mapResponseEnt.id != 0 && mapResponseEnt.pointGeom != null
+                                    && mapResponseEnt.elementType != null) {
+                                temp.add(mapResponseEnt);
+                            }
+                        }
+                        return Observable.just(temp);
+                    }
+                }));
     }
 
     public static Observable<AdsDetailEnt> getPropertyDetails(AdEnt adEnt) {

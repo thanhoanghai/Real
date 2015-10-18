@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,20 +10,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <include
-        android:id="@+id/tab_location_groupDetailBottom"
-        layout="@layout/layout_tab_location_bottom_detail"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:visibility="invisible" />
-
     <ImageView
         android:id="@+id/tab_location_btnMenu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/tab_location_groupDetailBottom"
-        android:layout_marginBottom="10dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/bottom_panel_item_height"
         android:src="@drawable/ico_map_menu" />
 
     <ProgressBar
@@ -33,5 +26,40 @@
         android:layout_centerInParent="true"
         android:indeterminate="true"
         android:visibility="gone" />
+
+    <com.sothree.slidinguppanel.SlidingUpPanelLayout
+        android:id="@+id/slidingUpPanel"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="bottom"
+        android:visibility="gone"
+        app:umanoPanelHeight="@dimen/bottom_panel_item_height"
+        app:umanoScrollableView="@+id/location_lvListBottom"
+        app:umanoShadowHeight="4dp">
+
+        <TextView
+            android:id="@+id/location_tvScrollUpToViewMore"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/lighter_trans_black"
+            android:gravity="center_horizontal|bottom"
+            android:text="(Scroll up to view more)"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <FrameLayout
+            android:id="@+id/location_listContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ListView
+                android:id="@+id/location_lvListBottom"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:divider="@drawable/shape_divider"
+                android:dividerHeight="1px" />
+        </FrameLayout>
+    </com.sothree.slidinguppanel.SlidingUpPanelLayout>
 
 </RelativeLayout>
