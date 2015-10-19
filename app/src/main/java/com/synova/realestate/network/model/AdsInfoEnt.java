@@ -28,7 +28,7 @@ public class AdsInfoEnt {
     public String codePostalS = PrefUtil.getPostalCode();
     public String roomNumberS = "" + PrefUtil.getRoomNumbers();
     public String keyWordS = PrefUtil.getMotsCles();
-    public Constants.FilterOrderType orderByS = Constants.FilterOrderType.DISTANCE_ASC;
+    public Constants.FilterOrderType orderByS = PrefUtil.getOrderBy();
 
     public AdsInfoEnt() {
         List<Constants.PropertyType> types = PrefUtil.getTypeDeBiens();

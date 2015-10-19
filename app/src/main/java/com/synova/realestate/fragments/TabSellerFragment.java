@@ -119,6 +119,7 @@ public class TabSellerFragment extends BaseFragment implements
         loadingState = Constants.ListLoadingState.SWIPE_REFRESH;
 
         publisherRequestEnt = new PublisherRequestEnt();
+        publisherRequestEnt.orderByS = Constants.FilterOrderType.DISTANCE_ASC;
 
         subscription = NetworkService.getListPublisher(publisherRequestEnt).subscribe(
                 new SubscriberImpl<List<Publisher>>() {

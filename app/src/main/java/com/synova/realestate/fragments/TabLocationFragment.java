@@ -371,6 +371,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 adsInfoEnt.propertyTypeS = Constants.PropertyType.APPARTEMENT.getName();
                 adsInfoEnt.xLocalisation = marker.getPosition().longitude;
                 adsInfoEnt.yLocalisation = marker.getPosition().latitude;
+                adsInfoEnt.orderByS = Constants.FilterOrderType.DISTANCE_ASC;
 
                 subscription = NetworkService.getAdsInfo(adsInfoEnt).subscribe(
                         new SubscriberImpl<List<AdsInfoResponseEnt>>() {
@@ -412,6 +413,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                 publisherRequestEnt.propertyTypeS = Constants.PropertyType.APPARTEMENT.getName();
                 publisherRequestEnt.xLocalisation = marker.getPosition().longitude;
                 publisherRequestEnt.yLocalisation = marker.getPosition().latitude;
+                publisherRequestEnt.orderByS = Constants.FilterOrderType.DISTANCE_ASC;
 
                 subscription = NetworkService.getListPublisher(publisherRequestEnt).subscribe(
                         new SubscriberImpl<List<Publisher>>() {
