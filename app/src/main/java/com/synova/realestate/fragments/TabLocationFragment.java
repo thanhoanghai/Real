@@ -170,7 +170,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Publisher publisher = publisherAdapter.getItem(position);
-                activity.showDetailActivity(publisher.nbAds);
+                activity.showDetailActivity(publisher.pid);
             }
         });
     }
@@ -380,6 +380,7 @@ public class TabLocationFragment extends BaseFragment implements OnMapReadyCallb
                                     List<Publisher> publishers = new ArrayList<>();
                                     for (AdsInfoResponseEnt ads : adsInfoResponseEnts) {
                                         Publisher publisher = new Publisher();
+                                        publisher.pid = ads.getId().intValue();
                                         publisher.logoUrl = ads.imageUrl;
                                         publisher.name = ads.title;
                                         publisher.amount = Util

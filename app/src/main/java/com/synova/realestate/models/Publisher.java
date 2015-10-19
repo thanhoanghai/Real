@@ -8,6 +8,7 @@ import com.synova.realestate.base.Constants;
  */
 public class Publisher {
 
+    public int pid;
     public int amount;
     public int nbAds;
     public String address;

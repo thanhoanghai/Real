@@ -27,7 +27,7 @@ public class PublisherPropertyEnt {
     public String surfaceMaxS = PrefUtil.getSurfaceMinMax().split("-")[1].trim();
     public String priceMinS = PrefUtil.getPrixMinMax().split("-")[0].trim();
     public String priceMaxS = PrefUtil.getPrixMinMax().split("-")[1].trim();
-    public String codePostalS = "";
+    public String codePostalS = PrefUtil.getPostalCode();
     public String roomNumberS = "" + PrefUtil.getRoomNumbers();
     public String keyWordS = PrefUtil.getMotsCles();
     public Constants.FilterOrderType orderByS = PrefUtil.getOrderBy();

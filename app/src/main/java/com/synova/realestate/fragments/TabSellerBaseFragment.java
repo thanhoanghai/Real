@@ -18,7 +18,6 @@ import com.synova.realestate.network.model.PublisherRequestEnt;
 public class TabSellerBaseFragment extends BaseFragment {
 
     private TabSellerFragment tabSellerFragment;
-    private SellerPropertyFragment sellerPropertyFragment;
 
     @Override
     protected View onFirstTimeCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -38,9 +37,7 @@ public class TabSellerBaseFragment extends BaseFragment {
     }
 
     public void showSellerPropertyFragment(PublisherRequestEnt publisherRequestEnt) {
-        if (sellerPropertyFragment == null) {
-            sellerPropertyFragment = new SellerPropertyFragment();
-        }
+        SellerPropertyFragment sellerPropertyFragment = new SellerPropertyFragment();
         sellerPropertyFragment.setPublisherRequestEnt(publisherRequestEnt);
         pushChildFragment(sellerPropertyFragment, Constants.TransitionType.NONE, true);
     }

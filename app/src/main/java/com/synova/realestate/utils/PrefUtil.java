@@ -27,6 +27,7 @@ public class PrefUtil {
     private static final String KEY_SURFACE_MIN_MAX = "6";
     private static final String KEY_ORDER_BY = "7";
     private static final String KEY_ROOM_NUMBERS = "8";
+    private static final String KEY_POSTAL_CODE = "9";
 
     private static SharedPreferences pref = null;
 
@@ -126,5 +127,15 @@ public class PrefUtil {
 
     public static int getRoomNumbers() {
         return pref.getInt(KEY_ROOM_NUMBERS, 1);
+    }
+
+    public static String getPostalCode() {
+        return pref.getString(KEY_POSTAL_CODE, "");
+    }
+
+    public static void setPostalCode(String postalCode) {
+        SharedPreferences.Editor editor = pref.edit();
+        editor.putString(KEY_POSTAL_CODE, postalCode);
+        editor.commit();
     }
 }

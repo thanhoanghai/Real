@@ -4,6 +4,7 @@ package com.synova.realestate.base;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.location.Address;
 import android.location.Location;
 import android.util.Log;
 
@@ -16,11 +17,14 @@ import com.google.android.gms.location.LocationSettingsStatusCodes;
 import com.synova.realestate.models.eventbus.LocationSettingsAllowanceEvent;
 import com.synova.realestate.utils.LogUtil;
 
+import java.util.List;
+
 import de.greenrobot.event.EventBus;
 import pl.charmas.android.reactivelocation.ReactiveLocationProvider;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action1;
+import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 /**
@@ -30,6 +34,7 @@ public class LocationService {
 
     private static final String TAG = LocationService.class.getSimpleName();
     private static final int REQUEST_CHECK_SETTINGS = 1000;
+    private static final int MAX_ADDRESS = 1;
 
     private static LocationService locationService;
 
@@ -94,6 +99,24 @@ public class LocationService {
 
         ReactiveLocationProvider locationProvider = new ReactiveLocationProvider(activity);
         return locationProvider.getUpdatedLocation(request);
+    }
+
+    public Observable<Address> getAddressFromLocation(Activity activity, double lat,
+            double lon) {
+        ReactiveLocationProvider locationProvider = new ReactiveLocationProvider(activity);
+        return prepareObservable(locationProvider
+                .getReverseGeocodeObservable(lat, lon, MAX_ADDRESS)).filter(
+                new Func1<List<Address>, Boolean>() {
+                    @Override
+                    public Boolean call(List<Address> addresses) {
+                        return addresses != null && addresses.size() > 0;
+                    }
+                }).flatMap(new Func1<List<Address>, Observable<Address>>() {
+            @Override
+            public Observable<Address> call(List<Address> addresses) {
+                return Observable.just(addresses.get(0));
+            }
+        });
     }
 
     public void onActivityResult(int requestCode, int resultCode, Intent data) {

@@ -148,6 +148,7 @@ public class TabSellerFragment extends BaseFragment implements
     @Override
     public void onItemClicked(RecyclerView recyclerView, View view, int position, long id,
             Publisher publisher) {
+        publisherRequestEnt.publisherId = publisher.pid;
         ((TabSellerBaseFragment) getParentFragment())
                 .showSellerPropertyFragment(publisherRequestEnt);
     }

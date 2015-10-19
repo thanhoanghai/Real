@@ -3,6 +3,7 @@ package com.synova.realestate.base;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.location.Address;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import com.synova.realestate.R;
 import com.synova.realestate.models.AdsInfoResponseEnt;
 import com.synova.realestate.models.eventbus.LocationSettingsAllowanceEvent;
 import com.synova.realestate.models.eventbus.ReceivedCurrentLocationEvent;
+import com.synova.realestate.utils.PrefUtil;
 
 import java.util.concurrent.CountDownLatch;
 
@@ -66,10 +68,37 @@ public class SplashActivity extends Activity {
                         RealEstateApplication.currentLocation = location;
                         RealEstateApplication.isMyLocationParis = false;
 
-                        EventBus.getDefault().postSticky(new ReceivedCurrentLocationEvent());
+                        if (PrefUtil.getPostalCode().length() == 0) {
+                            LocationService
+                                    .getInstance()
+                                    .getAddressFromLocation(SplashActivity.this,
+//                                            48.9306, 2.1475
+                                            location.getLatitude(), location.getLongitude()
+                                    )
+                                    .subscribe(new SubscriberImpl<Address>() {
+                                        @Override
+                                        public void onNext(Address address) {
+                                            String postalCode = address.getPostalCode();
+                                            if (postalCode != null && postalCode.length() > 0) {
+                                                PrefUtil.setPostalCode(postalCode);
+                                            }
 
-                        countDownLatch.countDown();
-                        checkToNavigateToNextScreen();
+                                            navigateToNextScreen();
+                                        }
+
+                                        @Override
+                                        public void onError(Throwable e) {
+                                            navigateToNextScreen();
+                                        }
+                                    });
+                        } else {
+                            navigateToNextScreen();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        navigateToNextScreen();
                     }
                 });
     }
@@ -107,6 +136,13 @@ public class SplashActivity extends Activity {
             startActivity(new Intent(SplashActivity.this, MainActivity.class));
             finish();
         }
+    }
+
+    private void navigateToNextScreen() {
+        EventBus.getDefault().postSticky(new ReceivedCurrentLocationEvent());
+
+        countDownLatch.countDown();
+        checkToNavigateToNextScreen();
     }
 
     private void checkToNavigateToNextScreen() {
